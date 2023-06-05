@@ -12,41 +12,19 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
-   
- * FILObuffer.c
- * Created on: Aug 18, 2022
+ 
+ AnyCRC.h
+ Created on: Sep 20, 2020
 *********************************************************************************/
+#ifndef ANY_CRC_H_
+#define ANY_CRC_H_
 
-#include "FILObuffer.h"
+#include "main.h"
+#include "math.h"
+#include "stdlib.h"
 
-//---------------------------------------------------------------------------
-void FILO_Init(filo_t *q) {
-	q->ind = 0;
-	q->bytes_avail = 0;
-	q->lockState = BUFFER_FREE;
-}
+uint32_t HW_CRC32(const uint8_t* pData, size_t count, uint32_t init);
 
-uint8_t FILO_PutOne(filo_t *q, int32_t data) {
-	if(q->buffer_size == q->bytes_avail){
-		return 0;
-	}
-	q->buffer[q->ind] = data;
-	q->ind += 1;
-	q->bytes_avail += 1;
-	return 1;
-}
+uint32_t crc32_zlib(const uint32_t *data, size_t cnt);
 
-uint8_t FILO_GetOne(filo_t *q, int32_t *data) {
-  if(q->bytes_avail == 0){
-      return 0;
-  }
-  if (q->ind > 0) {
-		q->ind -= 1;
-		*data = q->buffer[q->ind];
-		q->bytes_avail -= 1;
-    return 1;
-  } else {
-  	return 0;
-  }
-}
-
+#endif /* ANY_CRC_H_ */

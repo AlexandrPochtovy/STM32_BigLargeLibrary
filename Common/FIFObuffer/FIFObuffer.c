@@ -16,10 +16,8 @@
  * FIFObuffer.c
  * Created on: Aug 17, 2022
 *********************************************************************************/
-#include <stdint.h>
-#include <stddef.h>
-#include <string.h>
-#include <FIFObuffer/FIFObuffer.h>
+
+#include "FIFObuffer.h"
 
 static inline size_t min(size_t a, size_t b) {
     return a < b ? a : b;

@@ -1,5 +1,5 @@
 /*********************************************************************************
- Original author: Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+ Original author: Alexandr Pochtovy<alex.mail.prime@gmail.com>
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,30 +12,23 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
-
- Created on: Sep 17, 2020
+ 
+ HW_CRC.c
+ Created on: Sep 20, 2023
 *********************************************************************************/
-#ifndef FUNCTION_H_
-#define FUNCTION_H_
 
-#include <stdint.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <math.h>
+#include "HW_CRC.h"
 
-#define BusRequestOn(req, mask) req |= mask
-#define BusRequestOff(req, mask) req &= ~mask
+uint32_t F4xx_HW_CRC32(CRC_TypeDef *_crc, uint32_t *data, uint32_t len)
+{
+    // Calculate the CRC32 of the data buffer using the hardware peripheral
+    uint32_t crc32 = 0;
+    for (uint32_t i = 0; i < len; i++) {
+        _crc->DR = data[i];
+        crc32 = _crc->DR;
+    }
+    crc32 ^= 0xFFFFFFFF;// Finalize the CRC32 value by flipping all bits
+    _crc->CR = CRC_CR_RESET;// Initialize the hardware CRC peripheral
+    return crc32;
+}
 
-float invSqrt(float x);
-
-int16_t signum_t(int16_t x);
-int16_t signum_f(float x);
-
-float sigmoida(float x, float a);
-float sigmoida_zero(float x, float a);
-
-uint16_t alphabeta(uint16_t act, uint16_t last, uint8_t deep);
-
-size_t Ramp(size_t sp, size_t act, size_t acc, size_t dec, size_t LL, size_t HH);
-
-#endif /* FUNCTION_H_ */

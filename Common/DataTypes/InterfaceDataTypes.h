@@ -38,10 +38,11 @@ typedef enum PortStatus {	//состояние порта используетс
  * used to display the status of the process of working with the device for the main code
  */
 typedef enum DeviceStatus {//состояние устройства на шине
-	INIT,	//устройство не настроено
-	OK,		//устройство настроено опрос выполняется без ошибок
-	ERROR,	//опрос данных завершился с ошибкой
-	FAULTH	//ошибки при опросе устройства, потеря связи и тд
+	DEVICE_NOT_INIT,//устройство не настроено
+	DEVICE_INIT,		//устройство настроено
+	DEVICE_DONE,		//опрос выполняется без ошибок
+	DEVICE_ERROR,		//опрос данных завершился с ошибкой
+	DEVICE_FAULTH		//ошибки при опросе устройства, потеря связи и тд
 } DeviceStatus_t;
 
 

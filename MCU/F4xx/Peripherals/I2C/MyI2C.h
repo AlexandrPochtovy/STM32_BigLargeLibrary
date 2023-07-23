@@ -14,7 +14,7 @@
    limitations under the License.
 
  * 	MyI2C.h
- *	Created on: 30 nov. 2020
+ *	Created on: 30 nov. 2021
  */
 #ifndef _MYI2C_H_
 #define _MYI2C_H_
@@ -26,7 +26,7 @@ extern "C" {
 #include "main.h"
 #include "DataTypes/InterfaceDataTypes.h"
 #include "FIFObuffer/FIFObuffer.h"
-#include "Peripherals/DMA_Template/DMA_Template.h"
+//#include "Peripherals/DMA_Template/DMA_Template.h"
 
 //========================================================================================================================
 /*	команда работы с устройством: чтение или запись данных, используется как переключатель

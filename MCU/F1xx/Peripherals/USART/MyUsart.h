@@ -21,9 +21,9 @@
 
 #include "main.h"
 
-#include "Common/DataTypes/InterfaceDataTypes.h"
-#include "Common/FIFObuffer/FIFObuffer.h"
-#include "DMA_Template/DMA_Template.h"
+#include "DataTypes/InterfaceDataTypes.h"
+#include "FIFObuffer/FIFObuffer.h"
+//#include "DMA_Template/DMA_Template.h"
 #ifdef DMA_H
 	#include "DMA_Template/DMA_Template.h"
 #endif
@@ -34,10 +34,10 @@
 	 */
 	typedef struct USART_Connection {
 		USART_TypeDef *USART;		//pointer to HW USART port
-		Port_Status_t txStatus;	//status USART port
+		PortStatus_t txStatus;	//status USART port
 		fifo_t *txbuffer;				//pointer circular buffer
 		uint8_t txlen;					//length data
-		Port_Status_t rxStatus;	//status USART port
+		PortStatus_t rxStatus;	//status USART port
 		fifo_t *rxbuffer;				//pointer circular buffer
 		uint8_t rxlen;					//length data
 	} USART_Connection_t;

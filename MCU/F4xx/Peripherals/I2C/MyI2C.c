@@ -208,38 +208,3 @@ void I2C_ERR_IRQ_CallBack(I2C_IRQ_Connection_t *_i2c) {
 	_i2c->status = PORT_FREE;
 }
 //=============================================================================
-void ClearBusyI2C1(void){
-	volatile static uint8_t step = 0;
-	//I2C1 GPIO Configuration
-	//PB6 ------> I2C1_SCL
-	//PB7 ------> I2C1_SDA
-	if (step == 0) {
-	LL_I2C_Disable(I2C1);														//1 I2C disable
-	LL_GPIO_SetPinMode(GPIOB, LL_GPIO_PIN_6|LL_GPIO_PIN_7, LL_GPIO_MODE_OUTPUT);//2 change SDA SCL to output
-	LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_6|LL_GPIO_PIN_7);					//2	set SDA SCL "1"
-	step++;
-	}
-	if (step == 1 && LL_GPIO_IsOutputPinSet(GPIOB, LL_GPIO_PIN_6|LL_GPIO_PIN_7)) {	//3 check SDA SCL = 1
-		LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_7);								//4 set SDA = 0
-		step++;
-	}
-	if (step == 2 && !LL_GPIO_IsOutputPinSet(GPIOB, LL_GPIO_PIN_7)) {	//5 check SDA = 0
-		LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_6);					//6 set SCL = 0
-		step++;
-	}
-	if (step == 3 && !LL_GPIO_IsOutputPinSet(GPIOB, LL_GPIO_PIN_6)) {	//7 check SCL = 0
-		LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_6);						//8 set SCL = 1
-		step++;
-	}
-	if (step == 4 && LL_GPIO_IsOutputPinSet(GPIOB, LL_GPIO_PIN_6)) {	//9 check SCL = 1
-		LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_7);						//10 set SDA = 1
-		step++;
-	}
-	if (step == 5 && LL_GPIO_IsOutputPinSet(GPIOB, LL_GPIO_PIN_7)) {	//11 check SDA = 1
-		LL_GPIO_SetPinMode(GPIOB, LL_GPIO_PIN_6|LL_GPIO_PIN_7, LL_GPIO_MODE_ALTERNATE);//12
-		LL_I2C_EnableReset(I2C1);
-		LL_I2C_DisableReset(I2C1);
-		step = 0;
-	}
-}
-//=============================================================================

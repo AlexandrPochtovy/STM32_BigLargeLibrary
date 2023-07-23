@@ -14,8 +14,8 @@
    limitations under the License.
 
  * 	ADXL345.h
- *	Created on: 31.01.2022
- ********************************************************************************/
+ * 	Created on: 31.01.2022
+ */
 
 #ifndef ADXL345_H_
 #define ADXL345_H_
@@ -25,8 +25,8 @@ extern "C" {
 #endif
 
 #include "main.h"
-#include "ADXL345_Register.h"
 #include "I2C/MyI2C.h"
+#include "ADXL345_Register.h"
 
 enum ADXL345_ADDRESS {
 	ADXL345_ADDR = 0xA6//Assumes ALT address pin low
@@ -49,14 +49,15 @@ typedef struct ADXL345_data {
 //common data struct for sensor
 typedef struct ADXL345 {
 	const uint8_t addr;
+	uint8_t step;
 	Device_status_t status;
 	ADXL345_RAW_t raw;
 	ADXL345_data_t data;
 } ADXL345_t;
 
-uint8_t ADXL345_Init(I2C_Connection_t *_i2c, ADXL345_t *dev);
-uint8_t ADXL345_GetData(I2C_Connection_t *_i2c, ADXL345_t *dev);
-float ADXL345_ConvertData (int16_t raw, uint8_t range);
+uint8_t ADXL345_Init(I2C_Connection *_i2c, ADXL345_t *dev);
+uint8_t ADXL345_GetData(I2C_Connection *_i2c, ADXL345_t *dev);
+float ADXL345_ConvertData (int16_t raw);
 
 #ifdef __cplusplus
 }

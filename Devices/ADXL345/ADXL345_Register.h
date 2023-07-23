@@ -15,7 +15,7 @@
 
  * 	ADXL345_Register.h
  *	Created on: 31.01.2022
- ********************************************************************************/
+ */
 
 #ifndef ADXL345_REGISTER_H_
 #define ADXL345_REGISTER_H_

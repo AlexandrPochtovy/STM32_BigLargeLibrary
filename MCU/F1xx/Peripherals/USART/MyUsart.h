@@ -21,9 +21,9 @@
 
 #include "main.h"
 
-#include "Common/DataTypes/InterfaceDataTypes.h"
-#include "Common/FIFObuffer/FIFObuffer.h"
-#include "DMA_Template/DMA_Template.h"
+#include "DataTypes/InterfaceDataTypes.h"
+#include "FIFObuffer/FIFObuffer.h"
+//#include "DMA_Template.h"
 #ifdef DMA_H
 	#include "DMA_Template/DMA_Template.h"
 #endif

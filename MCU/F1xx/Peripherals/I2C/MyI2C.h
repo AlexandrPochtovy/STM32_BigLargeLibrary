@@ -24,9 +24,9 @@ extern "C" {
 #endif
 
 #include "main.h"
-#include "Common/DataTypes/InterfaceDataTypes.h"
-#include "Common/FIFObuffer/FIFObuffer.h"
-#include "DMA_Template/DMA_Template.h"
+#include "DataTypes/InterfaceDataTypes.h"
+#include "FIFObuffer/FIFObuffer.h"
+//#include "DMA_Template.h"
 
 //========================================================================================================================
 /*	команда работы с устройством: чтение или запись данных, используется как переключатель

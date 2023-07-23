@@ -1,0 +1,1 @@
+Simple Digital Accelerometer ADXL345 i2c driver for STM32 MCU.

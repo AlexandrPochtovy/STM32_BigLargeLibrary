@@ -29,13 +29,12 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (((uint16_t) msb << 8) | (uint16_t) lsb);
 }
 
-uint8_t ADXL345_Init(I2C_Connection *_i2c, ADXL345_t *dev) {
-	uint8_t cfg[14];
+uint8_t ADXL345_Init(I2C_IRQ_Connection_t *_i2c, ADXL345_t *dev) {
 	if (_i2c->status == PORT_FREE) {//send setup
 		_i2c->addr = dev->addr;
 		switch (dev->step) {
 			case 0: { //setup TAP FreeFall Threshold and Offsets 0x1D..0x2A registers
-				dev->status = INIT;
+				dev->status = DEVICE_NOT_INIT;
 				FIFO_PutOne(_i2c->buffer, ADXL345_THRESH_TAP_REG);
 				_i2c->len = 14;
 				_i2c->mode = I2C_MODE_WRITE;
@@ -72,18 +71,18 @@ uint8_t ADXL345_Init(I2C_Connection *_i2c, ADXL345_t *dev) {
 				FIFO_PutOne(_i2c->buffer, ADXL345_DATA_FORMAT_REG);
 				_i2c->len = 1;
 				_i2c->mode = I2C_MODE_WRITE;
-				PutOne(_i2c->buffer, 0x00);
+				FIFO_PutOne(_i2c->buffer, 0x00);
 				dev->step = 3;
 				break;
 			case 3: //setup FIFO
 				FIFO_PutOne(_i2c->buffer, ADXL345_FIFO_CTL_REG);
 				_i2c->len = 1;
 				_i2c->mode = I2C_MODE_WRITE;
-				PutOne(_i2c->buffer, 0x00);
+				FIFO_PutOne(_i2c->buffer, 0x00);
 				dev->step = 4;
 				break;
 			case 4:
-				dev->status = DEVICE_DONE;
+				dev->status = DEVICE_INIT;
 				dev->step = 0;
 				return 1;
 			default:
@@ -116,7 +115,7 @@ float ADXL345_ConvertData(int16_t raw) {
 	}
 }
 
-uint8_t ADXL345_GetData(I2C_Connection *_i2c, ADXL345_t *dev) {
+uint8_t ADXL345_GetData(I2C_IRQ_Connection_t *_i2c, ADXL345_t *dev) {
 	uint8_t val[ADXL345_DATA_LENGHT];
 	if (_i2c->status == PORT_FREE) {//
 		_i2c->addr = dev->addr;
@@ -128,7 +127,7 @@ uint8_t ADXL345_GetData(I2C_Connection *_i2c, ADXL345_t *dev) {
 				dev->step = 1;
 				break;
 			case 1: { //convert data
-				GetMulti(_i2c->buffer, val, ADXL345_DATA_LENGHT);
+				FIFO_GetMulti(_i2c->buffer, val, ADXL345_DATA_LENGHT);
 				dev->raw.X = (int16_t)CONCAT_BYTES(val[1], val[0]);
 				dev->data.X = ADXL345_ConvertData(dev->raw.X);
 				dev->raw.Y = (int16_t)CONCAT_BYTES(val[3], val[2]);

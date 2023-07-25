@@ -1,0 +1,1 @@
+Simple 3-Axis Digital Compass IC HMC5883L i2c driver for STM MCU.

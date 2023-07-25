@@ -55,8 +55,8 @@ typedef struct ADXL345 {
 	ADXL345_data_t data;
 } ADXL345_t;
 
-uint8_t ADXL345_Init(I2C_Connection *_i2c, ADXL345_t *dev);
-uint8_t ADXL345_GetData(I2C_Connection *_i2c, ADXL345_t *dev);
+uint8_t ADXL345_Init(I2C_Connection_t *_i2c, ADXL345_t *dev);
+uint8_t ADXL345_GetData(I2C_Connection_t *_i2c, ADXL345_t *dev);
 float ADXL345_ConvertData (int16_t raw);
 
 #ifdef __cplusplus

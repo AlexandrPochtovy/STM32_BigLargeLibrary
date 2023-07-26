@@ -23,12 +23,9 @@
 extern "C" {
 #endif
 
-#include "main.h"
 #include "math.h"
 #include "ITG3205_Register.h"
-#include "I2C/MyI2C.h"
-
-#define ITG3205_DATA_LEN 8
+#include "Peripherals/I2C/MyI2C.h"
 
 enum ITG3205_ADDRESS {
 	ITG3205_ADDR = 0xD0
@@ -50,13 +47,13 @@ typedef struct ITG3205_data_t {
 //common data struct for sensor
 typedef struct ITG3205 {
 	const uint8_t addr;
-	Device_status_t status;
+	DeviceStatus_t status;
 	ITG3205_RAW raw;
 	ITG3205_data data;
 } ITG3205_t;
 //===========================================================================
-uint8_t ITG3205_Init(I2C_Connection_t *_i2c, ITG3205_t *dev);
-uint8_t ITG3205_GetData(I2C_Connection_t *_i2c, ITG3205_t *dev);
+uint8_t ITG3205_Init(I2C_IRQ_Connection_t *_i2c, ITG3205_t *dev);
+uint8_t ITG3205_GetData(I2C_IRQ_Connection_t *_i2c, ITG3205_t *dev);
 
 #ifdef __cplusplus
 }

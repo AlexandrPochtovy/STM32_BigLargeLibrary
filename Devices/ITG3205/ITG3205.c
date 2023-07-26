@@ -21,16 +21,17 @@
 
 static const float Chip_GYRO_LSB = 14.375;
 static const uint16_t Chip_TEMP_LSB = 280;
+static const uint8_t ITG3205_DATA_LEN = 8;
 
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (uint16_t)(((uint16_t)msb << 8) | (uint16_t)lsb);
 }
 
-uint8_t ITG3205_Init(I2C_Connection_t *_i2c, ITG3205_t *dev) {
+uint8_t ITG3205_Init(I2C_IRQ_Connection_t *_i2c, ITG3205_t *dev) {
 	if (_i2c->status == PORT_FREE) { //send setup
 		switch (_i2c->step) {
 		case 0: //reset first
-			dev->status = INIT;
+			dev->status = DEVICE_NOT_INIT;
 			_i2c->addr = dev->addr;
 			FIFO_PutOne(_i2c->buffer, ITG3205_PWR_MGM);
 			FIFO_PutOne(_i2c->buffer, ITG3205_PWR_MGM_RESET);
@@ -59,7 +60,7 @@ uint8_t ITG3205_Init(I2C_Connection_t *_i2c, ITG3205_t *dev) {
 			_i2c->step = 3;
 			break;}
 		case 3:
-			dev->status = OK;
+			dev->status = DEVICE_INIT;
 			_i2c->step = 0;
 			return 1;
 			break;
@@ -72,7 +73,7 @@ uint8_t ITG3205_Init(I2C_Connection_t *_i2c, ITG3205_t *dev) {
 	return 0;
 }
 
-uint8_t ITG3205_GetData(I2C_Connection_t *_i2c, ITG3205_t *dev) {
+uint8_t ITG3205_GetData(I2C_IRQ_Connection_t *_i2c, ITG3205_t *dev) {
 	if (_i2c->status == PORT_FREE) {
 		switch (_i2c->step) {
 		case 0:
@@ -93,7 +94,7 @@ uint8_t ITG3205_GetData(I2C_Connection_t *_i2c, ITG3205_t *dev) {
 			dev->data.X = (float) dev->raw.X / Chip_GYRO_LSB * M_PI / 180;
 			dev->data.Y = (float) dev->raw.Y / Chip_GYRO_LSB * M_PI / 180;
 			dev->data.Z = (float) dev->raw.Z / Chip_GYRO_LSB * M_PI / 180;
-			dev->status = OK;
+			dev->status = DEVICE_DONE;
 			_i2c->step = 0;
 			return 1;
 			break;}

@@ -1,0 +1,1 @@
+Simple 3-Axis Magnetic Sensor QMC5883L i2c driver for STM32F1xx.

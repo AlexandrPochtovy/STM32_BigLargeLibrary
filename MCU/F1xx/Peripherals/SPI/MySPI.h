@@ -16,8 +16,6 @@
  * 	MySPI.h
  *  Created on: 30 nov 2020
  */
-#ifdef __SPI_H__
-
 #ifndef SPI_MYSPI_H_
 #define SPI_MYSPI_H_
 
@@ -26,9 +24,9 @@ extern "C" {
 #endif
 
 #include "main.h"
-#include "Common/DataTypes/InterfaceDataTypes.h"
-#include "Common/FIFObuffer/FIFObuffer.h"
-#include "DMA_Template/DMA_Template.h"
+#include "DataTypes/InterfaceDataTypes.h"
+#include "FIFObuffer/FIFObuffer.h"
+#include "Peripherals/DMA_Template/DMA_Template.h"
 
 typedef enum SPI_Mode {	//команда работы с устройством: чтение или запись данных
 	SPI_MODE_WRITE,	//полудуплекс запись в шину
@@ -43,11 +41,11 @@ typedef enum SPI_Mode {	//команда работы с устройством:
  */
 typedef struct SPI_Conn {
 	SPI_TypeDef *SPIbus;	//pointer to HW SPI port
-	Port_Status_t status;	//status port
+	PortStatus_t status;	//status port
 	//SPI_Mode_t mode;			//read write mode
-	fifo_t txbuffer;		//pointer circular buffer
+	fifo_t *txbuffer;		//pointer circular buffer
 	uint8_t txlen;			//length data
-	fifo_t rxbuffer;		//pointer circular buffer
+	fifo_t *rxbuffer;		//pointer circular buffer
 	uint8_t rxlen;			//length data
 } SPI_Connection_t;
 
@@ -64,5 +62,3 @@ void SPI_IRQ_DMA_CallBack(SPI_Connection_t *_spi);
 #endif
 
 #endif /* SRC_MYSPI_H_ */
-
-#endif

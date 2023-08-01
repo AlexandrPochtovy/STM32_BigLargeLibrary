@@ -16,15 +16,13 @@
  * 	MySPI.c
  *  Created on: 30 nov 2020
  */
-#ifdef SPI_H
-
 #include "MySPI.h"
 
 void SPI_Start_IRQ_HWNSS(SPI_Connection_t *_spi) {
 	_spi->status = PORT_BUSY;
 	_spi->SPIbus->CR2 |= (SPI_CR2_TXEIE | SPI_CR2_RXNEIE); //включили прерывание чтобы данные пошли
 	/*попробовать просто отключать интерфейс без постоянного включения/выключения прерываний*/
-	GetOne(&_spi->txbuffer, ((uint8_t*) &_spi->SPIbus->DR)); //записали регистр который читаем пишем
+	FIFO_GetOne(_spi->txbuffer, ((uint8_t*)&_spi->SPIbus->DR)); //записали регистр который читаем пишем
 	LL_SPI_Enable(_spi->SPIbus); //enable SPI
 }
 
@@ -50,7 +48,7 @@ void SPI_IRQ_CallBack(SPI_Connection_t *_spi) {
 	}
 	if (SPI_SR & SPI_SR_RXNE) {
 		if (_spi->rxlen > 0) {
-			PutOne(&_spi->rxbuffer, _spi->SPIbus->DR); //read byte
+			FIFO_PutOne(_spi->rxbuffer, _spi->SPIbus->DR); //read byte
 			--_spi->rxlen;
 		} else if (_spi->txlen > 0) {
 			(void)_spi->SPIbus->DR;
@@ -61,7 +59,7 @@ void SPI_IRQ_CallBack(SPI_Connection_t *_spi) {
 	}
 	if (SPI_SR & SPI_SR_TXE) {
 		if (_spi->txlen > 0) {
-				GetOne(&_spi->txbuffer, (uint8_t *)&_spi->SPIbus->DR);
+				FIFO_GetOne(_spi->txbuffer, (uint8_t*)&_spi->SPIbus->DR);
 			--_spi->txlen;
 		} else if (_spi->rxlen > 0) {
 			_spi->SPIbus->DR = 0xFF;
@@ -78,5 +76,3 @@ void SPI_IRQ_CallBack(SPI_Connection_t *_spi) {
 void SPI_IRQ_DMA_CallBack(SPI_Connection_t *_spi) {
 	__NOP(); //prototype
 }
-
-#endif

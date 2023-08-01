@@ -26,7 +26,7 @@
 //  E |   | C
 //     ---
 //      D
-const uint8_t TubeCode[] = {
+static const uint8_t TubeCode[] = {
 	0x3F,	//0
 	0x06,	//1
 	0x5B,	//2
@@ -40,6 +40,45 @@ const uint8_t TubeCode[] = {
 	0x00,	//space
 	0x40	//-
 	};
+
+/************** БУКВЫ И СИМВОЛЫ *****************/
+enum simbols {
+_A = 0x77,
+_B = 0x7f,
+_C = 0x39,
+_D = 0x3f,
+_E = 0x79,
+_F = 0x71,
+_G = 0x3d,
+_H = 0x76,
+_I = 0x06,
+_J = 0x1e,
+_L = 0x38,
+_N = 0x37,
+_O = 0x3f,
+_P = 0x73,
+_S = 0x6d,
+_U = 0x3e,
+_Y = 0x6e,
+_a = 0x5f,
+_b = 0x7c,
+_c = 0x58,
+_d = 0x5e,
+_e = 0x7b,
+_f = 0x71,
+_h = 0x74,
+_i = 0x10,
+_j = 0x0e,
+_l = 0x06,
+_n = 0x54,
+_o = 0x5c,
+_q = 0x67,
+_r = 0x50,
+_t = 0x78,
+_u = 0x1c,
+_y = 0x6e,
+_degree = 0x63 //градус
+};
 
 //==	RAW	===============================================================
 //send start signal to TM1637

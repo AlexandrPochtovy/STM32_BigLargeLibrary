@@ -55,51 +55,53 @@ enum Registers {
 	RX_ADDR_P5	= 0x0F,	//RW 3-5 байт (начиная с младшего байта). Адрес канала 5 приёмника
 	TX_ADDR			= 0x10, //RW 3-5 байт (начиная с младшего байта). Адрес канала передатчика
 	RX_PW_P0		= 0x11,	//RW допустимое число байт в канале 0: от 1 до 32. 0 - канал не используется
-	RX_PW_P1		= 0x12,	//RW допустимое число байт в канале 0: от 1 до 32. 0 - канал не используется
-	RX_PW_P2		= 0x13,	//RW допустимое число байт в канале 0: от 1 до 32. 0 - канал не используется
-	RX_PW_P3		= 0x14,	//RW допустимое число байт в канале 0: от 1 до 32. 0 - канал не используется
-	RX_PW_P4		= 0x15,	//RW допустимое число байт в канале 0: от 1 до 32. 0 - канал не используется
-	RX_PW_P5		= 0x16,	//RW допустимое число байт в канале 0: от 1 до 32. 0 - канал не используется
+	RX_PW_P1		= 0x12,	//RW допустимое число байт в канале 1: от 1 до 32. 0 - канал не используется
+	RX_PW_P2		= 0x13,	//RW допустимое число байт в канале 2: от 1 до 32. 0 - канал не используется
+	RX_PW_P3		= 0x14,	//RW допустимое число байт в канале 3: от 1 до 32. 0 - канал не используется
+	RX_PW_P4		= 0x15,	//RW допустимое число байт в канале 4: от 1 до 32. 0 - канал не используется
+	RX_PW_P5		= 0x16,	//RW допустимое число байт в канале 5: от 1 до 32. 0 - канал не используется
 	FIFO_STATUS = 0x17,	//RO Состояние очередей FIFO приёмника и передатчика
 	DYNPD				= 0x1C,	//RW Выбор каналов приёмника для которых используется произвольная длина пакетов
 	FEATURE			= 0x1D	//RW Регистр опций
 };
-//========================================= TYPEDEF's for CONFIG  ===================================
-typedef enum Enable {
-	OFF = 0x00,
-	ON 	= 0x01
-} Enable_t;
 
-typedef enum ModePTT {
-	modeTX 	= 0x00,
-	modeRX	= 0x01
-} ModePTT_t;
+//=============================== ENUM's, TYPEDEF's for REGISTERS  =======================
 
-typedef enum nRF_CRC {
-	crc_off	= 0x00,//
-	crc_1b 	= 0x08,
-	crc_2b 	= 0x0C
-} nRF_CRC_t;
+typedef enum RF_CRC {
+	crc_disable = 0x00,
+	crc_1byte = 0x01,
+	crc_2byte = 0x02
+} RF_CRC_t;
 
-typedef struct CONFIG_SET {
-	Enable_t RX_DR_IRQ;	//6 bit RW включает прерывание по RX_DR (получение пакета) 1 - OFF | 0 - ON
-	Enable_t TX_DS_IRQ;	//5 bit RW включает прерывание по TX_DS (отправка пакета или получение подтверждения о доставке) 1-OFF | 0-ON
-	Enable_t MAX_TX_IRQ;//4 bit RW включает прерывание по MAX_RT (превышение числа повторных попыток отправки) 1-OFF | 0-ON
-	nRF_CRC_t crc;		//3&2 bits RW Размер поля CRC: 0 - 1 байт; 1 - 2 байта
-	Enable_t power;		//1 bit RW Включение питания 1 - Power Up; 0 - Power Down, помни про временные задержки на включение
-	ModePTT_t mode;		//0 bit RW Выбор режима: 0 - TX (передатчик); 1 - RX (приёмник)
-} CONFIG_SET_t;
-//========================================= TYPEDEF's for ADDR WIDTH  =================================
+enum EN_AA_BITS {
+	ENAA_P0 = 0,
+	ENAA_P1 = 1,
+	ENAA_P2 = 2,
+	ENAA_P3 = 3,
+	ENAA_P4 = 4,
+	ENAA_P5 = 5,
+};
+
+enum EN_RXADDR_BITS {
+	ERX_P0 = 0,
+	ERX_P1 = 1,
+	ERX_P2 = 2,
+	ERX_P3 = 3,
+	ERX_P4 = 4,
+	ERX_P5 = 5,
+};
+
 typedef enum AddrWidth {
 	addrWidth_3b = 0x01,
 	addrWidth_4b = 0x02,
 	addrWidth_5b = 0x03
 } AddrWidth_t;
-//========================================= TYPEDEF's for RF SETUP  ===================================
+
+
 typedef enum RF_Speed {
-	nRF_1Mbps		= 0x00,	//RF_DR_LOW = 0 & RF_DR_HIGH = 0
-	nRF_2Mbps		= 0x08,	//RF_DR_LOW = 0 & RF_DR_HIGH = 1
-	nRF_250kbps	= 0x20	//RF_DR_LOW = 1 & RF_DR_HIGH = 0
+	RF_1Mbps		= 0x00,	//RF_DR_LOW = 0 & RF_DR_HIGH = 0
+	RF_2Mbps		= 0x08,	//RF_DR_LOW = 0 & RF_DR_HIGH = 1
+	RF_250kbps	= 0x20	//RF_DR_LOW = 1 & RF_DR_HIGH = 0
 } RF_Speed_t;
 
 typedef enum RF_Power {
@@ -109,24 +111,9 @@ typedef enum RF_Power {
 	RF_PWR_0db		= 0x06	//2бита мощность: 11  0dBm
 } RF_Power_t;
 
-typedef struct RF_SET {
-	Enable_t CONT_WAVE;
-	Enable_t PLL_LOCK;
-	RF_Speed_t speed;
-	RF_Power_t radiance;
-} RF_SET_t;
-//========================================= TYPEDEF's for STATUS  =====================================
-typedef enum Line {
-	line0 = 0x00,
-	line1 = 0x01,
-	line2 = 0x02,
-	line3 = 0x03,
-	line4 = 0x04,
-	line5 = 0x05,
-	empty = 0x07
-} Line_t;
 
-enum Status_Bitmask {
+//========================================= TYPEDEF's for STATUS  =====================================
+enum STATUS_BITS {
 	RX_DR 	= 0x40,
 	TX_DS 	= 0x20,
 	MAX_RT 	= 0x10,
@@ -140,10 +127,3 @@ enum FIFO_Bitmask {
 	RX_FIFO_FULL	= 0x02, //RO Флаг переполнения FIFO очереди приёмника. 1 - full, 0 - empty
 	RX_FIFO_EMPTY	= 0x01 	//RO Флаг освобождения FIFO очереди приёмника. 1 - empty, 0 - data in buffer
 };
-//========================================= TYPEDEF's for FEATURE  =====================================
-typedef struct FEATURE_Set {
-	Enable_t EN_DPL; 	//RW Включает поддержку приёма и передачи пакетов произвольной длины
-	Enable_t EN_ACK_PAY;//RW Разрешает передачу данных с пакетами подтверждения приёма
-	Enable_t EN_DYN_ACK;//RW Разрешает использование W_TX_PAYLOAD_NOACK (отправка пакета без подтверждения)
-} FEATURE_Set_t;
-//=======================================================================================================

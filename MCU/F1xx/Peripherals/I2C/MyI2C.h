@@ -33,9 +33,9 @@ extern "C" {
 *	при переходе от записи к чтению при работе с шиной, внутренний признак, используется только в обработчике прерываний
  */
 typedef enum I2C_Mode {
-	I2C_MODE_WRITE,	//запись в шину
-	I2C_MODE_READ,	//чтение из шины
-	I2C_MODE_RW		//для чтения через запись в шину через повторный старт, не использовать
+	I2C_MODE_WRITE,	//for write
+	I2C_MODE_READ,	//for read
+	I2C_MODE_RW			//for read as write restart
 } I2C_Mode_t;
 
 /* структура работы с шиной состоит из:
@@ -45,22 +45,22 @@ typedef enum I2C_Mode {
 * указатель на структуру кольцевого буфера
 */
 typedef struct I2C_IRQ_Connection {
-	I2C_TypeDef *i2c;	    //pointer to HW i2c bus
-	PortStatus_t status;  	//status I2C bus
-	uint8_t step;			//step processing
-	uint8_t addr;			//device I2C address
-	uint8_t len;			//length data
+	I2C_TypeDef *i2c;		//pointer to HW i2c bus
+	PortStatus_t status;//status I2C bus
+	uint8_t step;				//step processing
+	uint8_t addr;				//device I2C address
+	uint8_t len;				//length data
 	I2C_Mode_t mode;		//device mode
 	fifo_t *buffer;			//pointer circular buffer
 } I2C_IRQ_Connection_t;
 
 typedef struct I2C_DMA_Connection {
 	I2C_TypeDef *i2c;		//pointer to HW i2c bus
-	void *dma_channel;		//pointer to dma channel restart function
-	PortStatus_t status;	//status I2C bus
-	uint8_t step;			//step processing
-	uint8_t addr;			//device I2C address
-	uint8_t len;			//length data
+	void *dma_channel;	//pointer to dma channel restart function
+	PortStatus_t status;//status I2C bus
+	uint8_t step;				//step processing
+	uint8_t addr;				//device I2C address
+	uint8_t len;				//length data
 	I2C_Mode_t mode;		//device mode
 	fifo_t *buffer;			//pointer circular buffer
 } I2C_DMA_Connection_t;
@@ -73,6 +73,43 @@ void ClearBusyI2C1(void);//сбрасывает флаг зависшей шин
 void I2C_Raw_IRQ_CallBack(I2C_IRQ_Connection_t *_i2c);
 void I2C_EV_IRQ_DMA_CallBack(I2C_DMA_Connection_t *_i2c);
 void I2C_ERR_IRQ_CallBack(I2C_IRQ_Connection_t *_i2c);
+
+/* @brief
+ * write 3 bytes:addr reg value
+ * @param
+ * i2c connection, addr, register and value data
+ * @retval
+ * 0 - processing, 1 - complite
+*/
+uint8_t WriteOneRegByte(I2C_IRQ_Connection_t *_i2c, uint8_t addr, uint8_t reg, uint8_t value);
+
+/*
+ * @brief
+ * write many bytes:addr, reg, values array
+ * @param
+ * i2c connection, addr, register and data array
+ * @retval
+ * 0 - processing, 1 - complite
+*/
+uint8_t WriteRegBytes(I2C_IRQ_Connection_t *_i2c, uint8_t addr, uint8_t reg, void *data, uint8_t size);
+
+/*****************************************************************
+ * @brief
+ * read one byte :addr, reg, value
+ * @param
+ * i2c connection, addr, register and pointer data
+ * @retval
+ * 0 - processing, 1 - complite
+*/
+uint8_t ReadOneRegByte(I2C_IRQ_Connection_t *_i2c, uint8_t addr, uint8_t reg, uint8_t *value);
+
+/*****************************************************************
+  * @brief
+  * @param
+  * @retval
+  */
+uint8_t ReadRegBytes(I2C_IRQ_Connection_t *_i2c, uint8_t addr, uint8_t reg, void *data, uint8_t size);
+
 
 #ifdef __cplusplus
 }

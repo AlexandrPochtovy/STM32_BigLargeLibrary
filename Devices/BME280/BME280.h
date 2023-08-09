@@ -97,9 +97,6 @@ typedef struct bme280_dev {
 uint8_t BME280_Init(I2C_IRQ_Connection_t *_i2c, BME280_t *dev);
 uint8_t BME280_GetData(I2C_IRQ_Connection_t *_i2c, BME280_t *dev);
 //CALCULATING	==========================================================================
-void parse_temp_press_calib_data(I2C_IRQ_Connection_t *_i2c, BME280_t *dev);
-void parse_humidity_calib_data(I2C_IRQ_Connection_t *_i2c, BME280_t *dev);
-void bme280_parse_sensor_data(I2C_IRQ_Connection_t *_i2c, BME280_t *dev);
 int32_t compensate_temperature_int(BME280_t *dev);
 float compensate_temperature_float(BME280_t *dev);
 uint32_t compensate_pressure_int(BME280_t *dev);

@@ -37,7 +37,6 @@ typedef struct INA219_RawData_t {
 	uint16_t voltage;
 	uint16_t current;
 	uint16_t power;
-	uint16_t calibration;
 } INA219_RawData;
 
 typedef struct INA219 {

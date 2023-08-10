@@ -32,7 +32,7 @@ enum ADXL345_ADDRESS {
 	ADXL345_ADDR = 0xA6//Assumes ALT address pin low
 };
 
-#define ADXL345_DATA_LENGHT  6
+const uint8_t ADXL345_DATA_LENGHT = 6;
 
 typedef struct ADXL345_RAW {
 	int16_t X;

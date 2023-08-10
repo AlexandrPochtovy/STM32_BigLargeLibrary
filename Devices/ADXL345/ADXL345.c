@@ -59,7 +59,7 @@ uint8_t ADXL345_Init(I2C_IRQ_Connection_t *_i2c, ADXL345_t *dev) {
 				data[1] = ADXL345_POWER_CTL_MEASURE | ADXL345_POWER_CTL_WAKEUP_8Hz; //0x2D
 				data[2] = ADXL345_INT_ENABLE_DATA_READY; 				//0x2E
 				data[3] = (uint8_t)~ADXL345_INT_MAP_DATA_READY; //0x2F
-				if (WriteRegBytes(_i2c, dev->addr, ADXL345_BW_RATE_REG, data, 14)) {
+				if (WriteRegBytes(_i2c, dev->addr, ADXL345_BW_RATE_REG, data, 4)) {
 					dev->step = 2;
 				}
 				break;

@@ -12,54 +12,40 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+ 
+   Created on: Aug 1, 2022
+ ********************************************************************************/
 
- * 	ADXL345.h
- * 	Created on: 31.01.2022
- */
+#ifndef TCA9548A_H_
+#define TCA9548A_H_
 
-#ifndef ADXL345_H_
-#define ADXL345_H_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "main.h"
 #include "Peripherals/I2C/MyI2C.h"
-#include "ADXL345_Register.h"
 
-enum ADXL345_ADDRESS {
-	ADXL345_ADDR = 0xA6//Assumes ALT address pin low
+enum TCA9548A_ADDRESS {
+	TCA9548A_ADDR = 0x70//Assumes ALT address pin low
 };
 
-const uint8_t ADXL345_DATA_LENGHT = 6;
-
-typedef struct ADXL345_RAW {
-	int16_t X;
-	int16_t Y;
-	int16_t Z;
-} ADXL345_RAW_t;
-
-typedef struct ADXL345_data {
-	float X;
-	float Y;
-	float Z;
-} ADXL345_data_t;
+typedef enum TCA9548A_channel {
+	channel_0 = 0x01,
+	channel_1 = 0x02,
+	channel_2 = 0x04,
+	channel_3 = 0x08,
+	channel_4 = 0x10,
+	channel_5 = 0x20,
+	channel_6 = 0x40,
+	channel_7 = 0x80
+} TCA9548A_ch_t;
 
 //common data struct for sensor
-typedef struct ADXL345 {
-	const uint8_t addr;
+typedef struct TCA9548A {
+	uint8_t addr;
 	uint8_t step;
 	DeviceStatus_t status;
-	ADXL345_RAW_t raw;
-	ADXL345_data_t data;
-} ADXL345_t;
+	uint8_t port;
+} TCA9548A_t;
 
-uint8_t ADXL345_Init(I2C_IRQ_Connection_t *_i2c, ADXL345_t *dev);
-uint8_t ADXL345_GetData(I2C_IRQ_Connection_t *_i2c, ADXL345_t *dev);
-float ADXL345_ConvertData (int16_t raw);
+uint8_t TCA9548A_Init(I2C_IRQ_Connection_t *_i2c, TCA9548A_t *dev);
+uint8_t TCA9548A_OnChannel(I2C_IRQ_Connection_t *_i2c, TCA9548A_t *dev, TCA9548A_ch_t ch);
+uint8_t TCA9548A_OffChannel(I2C_IRQ_Connection_t *_i2c, TCA9548A_t *dev, TCA9548A_ch_t ch);
 
-#ifdef __cplusplus
-}
-#endif
-#endif /* ADXL345_H_ */
+#endif /* TCA9548A_H_ */

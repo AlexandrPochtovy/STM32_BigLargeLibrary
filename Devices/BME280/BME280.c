@@ -22,107 +22,30 @@
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (uint16_t)(((uint16_t)msb << 8) | (uint16_t)lsb);
 }
-//INITIALIZATION	================================================================
-/*!
- *  @brief This API is the entry point.
- *  It reads the chip-id and calibration data from the sensor.
- */
-uint8_t BME280_Init(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {
-	if (_i2c->status == PORT_FREE) {  //send setup
-		_i2c->addr = dev->addr;
-		switch (dev->step) {
-		case 0:  //setup humidity
-			dev->status = DEVICE_NOT_INIT;
-			FIFO_PutOne(_i2c->buffer, BME280_REG_CTRL_HUM);
-			_i2c->len = 1;
-			_i2c->mode = I2C_MODE_WRITE;
-			FIFO_PutOne(_i2c->buffer, BME280_HUM_OVERSAMPLING_16X);
-			dev->step = 1;
-			break;
-		case 1:  //setup mode temp pressure
-			FIFO_PutOne(_i2c->buffer, BME280_REG_CTRL_MEAS_PWR);
-			_i2c->len = 2;
-			_i2c->mode = I2C_MODE_WRITE;
-			FIFO_PutOne(
-			    _i2c->buffer,
-			    (BME280_NORMAL_MODE | BME280_PRESS_OVERSAMPLING_16X | BME280_TEMP_OVERSAMPLING_16X));
-			FIFO_PutOne(_i2c->buffer,
-			            (BME280_SPI_3WIRE_MODE_OFF | BME280_FILTER_COEFF_16 | BME280_STANDBY_TIME_20_MS));
-			dev->step = 2;
-			break;
-		case 2:  //read calib temp data
-			FIFO_PutOne(_i2c->buffer, BME280_REG_T_P_CALIB_DATA);
-			_i2c->len = BME280_T_P_CALIB_DATA_LEN;
-			_i2c->mode = I2C_MODE_READ;
-			dev->step = 3;
-			break;
-		case 3:  //read calib pressure data
-			parse_temp_press_calib_data(_i2c, dev);
-			FIFO_PutOne(_i2c->buffer, BME280_REG_HUM_CALIB_DATA);
-			_i2c->len = BME280_HUM_CALIB_DATA_LEN;
-			_i2c->mode = I2C_MODE_READ;
-			dev->step = 4;
-			break;
-		case 4:
-			parse_humidity_calib_data(_i2c, dev);
-			dev->status = DEVICE_INIT;
-			dev->step = 0;
-			return 1;
-			break;
-		default:
-			dev->step = 0;
-			break;
-		}
-		I2C_Start_IRQ(_i2c);
-	}
-	return 0;
-}
 
-uint8_t BME280_GetData(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {
-	if (_i2c->status == PORT_FREE) {  //send setup
-		_i2c->addr = dev->addr;
-		if (dev->step == 0) {
-			FIFO_PutOne(_i2c->buffer, BME280_REG_DATA);
-			_i2c->len = BME280_DATA_LEN;
-			_i2c->mode = I2C_MODE_READ;
-			dev->step = 1;
-		}
-		else if (dev->step == 1) {
-			bme280_parse_sensor_data(_i2c, dev);
-			bme280_calculate_data_int(dev);
-			bme280_calculate_data_float(dev);
-			dev->step = 0;
-			return 1;
-		}
-		I2C_Start_IRQ(_i2c);
-	}
-	return 0;
-}
-//CALCULATING	==========================================================================
+//parsing raw data	=================================================================
 /*!
  *  @brief This API is used to parse the pressure, temperature and
  *  humidity data and store it in the bme280_uncomp_data structure instance.
  */
-void bme280_parse_sensor_data(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {
+void bme280_parse_sensor_data(BME280_t *dev, uint8_t *data) {
 	/* Variables to store the sensor data */
 	uint32_t data_xlsb;
 	uint32_t data_lsb;
 	uint32_t data_msb;
-	uint8_t dt[BME280_DATA_LEN];
-	FIFO_GetMulti(_i2c->buffer, dt, BME280_DATA_LEN);
 	/* Store the parsed register values for pressure data */
-	data_msb = (uint32_t)dt[0] << 12;
-	data_lsb = (uint32_t)dt[1] << 4;
-	data_xlsb = (uint32_t)dt[2] >> 4;
+	data_msb = (uint32_t)data[0] << 12;
+	data_lsb = (uint32_t)data[1] << 4;
+	data_xlsb = (uint32_t)data[2] >> 4;
 	dev->uncomp_data.pressure = data_msb | data_lsb | data_xlsb;
 	/* Store the parsed register values for temperature data */
-	data_msb = (uint32_t)dt[3] << 12;
-	data_lsb = (uint32_t)dt[4] << 4;
-	data_xlsb = (uint32_t)dt[5] >> 4;
+	data_msb = (uint32_t)data[3] << 12;
+	data_lsb = (uint32_t)data[4] << 4;
+	data_xlsb = (uint32_t)data[5] >> 4;
 	dev->uncomp_data.temperature = data_msb | data_lsb | data_xlsb;
 	/* Store the parsed register values for humidity data */
-	data_msb = (uint32_t)dt[6] << 8;
-	data_lsb = (uint32_t)dt[7];
+	data_msb = (uint32_t)data[6] << 8;
+	data_lsb = (uint32_t)data[7];
 	dev->uncomp_data.humidity = data_msb | data_lsb;
 }
 
@@ -130,40 +53,90 @@ void bme280_parse_sensor_data(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {
  *  @brief This internal API is used to parse the temperature and
  *  pressure calibration data and store it in device structure.
  */
-void parse_temp_press_calib_data(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {
-	uint8_t dt[BME280_T_P_CALIB_DATA_LEN];
-	FIFO_GetMulti(_i2c->buffer, dt, BME280_T_P_CALIB_DATA_LEN);
-	dev->calib_data.dig_t1 = CONCAT_BYTES(dt[1], dt[0]);
-	dev->calib_data.dig_t2 = (int16_t)CONCAT_BYTES(dt[3], dt[2]);
-	dev->calib_data.dig_t3 = (int16_t)CONCAT_BYTES(dt[5], dt[4]);
-	dev->calib_data.dig_p1 = CONCAT_BYTES(dt[7], dt[6]);
-	dev->calib_data.dig_p2 = (int16_t)CONCAT_BYTES(dt[9], dt[8]);
-	dev->calib_data.dig_p3 = (int16_t)CONCAT_BYTES(dt[11], dt[10]);
-	dev->calib_data.dig_p4 = (int16_t)CONCAT_BYTES(dt[13], dt[12]);
-	dev->calib_data.dig_p5 = (int16_t)CONCAT_BYTES(dt[15], dt[14]);
-	dev->calib_data.dig_p6 = (int16_t)CONCAT_BYTES(dt[17], dt[16]);
-	dev->calib_data.dig_p7 = (int16_t)CONCAT_BYTES(dt[19], dt[18]);
-	dev->calib_data.dig_p8 = (int16_t)CONCAT_BYTES(dt[21], dt[20]);
-	dev->calib_data.dig_p9 = (int16_t)CONCAT_BYTES(dt[23], dt[22]);
-	dev->calib_data.dig_h1 = dt[25];
+void parse_temp_press_calib_data(BME280_t *dev, uint8_t *data) {
+	dev->calib_data.dig_t1 = CONCAT_BYTES(data[1], data[0]);
+	dev->calib_data.dig_t2 = (int16_t)CONCAT_BYTES(data[3], data[2]);
+	dev->calib_data.dig_t3 = (int16_t)CONCAT_BYTES(data[5], data[4]);
+	dev->calib_data.dig_p1 = CONCAT_BYTES(data[7], data[6]);
+	dev->calib_data.dig_p2 = (int16_t)CONCAT_BYTES(data[9], data[8]);
+	dev->calib_data.dig_p3 = (int16_t)CONCAT_BYTES(data[11], data[10]);
+	dev->calib_data.dig_p4 = (int16_t)CONCAT_BYTES(data[13], data[12]);
+	dev->calib_data.dig_p5 = (int16_t)CONCAT_BYTES(data[15], data[14]);
+	dev->calib_data.dig_p6 = (int16_t)CONCAT_BYTES(data[17], data[16]);
+	dev->calib_data.dig_p7 = (int16_t)CONCAT_BYTES(data[19], data[18]);
+	dev->calib_data.dig_p8 = (int16_t)CONCAT_BYTES(data[21], data[20]);
+	dev->calib_data.dig_p9 = (int16_t)CONCAT_BYTES(data[23], data[22]);
+	dev->calib_data.dig_h1 = data[25];
 }
 
-void parse_humidity_calib_data(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {  //need check
+void parse_humidity_calib_data(BME280_t *dev, uint8_t *data) {  //need check
 	int16_t dig_h4_lsb;
 	int16_t dig_h4_msb;
 	int16_t dig_h5_lsb;
 	int16_t dig_h5_msb;
-	uint8_t dt[7];
-	FIFO_GetMulti(_i2c->buffer, dt, 7);
-	dev->calib_data.dig_h2 = (int16_t)CONCAT_BYTES(dt[1], dt[0]);
-	dev->calib_data.dig_h3 = dt[2];
-	dig_h4_msb = (int16_t)(int8_t)dt[3] * 16;
-	dig_h4_lsb = (int16_t)(dt[4] & 0x0F);
+	dev->calib_data.dig_h2 = (int16_t)CONCAT_BYTES(data[1], data[0]);
+	dev->calib_data.dig_h3 = data[2];
+	dig_h4_msb = (int16_t)(int8_t)data[3] * 16;
+	dig_h4_lsb = (int16_t)(data[4] & 0x0F);
 	dev->calib_data.dig_h4 = dig_h4_msb | dig_h4_lsb;
-	dig_h5_msb = (int16_t)(int8_t)dt[5] * 16;
-	dig_h5_lsb = (int16_t)(dt[4] >> 4);
+	dig_h5_msb = (int16_t)(int8_t)data[5] * 16;
+	dig_h5_lsb = (int16_t)(data[4] >> 4);
 	dev->calib_data.dig_h5 = dig_h5_msb | dig_h5_lsb;
-	dev->calib_data.dig_h6 = (int8_t)dt[6];
+	dev->calib_data.dig_h6 = (int8_t)data[6];
+}
+
+//INITIALIZATION	================================================================
+/*!
+ *  @brief This API is the entry point.
+ *  It reads the chip-id and calibration data from the sensor.
+ */
+uint8_t BME280_Init(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {
+	uint8_t data[BME280_T_P_CALIB_DATA_LEN];
+		_i2c->addr = dev->addr;
+		switch (dev->step) {
+		case 0://setup humidity
+			dev->status = DEVICE_NOT_INIT;
+			if (WriteOneRegByte(_i2c, dev->addr, BME280_REG_CTRL_HUM, BME280_HUM_OVERSAMPLING_16X)) {
+				dev->step = 1;
+			}
+			break;
+		case 1://setup mode temp pressure
+			data[0] = BME280_NORMAL_MODE | BME280_PRESS_OVERSAMPLING_16X | BME280_TEMP_OVERSAMPLING_16X;
+			data[1] = BME280_SPI_3WIRE_MODE_OFF | BME280_FILTER_COEFF_16 | BME280_STANDBY_TIME_20_MS;
+			if (WriteRegBytes(_i2c, dev->addr, BME280_REG_CTRL_MEAS_PWR, data, 2)) {
+				dev->step = 2;
+			}
+			break;
+		case 2://read calib temp data
+			if (ReadRegBytes(_i2c, dev->addr, BME280_REG_T_P_CALIB_DATA, data, BME280_T_P_CALIB_DATA_LEN)) {
+				parse_temp_press_calib_data(dev, data);
+				dev->step = 3;
+			}
+			break;
+		case 3:  //read calib pressure data
+			if (ReadRegBytes(_i2c, dev->addr, BME280_REG_HUM_CALIB_DATA, data, BME280_HUM_CALIB_DATA_LEN)) {
+				parse_humidity_calib_data(dev, data);
+				dev->status = DEVICE_INIT;
+				dev->step = 0;
+			}
+			return 1;
+		default:
+			dev->step = 0;
+			break;
+		}
+	return 0;
+}
+
+uint8_t BME280_GetData(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {
+	uint8_t data[BME280_DATA_LEN];
+	if (ReadRegBytes(_i2c, dev->addr, BME280_REG_DATA, data, BME280_DATA_LEN)) {
+		bme280_parse_sensor_data(dev, data);
+		bme280_calculate_data_int(dev);
+		bme280_calculate_data_float(dev);
+		dev->step = 0;
+		return 1;
+	}
+	return 0;
 }
 
 /*!

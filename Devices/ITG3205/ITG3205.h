@@ -48,6 +48,7 @@ typedef struct ITG3205_data_t {
 typedef struct ITG3205 {
 	const uint8_t addr;
 	DeviceStatus_t status;
+	uint8_t step;
 	ITG3205_RAW raw;
 	ITG3205_data data;
 } ITG3205_t;

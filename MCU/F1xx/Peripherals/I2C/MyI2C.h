@@ -44,7 +44,7 @@ typedef enum I2C_Mode {
 * параметров запроса: адрес устройства, режим чтение/запись, длина запроса
 * указатель на структуру кольцевого буфера
 */
-typedef struct I2C_IRQ_Connection {
+typedef struct I2C_IRQ_Conn {
 	I2C_TypeDef *i2c;		//pointer to HW i2c bus
 	PortStatus_t status;//status I2C bus
 	uint8_t step;				//step processing
@@ -54,7 +54,7 @@ typedef struct I2C_IRQ_Connection {
 	fifo_t *buffer;			//pointer circular buffer
 } I2C_IRQ_Connection_t;
 
-typedef struct I2C_DMA_Connection {
+typedef struct I2C_DMA_Conn {
 	I2C_TypeDef *i2c;		//pointer to HW i2c bus
 	void *dma_channel;	//pointer to dma channel restart function
 	PortStatus_t status;//status I2C bus

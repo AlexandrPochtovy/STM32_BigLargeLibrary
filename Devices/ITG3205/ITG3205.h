@@ -53,8 +53,8 @@ typedef struct ITG3205 {
 	ITG3205_data data;
 } ITG3205_t;
 //===========================================================================
-uint8_t ITG3205_Init(I2C_IRQ_Connection_t *_i2c, ITG3205_t *dev);
-uint8_t ITG3205_GetData(I2C_IRQ_Connection_t *_i2c, ITG3205_t *dev);
+uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev);
+uint8_t ITG3205_GetData(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev);
 
 #ifdef __cplusplus
 }

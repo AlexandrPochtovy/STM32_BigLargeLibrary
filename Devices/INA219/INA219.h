@@ -46,8 +46,8 @@ typedef struct INA219 {
 		INA219_RawData raw;
 } INA219_t;
 //Init & setup	==============================================================================
-uint8_t INA219_Init(I2C_IRQ_Connection_t *_i2c, INA219_t *dev);
-uint8_t INA219_GetRawData(I2C_IRQ_Connection_t *_i2c, INA219_t *dev);
+uint8_t INA219_Init(I2C_IRQ_Conn_t *_i2c, INA219_t *dev);
+uint8_t INA219_GetRawData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev);
 //Get & conversion raw data	==================================================================
 uint16_t INA219_GetVoltageInt(INA219_t *dev, uint16_t divider);
 float INA219_GetVoltageFloat(INA219_t *dev, uint16_t divider);

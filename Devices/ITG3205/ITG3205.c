@@ -27,7 +27,7 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (uint16_t)(((uint16_t)msb << 8) | (uint16_t)lsb);
 }
 
-uint8_t ITG3205_Init(I2C_IRQ_Connection_t *_i2c, ITG3205_t *dev) {
+uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 	dev->status = DEVICE_NOT_INIT;
 	switch (dev->step) {
 		case 0: //reset first
@@ -59,7 +59,7 @@ uint8_t ITG3205_Init(I2C_IRQ_Connection_t *_i2c, ITG3205_t *dev) {
 	return 0;
 }
 
-uint8_t ITG3205_GetData(I2C_IRQ_Connection_t *_i2c, ITG3205_t *dev) {
+uint8_t ITG3205_GetData(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 	uint8_t dt[ITG3205_DATA_LEN];
 	if (ReadRegBytes(_i2c, dev->addr, ITG3205_TEMP_OUT_H, dt, ITG3205_DATA_LEN)) {
 		dev->raw.temp = (int16_t)CONCAT_BYTES(dt[0], dt[1]);

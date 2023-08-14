@@ -53,8 +53,8 @@ typedef struct HMC5883L_dev_t {
 } HMC5883L_dev;
 
 //INITIALIZATION	================================================================
-uint8_t HMC5883L_Init(I2C_IRQ_Connection_t *_i2c, HMC5883L_dev *dev);
-uint8_t HMC5883L_GetData(I2C_IRQ_Connection_t *_i2c, HMC5883L_dev *dev);
+uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev);
+uint8_t HMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev);
 
 #ifdef __cplusplus
 }

@@ -90,7 +90,7 @@ void parse_humidity_calib_data(BME280_t *dev, uint8_t *data) {  //need check
  *  @brief This API is the entry point.
  *  It reads the chip-id and calibration data from the sensor.
  */
-uint8_t BME280_Init(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {
+uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
 	uint8_t data[BME280_T_P_CALIB_DATA_LEN];
 		_i2c->addr = dev->addr;
 		switch (dev->step) {
@@ -127,7 +127,7 @@ uint8_t BME280_Init(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {
 	return 0;
 }
 
-uint8_t BME280_GetData(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {
+uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
 	uint8_t data[BME280_DATA_LEN];
 	if (ReadRegBytes(_i2c, dev->addr, BME280_REG_DATA, data, BME280_DATA_LEN)) {
 		bme280_parse_sensor_data(dev, data);

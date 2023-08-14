@@ -21,7 +21,7 @@
 
 #define MCP23017_CFG_LENGHT 22
 
-uint8_t MCP23_17_Init(I2C_IRQ_Connection_t *_i2c, MCP23_t *dev) {
+uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev) {
 	uint8_t data[MCP23017_CFG_LENGHT];
 	dev->status = DEVICE_NOT_INIT;
 	data[0] = MCP23017_IODIR_ALL_INPUT;  //reg 0x00 IODIRA 	RW set all pins portA as output
@@ -53,7 +53,7 @@ uint8_t MCP23_17_Init(I2C_IRQ_Connection_t *_i2c, MCP23_t *dev) {
 	return 0;
 }
 
-uint8_t MCP23_17_ReadPort(I2C_IRQ_Connection_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t *value) {
+uint8_t MCP23_17_ReadPort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t *value) {
 	if (ReadOneRegByte(_i2c, dev->addr, port, value)) {
 		dev->status = DEVICE_DONE;
 		return 1;
@@ -61,7 +61,7 @@ uint8_t MCP23_17_ReadPort(I2C_IRQ_Connection_t *_i2c, MCP23_t *dev, uint8_t port
 	return 0;
 }
 
-uint8_t MCP23_17_WritePort(I2C_IRQ_Connection_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t value) {
+uint8_t MCP23_17_WritePort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t value) {
 	if (WriteOneRegByte(_i2c, dev->addr, port, value)) {
 		dev->status = DEVICE_DONE;
 		return 1;

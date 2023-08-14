@@ -94,8 +94,8 @@ typedef struct bme280_dev {
 } BME280_t;
 
 //INITIALIZATION	================================================================
-uint8_t BME280_Init(I2C_IRQ_Connection_t *_i2c, BME280_t *dev);
-uint8_t BME280_GetData(I2C_IRQ_Connection_t *_i2c, BME280_t *dev);
+uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev);
+uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev);
 //CALCULATING	==========================================================================
 int32_t compensate_temperature_int(BME280_t *dev);
 float compensate_temperature_float(BME280_t *dev);

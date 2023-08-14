@@ -26,7 +26,7 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
     return (uint16_t)(((uint16_t)msb << 8) | (uint16_t)lsb);
 }	
 
-uint8_t HMC5883L_Init(I2C_IRQ_Connection_t *_i2c, HMC5883L_dev *dev) {
+uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev) {
 	dev->status = DEVICE_NOT_INIT;
 	//setup sensor
 	uint8_t data[3];
@@ -41,7 +41,7 @@ uint8_t HMC5883L_Init(I2C_IRQ_Connection_t *_i2c, HMC5883L_dev *dev) {
 	return 0;
 }
 
-uint8_t HMC5883L_GetData(I2C_IRQ_Connection_t *_i2c, HMC5883L_dev *dev) {
+uint8_t HMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev) {
 	uint8_t data[HMC5883L_DATA_LEN];
 	if (ReadRegBytes(_i2c, dev->addr, HMC5883L_REG_OUT_X_M, data, HMC5883L_DATA_LEN)) {
 		dev->raw.X = CONCAT_BYTES(data[0], data[1]);

@@ -29,7 +29,7 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (((uint16_t) msb << 8) | (uint16_t) lsb);
 }
 
-uint8_t ADXL345_Init(I2C_IRQ_Connection_t *_i2c, ADXL345_t *dev) {
+uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 		switch (dev->step) {
 			case 0: { //setup TAP FreeFall Threshold and Offsets 0x1D..0x2A registers
 				uint8_t data[14];
@@ -106,7 +106,7 @@ float ADXL345_ConvertData(int16_t raw) {
 	}
 }
 
-uint8_t ADXL345_GetData(I2C_IRQ_Connection_t *_i2c, ADXL345_t *dev) {
+uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 	uint8_t val[ADXL345_DATA_LENGHT];
 	if (ReadRegBytes(_i2c, dev->addr, ADXL345_DATAX0_REG, &val, ADXL345_DATA_LENGHT)) {
 		dev->raw.X = (int16_t)CONCAT_BYTES(val[1], val[0]);

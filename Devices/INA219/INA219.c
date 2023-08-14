@@ -32,7 +32,7 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 }
 
 //Init & setup	=============================================================================================
-uint8_t INA219_Init(I2C_IRQ_Connection_t *_i2c, INA219_t *dev) {
+uint8_t INA219_Init(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 	dev->status = DEVICE_NOT_INIT;
 	uint16_t cfg;
 	uint8_t data[INA219_REG_LEN];
@@ -65,7 +65,7 @@ uint8_t INA219_Init(I2C_IRQ_Connection_t *_i2c, INA219_t *dev) {
 	return 0;
 }
 
-uint8_t INA219_GetRawData(I2C_IRQ_Connection_t *_i2c, INA219_t *dev) {
+uint8_t INA219_GetRawData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 		uint8_t dt[INA219_REG_LEN];
 		uint8_t reg;
 		_i2c->addr = dev->addr;

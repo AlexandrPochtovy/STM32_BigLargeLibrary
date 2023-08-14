@@ -51,8 +51,8 @@ typedef struct QMC5883L {
 } QMC5883L_t;
 
 //INITIALIZATION	================================================================
-uint8_t QMC5883L_Init(I2C_IRQ_Connection_t *_i2c, QMC5883L_t *dev);
-uint8_t QMC5883L_GetData(I2C_IRQ_Connection_t *_i2c, QMC5883L_t *dev);
+uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev);
+uint8_t QMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev);
 
 #ifdef __cplusplus
 }

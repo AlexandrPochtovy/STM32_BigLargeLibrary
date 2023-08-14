@@ -21,7 +21,7 @@
 
 static const uint8_t TCA9548A_PORT = 0x00;
 
-uint8_t TCA9548A_Init(I2C_IRQ_Connection_t *_i2c, TCA9548A_t *dev) {
+uint8_t TCA9548A_Init(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev) {
 	dev->status = DEVICE_NOT_INIT;
 	if (WriteOneRegByte(_i2c, dev->addr, TCA9548A_PORT, 0x00)) {
 		dev->status = DEVICE_INIT;
@@ -31,7 +31,7 @@ uint8_t TCA9548A_Init(I2C_IRQ_Connection_t *_i2c, TCA9548A_t *dev) {
 	return 0;
 }
 
-uint8_t TCA9548A_OnChannel(I2C_IRQ_Connection_t *_i2c, TCA9548A_t *dev, TCA9548A_ch_t ch) {
+uint8_t TCA9548A_OnChannel(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, TCA9548A_ch_t ch) {
 	switch (dev->step) {
 		case 0://read port actual
 			if (ReadOneRegByte(_i2c, dev->addr, TCA9548A_PORT, &dev->port)) {
@@ -52,7 +52,7 @@ uint8_t TCA9548A_OnChannel(I2C_IRQ_Connection_t *_i2c, TCA9548A_t *dev, TCA9548A
 	return 0;
 }
 
-uint8_t TCA9548A_OffChannel(I2C_IRQ_Connection_t *_i2c, TCA9548A_t *dev, TCA9548A_ch_t ch) {
+uint8_t TCA9548A_OffChannel(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, TCA9548A_ch_t ch) {
 	switch (dev->step) {
 		case 0://read port actual
 			if (ReadOneRegByte(_i2c, dev->addr, TCA9548A_PORT, &dev->port)) {

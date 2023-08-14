@@ -44,8 +44,8 @@ typedef struct TCA9548A {
 	uint8_t port;
 } TCA9548A_t;
 
-uint8_t TCA9548A_Init(I2C_IRQ_Connection_t *_i2c, TCA9548A_t *dev);
-uint8_t TCA9548A_OnChannel(I2C_IRQ_Connection_t *_i2c, TCA9548A_t *dev, TCA9548A_ch_t ch);
-uint8_t TCA9548A_OffChannel(I2C_IRQ_Connection_t *_i2c, TCA9548A_t *dev, TCA9548A_ch_t ch);
+uint8_t TCA9548A_Init(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev);
+uint8_t TCA9548A_OnChannel(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, TCA9548A_ch_t ch);
+uint8_t TCA9548A_OffChannel(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, TCA9548A_ch_t ch);
 
 #endif /* TCA9548A_H_ */

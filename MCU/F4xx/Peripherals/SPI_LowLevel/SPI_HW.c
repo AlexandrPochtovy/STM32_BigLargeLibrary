@@ -13,11 +13,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- * 	MySPI.c
+ * 	SPI_HW.c
  *  Created on: 08 mar 2023
  */
 
-#include "MySPI.h"
+#include "SPI_HW.h"
 
 void SPI_Start_IRQ_TWO_HWNSS(SPI_Conn_TWO_t *_spi) {
 	_spi->status = PORT_BUSY;

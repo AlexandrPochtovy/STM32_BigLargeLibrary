@@ -13,16 +13,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
- * 	MyUsart.h
+ * 	USART_HW.h
  *  Created on: Aug 30, 2023
  */
 #ifndef SRC_MYUSART_H_
 #define SRC_MYUSART_H_
 
-#include "main.h"
-
+#include <stm32f4xx_ll_usart.h>
 #include "DataTypes/InterfaceDataTypes.h"
-#include "FIFObuffer/FIFObuffer.h"
 //#include "DMA_Template/DMA_Template.h"
 #ifdef DMA_H
 	#include "DMA_Template/DMA_Template.h"

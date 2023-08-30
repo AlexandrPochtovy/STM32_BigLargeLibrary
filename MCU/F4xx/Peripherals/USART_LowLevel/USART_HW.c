@@ -13,11 +13,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- * 	MyUsart.c
+ * 	USART_HW.c
  *  Created on: AUG 30, 2023
  */
 
-#include "MyUsart.h"
+#include <Peripherals/USART_LowLevel/USART_HW.h>
 
 /*
  *

@@ -24,9 +24,7 @@
 extern "C" {
 #endif
 
-#include <stddef.h>
-#include <stdint.h>
-#include "Peripherals/I2C/MyI2C.h"
+#include "Peripherals/I2C_LowLevel/I2C_HW.h"
 /* @brief
  * write 3 bytes:addr reg value
  * @param

@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
-#include "DataTypes/BufferDataTypes.h"
+#include "DataTypes/CommonDataTypes.h"
 
 typedef struct filo {
     int32_t *buffer;

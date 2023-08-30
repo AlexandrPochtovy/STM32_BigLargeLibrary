@@ -13,11 +13,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
- * 	MyI2C.c
+ * 	I2_HWC.c
  *	Created on: 30 nov. 2020
  */
 
-#include "MyI2C.h"
+
+#include "I2C_HW.h"
 /*запускает обмен с I2C через прерывания, использовать
  * после того как передали в кольцевой буфер все необходимые данные
  */

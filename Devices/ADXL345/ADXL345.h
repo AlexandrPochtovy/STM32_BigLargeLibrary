@@ -24,10 +24,6 @@
 extern "C" {
 #endif
 
-#include "main.h"
-#include <stddef.h>
-#include <stdint.h>
-#include <math.h>
 #include "ADXL345_Register.h"
 #include "I2C_MiddleLevel/I2C_API.h"
 

@@ -13,15 +13,22 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  
- HW_CRC.h
+ CRC_HW.c
  Created on: Sep 20, 2023
 *********************************************************************************/
-#ifndef HW_CRC_H_
-#define HW_CRC_H_
 
-#include "stm32f4xx.h"
-#include "stdlib.h"
+#include <CRC/CRC_HW.h>
 
-uint32_t F4xx_HW_CRC32(CRC_TypeDef *_crc, uint32_t *data, uint32_t len);
+uint32_t F4xx_HW_CRC32(CRC_TypeDef *_crc, uint32_t *data, uint32_t len)
+{
+    // Calculate the CRC32 of the data buffer using the hardware peripheral
+    uint32_t crc32 = 0;
+    for (uint32_t i = 0; i < len; i++) {
+        _crc->DR = data[i];
+        crc32 = _crc->DR;
+    }
+    crc32 ^= 0xFFFFFFFF;// Finalize the CRC32 value by flipping all bits
+    _crc->CR = CRC_CR_RESET;// Initialize the hardware CRC peripheral
+    return crc32;
+}
 
-#endif /* HW_CRC_H_ */

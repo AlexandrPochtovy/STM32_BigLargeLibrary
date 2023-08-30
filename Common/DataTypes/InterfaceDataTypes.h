@@ -20,7 +20,9 @@
 #ifndef INTERFACEDATATYPES_H_
 #define INTERFACEDATATYPES_H_
 
-
+/************************************************************************************
+*									COMMON											*
+************************************************************************************/
 /* MCU peripheral state
 * specifies that it is possible to work with peripherals at a low level
 * with multiple errors or timeouts, the peripheral is considered faulty
@@ -44,6 +46,80 @@ typedef enum DeviceStatus {//состояние устройства на шин
 	DEVICE_ERROR,		//опрос данных завершился с ошибкой
 	DEVICE_FAULTH		//ошибки при опросе устройства, потеря связи и тд
 } DeviceStatus_t;
+
+/************************************************************************************
+*									I2C												*
+************************************************************************************/
+typedef enum I2C_Mode {
+	I2C_MODE_WRITE,	//for write
+	I2C_MODE_READ,	//for read
+	I2C_MODE_RW		//for read as write restart internal use only
+} I2C_Mode_t;
+
+typedef struct I2C_IRQ_Conn {
+	I2C_TypeDef *i2c;	//pointer to HW i2c bus
+	PortStatus_t status;//status I2C bus
+	uint8_t step;		//step processing
+	uint8_t addr;		//device I2C address
+	uint8_t len;		//length data
+	I2C_Mode_t mode;	//device mode
+	fifo_t *buffer;		//pointer circular buffer
+} I2C_IRQ_Conn_t;
+
+typedef struct I2C_DMA_Conn {
+	I2C_TypeDef *i2c;	//pointer to HW i2c bus
+	void *DMAx;			//pointer to DMA MCU peripheral
+	uint32_t Channel;	//pointer to dma channel
+	PortStatus_t status;//status I2C bus
+	uint8_t step;		//step processing
+	uint8_t addr;		//device I2C address
+	uint8_t reg;		//register I2C
+	uint8_t len;		//length data
+	I2C_Mode_t mode;	//device mode
+	uint8_t *buffer;	//pointer linear buffer
+} I2C_DMA_Conn_t;
+
+/************************************************************************************
+*									SPI												*
+************************************************************************************/
+typedef enum SPI_Mode {	//команда работы с устройством: чтение или запись данных
+	SPI_MODE_WRITE,	//полудуплекс запись в шину
+	SPI_MODE_READ,	//полудуплекс чтение из шины
+	SPI_MODE_DUPLEX	//полный дуплекс чтение и запись параллельно
+} SPI_Mode_t;
+/*
+ * общая структура соединения с любым устройством на шине состоит из:
+ * структуры запроса по шине: адрес устройства, адрес регистра, длина запроса, режим чтение/запись
+ * структуры работы с шиной: аппаратный адрес шины, состояние шины, буфер приема/передачи
+ * состояния устройства: не настроено, настроено и готово, ошибка
+ */
+typedef struct SPI_Conn {
+	SPI_TypeDef *SPIbus;	//pointer to HW SPI port
+	Port_Status_t status;	//status port
+	//SPI_Mode_t mode;			//read write mode
+	fifo_t txbuffer;		//pointer circular buffer
+	uint8_t txlen;			//length data
+	fifo_t rxbuffer;		//pointer circular buffer
+	uint8_t rxlen;			//length data
+} SPI_Connection_t;
+
+/************************************************************************************
+*									USART											*
+************************************************************************************/
+	/*	общая структура соединения с любым устройством на шине состоит из:
+	 * структуры запроса по шине: адрес устройства, адрес регистра, длина запроса, режим чтение/запись
+	 * структуры работы с шиной: аппаратный адрес шины, состояние шины, буфер приема/передачи
+	 * состояния устройства: не настроено, настроено и готово, ошибка
+	 */
+	typedef struct USART_Conn {
+		USART_TypeDef *USART;		//pointer to HW USART port
+		PortStatus_t txStatus;	//status USART port
+		fifo_t *txbuffer;				//pointer circular buffer
+		uint8_t txlen;					//length data
+		PortStatus_t rxStatus;	//status USART port
+		fifo_t *rxbuffer;				//pointer circular buffer
+		uint8_t rxlen;					//length data
+	} USART_Conn_t;
 
 
 #endif /* INTERFACEDATATYPES_H_ */

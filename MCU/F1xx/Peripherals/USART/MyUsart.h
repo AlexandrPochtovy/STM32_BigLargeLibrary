@@ -27,28 +27,15 @@
 #ifdef DMA_H
 	#include "DMA_Template/DMA_Template.h"
 #endif
-	/*	общая структура соединения с любым устройством на шине состоит из:
-	 * структуры запроса по шине: адрес устройства, адрес регистра, длина запроса, режим чтение/запись
-	 * структуры работы с шиной: аппаратный адрес шины, состояние шины, буфер приема/передачи
-	 * состояния устройства: не настроено, настроено и готово, ошибка
-	 */
-	typedef struct USART_Connection {
-		USART_TypeDef *USART;		//pointer to HW USART port
-		PortStatus_t txStatus;	//status USART port
-		fifo_t *txbuffer;				//pointer circular buffer
-		uint8_t txlen;					//length data
-		PortStatus_t rxStatus;	//status USART port
-		fifo_t *rxbuffer;				//pointer circular buffer
-		uint8_t rxlen;					//length data
-	} USART_Connection_t;
-	//==============================================================================================
-	void USART_Send(USART_Connection_t *_usart, uint8_t len);//пишет в порт и устанавливает флаг "занято" для устройства
-	void USART_Receive(USART_Connection_t *usart);//читает из порта пока не будет тишина
-	void USART_Start_DMA(USART_Connection_t *usart);//запускает обмен и устанавливает флаг "занято" для устройства
-	/*	interrupt processing function	******************************/
-	void USART_EV_IRQ_CallBack(USART_Connection_t *usart);
-	void USART_EV_DMA_CallBack(USART_Connection_t *usart);
-	/*********************************************************************************/
+
+//==============================================================================================
+void USART_Send(USART_Connection_t *_usart, uint8_t len);//пишет в порт и устанавливает флаг "занято" для устройства
+void USART_Receive(USART_Connection_t *usart);//читает из порта пока не будет тишина
+void USART_Start_DMA(USART_Connection_t *usart);//запускает обмен и устанавливает флаг "занято" для устройства
+/*	interrupt processing function	******************************/
+void USART_EV_IRQ_CallBack(USART_Connection_t *usart);
+void USART_EV_DMA_CallBack(USART_Connection_t *usart);
+/*********************************************************************************/
 
 #endif /* SRC_MYFUNCTION_MYUSART_H_ */
 

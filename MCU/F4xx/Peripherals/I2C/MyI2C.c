@@ -21,7 +21,7 @@
 /*запускает обмен с I2C через прерывания, использовать
  * после того как передали в кольцевой буфер все необходимые данные
  */
-void I2C_Start_IRQ(I2C_IRQ_Connection_t *_i2c) {
+void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c) {
 	_i2c->status = PORT_BUSY;
 	LL_I2C_EnableIT_BUF(_i2c->i2c);	//Enable TXE RxNE iterrupt for >1 byte
 	if (_i2c->len > 1) {
@@ -33,7 +33,7 @@ void I2C_Start_IRQ(I2C_IRQ_Connection_t *_i2c) {
 	LL_I2C_GenerateStartCondition(_i2c->i2c);
 }
 /*запускает обмен по I2C с использованием DMA, не дописано*/
-void I2C_Start_DMA(I2C_DMA_Connection_t *_i2c) {
+void I2C_Start_DMA(I2C_DMA_Conn_t *_i2c) {
 	_i2c->status = PORT_BUSY;
 	LL_I2C_DisableDMAReq_TX(_i2c->i2c);
 	LL_I2C_DisableIT_BUF(_i2c->i2c);//отключаем прерывания чтобы работало DMA
@@ -48,7 +48,7 @@ void I2C_Start_DMA(I2C_DMA_Connection_t *_i2c) {
 /* альтернативный основной обработчик прерывания, использовать в блоке обработки прерываний
  * после окончания обработки присваивает соединению статус "свободно"
  * при ошибках будет выполняться обработчик ошибок*/
-void I2C_Raw_IRQ_CallBack(I2C_IRQ_Connection_t *_i2c) {
+void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 	//_i2c->status = PORT_BUSY;
 	volatile uint16_t I2C_SR1 = LL_I2C_ReadReg(_i2c->i2c, SR1);//Read SR1 first
 	//EV5 Start condition generated. Clear: read SR1 and write slave addr to DR final
@@ -134,7 +134,7 @@ void I2C_Raw_IRQ_CallBack(I2C_IRQ_Connection_t *_i2c) {
 }
 
 /* обработчик прерываний при обмене с использованием DMA переделать*/
-void I2C_EV_IRQ_DMA_CallBack(I2C_DMA_Connection_t *_i2c) {
+void I2C_EV_IRQ_DMA_CallBack(I2C_DMA_Conn_t *_i2c) {
 	volatile uint16_t I2C_SR1 = LL_I2C_ReadReg(_i2c->i2c, SR1);	//Read SR1
 	//EV5 Start condition generated. Clear: read SR1 and write slave addr to DR
 	if (I2C_SR1 & I2C_SR1_SB) {//send device address
@@ -163,7 +163,7 @@ void I2C_EV_IRQ_DMA_CallBack(I2C_DMA_Connection_t *_i2c) {
 	}
 }
 //=============================================================================
-void I2C_ERR_IRQ_CallBack(I2C_IRQ_Connection_t *_i2c) {
+void I2C_ERR_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 	volatile uint32_t I2C_SR1 = 0;
 	volatile uint32_t I2C_SR2 = 0;
 	_i2c->status = PORT_ERROR;

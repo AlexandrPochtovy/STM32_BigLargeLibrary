@@ -28,36 +28,7 @@ extern "C" {
 #include "FIFObuffer/FIFObuffer.h"
 #include "Peripherals/DMA_Template/DMA_Template.h"
 
-//========================================================================================================================
 
-typedef enum I2C_Mode {
-	I2C_MODE_WRITE,	//for write
-	I2C_MODE_READ,	//for read
-	I2C_MODE_RW			//for read as write restart internal use only
-} I2C_Mode_t;
-
-typedef struct I2C_IRQ_Conn {
-	I2C_TypeDef *i2c;		//pointer to HW i2c bus
-	PortStatus_t status;//status I2C bus
-	uint8_t step;				//step processing
-	uint8_t addr;				//device I2C address
-	uint8_t len;				//length data
-	I2C_Mode_t mode;		//device mode
-	fifo_t *buffer;			//pointer circular buffer
-} I2C_IRQ_Conn_t;
-
-typedef struct I2C_DMA_Conn {
-	I2C_TypeDef *i2c;		//pointer to HW i2c bus
-	void *DMAx;					//pointer to DMA MCU peripheral
-	uint32_t Channel;		//pointer to dma channel
-	PortStatus_t status;//status I2C bus
-	uint8_t step;				//step processing
-	uint8_t addr;				//device I2C address
-	uint8_t reg;				//reg I2C
-	uint8_t len;				//length data
-	I2C_Mode_t mode;		//device mode
-	uint8_t *buffer;		//pointer linear buffer
-} I2C_DMA_Conn_t;
 
 /*	control function	******************************************/
 void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c);

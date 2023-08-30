@@ -20,6 +20,8 @@
 #ifndef INTERFACEDATATYPES_H_
 #define INTERFACEDATATYPES_H_
 
+#include "FIFObuffer/FIFObuffer.h"
+
 /************************************************************************************
 *									COMMON											*
 ************************************************************************************/
@@ -82,26 +84,31 @@ typedef struct I2C_DMA_Conn {
 /************************************************************************************
 *									SPI												*
 ************************************************************************************/
-typedef enum SPI_Mode {	//команда работы с устройством: чтение или запись данных
-	SPI_MODE_WRITE,	//полудуплекс запись в шину
-	SPI_MODE_READ,	//полудуплекс чтение из шины
-	SPI_MODE_DUPLEX	//полный дуплекс чтение и запись параллельно
+typedef enum SPI_Mode {
+	SPI_MODE_WRITE,		//half-duplex write only
+	SPI_MODE_READ,		//half-duplex read only
+	SPI_MODE_DUPLEX,	//full-duplex write and read both
+	SPI_MODE_RO,			//receive-only mode (3 wire)
+	SPI_MODE_TO				//transmit-only mode (3 wire)
 } SPI_Mode_t;
-/*
- * общая структура соединения с любым устройством на шине состоит из:
- * структуры запроса по шине: адрес устройства, адрес регистра, длина запроса, режим чтение/запись
- * структуры работы с шиной: аппаратный адрес шины, состояние шины, буфер приема/передачи
- * состояния устройства: не настроено, настроено и готово, ошибка
- */
-typedef struct SPI_Conn {
-	SPI_TypeDef *SPIbus;	//pointer to HW SPI port
-	Port_Status_t status;	//status port
-	//SPI_Mode_t mode;			//read write mode
-	fifo_t txbuffer;		//pointer circular buffer
-	uint8_t txlen;			//length data
-	fifo_t rxbuffer;		//pointer circular buffer
-	uint8_t rxlen;			//length data
-} SPI_Connection_t;
+
+typedef struct SPI_Conn_TWO {
+	SPI_TypeDef *SPIbus;	        //pointer to HW SPI port
+	volatile PortStatus_t status;//status port
+	volatile SPI_Mode_t mode;			//read write mode
+	fifo_t *txbuffer;		          //pointer circular buffer
+	volatile uint8_t txlen;			  //length data
+	fifo_t *rxbuffer;		          //pointer circular buffer
+	volatile uint8_t rxlen;			  //length data
+} SPI_Conn_TWO_t;
+
+typedef struct SPI_Conn_ONE {
+	SPI_TypeDef *SPIbus;	        //pointer to HW SPI port
+	volatile PortStatus_t status;//status port
+	volatile SPI_Mode_t mode;			//read write mode
+	fifo_t *data;		          //pointer circular buffer
+	volatile uint8_t len;			  //length data
+} SPI_Conn_ONE_t;
 
 /************************************************************************************
 *									USART											*

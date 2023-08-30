@@ -29,46 +29,7 @@ extern "C" {
 #include "FIFObuffer/FIFObuffer.h"
 //#include "DMA_Template/DMA_Template.h"
 
-typedef enum SPI_Mode {	//команда работы с устройством: чтение или запись данных
-	SPI_MODE_WRITE,		//полудуплекс запись в шину
-	SPI_MODE_READ,		//полудуплекс чтение из шины
-	SPI_MODE_DUPLEX,	//полный дуплекс чтение и запись параллельно
-	SPI_MODE_RO,			//
-	SPI_MODE_TO				//
-} SPI_Mode_t;
 
-/* структура работы с шиной состоит из:
-* указателя на аппаратную шину
-* статуса шины
-* параметров запроса: адрес устройства, режим чтение/запись, длина запроса
-* указатель на структуру кольцевого буфера
-*/
-typedef struct SPI_Conn_TWO {
-	SPI_TypeDef *SPIbus;	        //pointer to HW SPI port
-	volatile PortStatus_t status;//status port
-	volatile SPI_Mode_t mode;			//read write mode
-	fifo_t *txbuffer;		          //pointer circular buffer
-	volatile uint8_t txlen;			  //length data
-	fifo_t *rxbuffer;		          //pointer circular buffer
-	volatile uint8_t rxlen;			  //length data
-} SPI_Conn_TWO_t;
-
-/* структура работы с шиной состоит из:
-* указателя на аппаратную шину
-* статуса шины
-* параметров запроса: адрес устройства, режим чтение/запись, длина запроса
-* указатель на структуру кольцевого буфера
-*/
-typedef struct SPI_Conn_ONE {
-	SPI_TypeDef *SPIbus;	        //pointer to HW SPI port
-	volatile PortStatus_t status;//status port
-	volatile SPI_Mode_t mode;			//read write mode
-	fifo_t *data;		          //pointer circular buffer
-	volatile uint8_t len;			  //length data
-} SPI_Conn_ONE_t;
-
-
-//==============================================================================================
 /*	control function	******************************************/
 //запускает обмен и устанавливает флаг "занято" для устройства
 void SPI_Start_IRQ_TWO_HWNSS(SPI_Conn_TWO_t *_spi);

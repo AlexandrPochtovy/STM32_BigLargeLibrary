@@ -119,13 +119,13 @@ typedef struct SPI_Conn_ONE {
 	 * состояния устройства: не настроено, настроено и готово, ошибка
 	 */
 	typedef struct USART_Conn {
-		USART_TypeDef *USART;		//pointer to HW USART port
+		USART_TypeDef *USART;	//pointer to HW USART port
 		PortStatus_t txStatus;	//status USART port
-		fifo_t *txbuffer;				//pointer circular buffer
-		uint8_t txlen;					//length data
+		fifo_t *txbuffer;		//pointer circular buffer
+		uint8_t txlen;			//length data
 		PortStatus_t rxStatus;	//status USART port
-		fifo_t *rxbuffer;				//pointer circular buffer
-		uint8_t rxlen;					//length data
+		fifo_t *rxbuffer;		//pointer circular buffer
+		uint8_t rxlen;			//length data
 	} USART_Conn_t;
 
 

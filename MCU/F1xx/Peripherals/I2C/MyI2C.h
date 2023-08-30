@@ -39,43 +39,6 @@ void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c);
 void I2C_EV_IRQ_DMA_CallBack(I2C_DMA_Conn_t *_i2c);
 void I2C_ERR_CallBack(I2C_IRQ_Conn_t *_i2c);
 
-/* @brief
- * write 3 bytes:addr reg value
- * @param
- * i2c connection, addr, register and value data
- * @retval
- * 0 - processing, 1 - complite
-*/
-uint8_t WriteOneRegByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t value);
-
-/*
- * @brief
- * write many bytes:addr, reg, values array
- * @param
- * i2c connection, addr, register and data array
- * @retval
- * 0 - processing, 1 - complite
-*/
-uint8_t WriteRegBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, void *data, uint8_t size);
-
-/*****************************************************************
- * @brief
- * read one byte :addr, reg, value
- * @param
- * i2c connection, addr, register and pointer data
- * @retval
- * 0 - processing, 1 - complite
-*/
-uint8_t ReadOneRegByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t *value);
-
-/*****************************************************************
-  * @brief
-  * @param
-  * @retval
-  */
-uint8_t ReadRegBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, void *data, uint8_t size);
-
-
 #ifdef __cplusplus
 }
 #endif

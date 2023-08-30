@@ -24,9 +24,9 @@
 extern "C" {
 #endif
 
-#include "Peripherals/I2C/MyI2C.h"
-#include "INA219_Register.h"
 
+#include "INA219_Register.h"
+#include "I2C_MiddleLevel/I2C_API.h"
 //============================================================================================
 enum INA219_ADDRESS {
 	INA219_ADDR = 0x88

@@ -25,7 +25,7 @@ extern "C" {
 
 
 #include "HMC5883L_Register.h"
-#include "Peripherals/I2C/MyI2C.h"
+#include "I2C_MiddleLevel/I2C_API.h"
 
 enum HMC5883L_ADDRESS {
 	HMC5883L_ADDR = 0x3C

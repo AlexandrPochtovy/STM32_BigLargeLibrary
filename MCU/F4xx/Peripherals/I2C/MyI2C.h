@@ -28,51 +28,14 @@ extern "C" {
 #include "FIFObuffer/FIFObuffer.h"
 //#include "Peripherals/DMA_Template/DMA_Template.h"
 
-//========================================================================================================================
-/*	команда работы с устройством: чтение или запись данных, используется как переключатель
-*	при переходе от записи к чтению при работе с шиной, внутренний признак, используется только в обработчике прерываний
- */
-typedef enum I2C_Mode {
-	I2C_MODE_WRITE,	//запись в шину
-	I2C_MODE_READ,	//чтение из шины
-	I2C_MODE_RW		//для чтения через запись в шину через повторный старт, не использовать
-} I2C_Mode_t;
-
-/* структура работы с шиной состоит из:
-* указателя на аппаратную шину
-* статуса шины
-* параметров запроса: адрес устройства, режим чтение/запись, длина запроса
-* указатель на структуру кольцевого буфера
-*/
-typedef struct I2C_IRQ_Connection {
-	I2C_TypeDef *i2c;	    //pointer to HW i2c bus
-	PortStatus_t status;  	//status I2C bus
-	uint8_t step;			//step processing
-	uint8_t addr;			//device I2C address
-	uint8_t len;			//length data
-	I2C_Mode_t mode;		//device mode
-	fifo_t *buffer;			//pointer circular buffer
-} I2C_IRQ_Connection_t;
-
-typedef struct I2C_DMA_Connection {
-	I2C_TypeDef *i2c;		//pointer to HW i2c bus
-	void *dma_channel;		//pointer to dma channel restart function
-	PortStatus_t status;	//status I2C bus
-	uint8_t step;			//step processing
-	uint8_t addr;			//device I2C address
-	uint8_t len;			//length data
-	I2C_Mode_t mode;		//device mode
-	fifo_t *buffer;			//pointer circular buffer
-} I2C_DMA_Connection_t;
-
 /*	control function	******************************************/
-void I2C_Start_IRQ(I2C_IRQ_Connection_t *_i2c);//запускает обмен и устанавливает флаг "занято" для устройства
-void I2C_Start_DMA(I2C_DMA_Connection_t *_i2c);//запускает обмен и устанавливает флаг "занято" для устройства
+void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c);//запускает обмен и устанавливает флаг "занято" для устройства
+void I2C_Start_DMA(I2C_DMA_Conn_t *_i2c);//запускает обмен и устанавливает флаг "занято" для устройства
 void ClearBusyI2C1(void);//сбрасывает флаг зависшей шины согласно эррате
 /*	interrupt processing function	******************************/
-void I2C_Raw_IRQ_CallBack(I2C_IRQ_Connection_t *_i2c);
-void I2C_EV_IRQ_DMA_CallBack(I2C_DMA_Connection_t *_i2c);
-void I2C_ERR_IRQ_CallBack(I2C_IRQ_Connection_t *_i2c);
+void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c);
+void I2C_EV_IRQ_DMA_CallBack(I2C_DMA_Conn_t *_i2c);
+void I2C_ERR_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c);
 
 #ifdef __cplusplus
 }

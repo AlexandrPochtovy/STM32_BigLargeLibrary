@@ -30,28 +30,6 @@ extern "C" {
 #include "Common/FIFObuffer/FIFObuffer.h"
 #include "DMA_Template/DMA_Template.h"
 
-typedef enum SPI_Mode {	//команда работы с устройством: чтение или запись данных
-	SPI_MODE_WRITE,	//полудуплекс запись в шину
-	SPI_MODE_READ,	//полудуплекс чтение из шины
-	SPI_MODE_DUPLEX	//полный дуплекс чтение и запись параллельно
-} SPI_Mode_t;
-/*
- * общая структура соединения с любым устройством на шине состоит из:
- * структуры запроса по шине: адрес устройства, адрес регистра, длина запроса, режим чтение/запись
- * структуры работы с шиной: аппаратный адрес шины, состояние шины, буфер приема/передачи
- * состояния устройства: не настроено, настроено и готово, ошибка
- */
-typedef struct SPI_Conn {
-	SPI_TypeDef *SPIbus;	//pointer to HW SPI port
-	Port_Status_t status;	//status port
-	//SPI_Mode_t mode;			//read write mode
-	fifo_t txbuffer;		//pointer circular buffer
-	uint8_t txlen;			//length data
-	fifo_t rxbuffer;		//pointer circular buffer
-	uint8_t rxlen;			//length data
-} SPI_Connection_t;
-
-//==============================================================================================
 /*	control function	******************************************/
 void SPI_Start_IRQ_HWNSS(SPI_Connection_t *_spi);//запускает обмен и устанавливает флаг "занято" для устройства
 void SPI_Start_DMA_HWNSS(SPI_Connection_t *_spi);//запускает обмен и устанавливает флаг "занято" для устройства

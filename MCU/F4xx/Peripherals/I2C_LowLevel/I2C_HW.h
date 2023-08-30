@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
- * 	MyI2C.h
+ * 	I2C_HW.h
  *	Created on: 30 nov. 2021
  */
 #ifndef _MYI2C_H_
@@ -23,10 +23,8 @@
 extern "C" {
 #endif
 
-#include "main.h"
-#include "DataTypes/InterfaceDataTypes.h"
-#include "FIFObuffer/FIFObuffer.h"
-//#include "Peripherals/DMA_Template/DMA_Template.h"
+#include <stm32f4xx_ll_i2c.h>
+#include <DataTypes/InterfaceDataTypes.h>
 
 /*	control function	******************************************/
 void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c);//запускает обмен и устанавливает флаг "занято" для устройства

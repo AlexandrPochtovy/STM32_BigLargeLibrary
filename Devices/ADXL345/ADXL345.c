@@ -19,12 +19,6 @@
 
 #include "ADXL345.h"
 
-const float kRatio2g = (float) (2 * 2) / 1024.0f;
-const float kRatio4g = (float) (4 * 2) / 1024.0f;
-const float kRatio8g = (float) (8 * 2) / 1024.0f;
-const float kRatio16g = (float) (16 * 2) / 1024.0f;
-const float my_gravity = 9.80665; // m/s^2
-
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (((uint16_t) msb << 8) | (uint16_t) lsb);
 }
@@ -89,16 +83,16 @@ float ADXL345_ConvertData(int16_t raw) {
 	uint8_t range = ADXL345_DATA_FORMAT_RANGE_2G;
 	switch (range) {
 		case ADXL345_DATA_FORMAT_RANGE_2G:
-			return (float) raw * my_gravity * kRatio2g;
+			return (float) raw * my_gravity * RATIO_2G;
 			break;
 		case ADXL345_DATA_FORMAT_RANGE_4G:
-			return (float) raw * my_gravity * kRatio4g;
+			return (float) raw * my_gravity * RATIO_4G;
 			break;
 		case ADXL345_DATA_FORMAT_RANGE_8G:
-			return (float) raw * my_gravity * kRatio8g;
+			return (float) raw * my_gravity * RATIO_8G;
 			break;
 		case ADXL345_DATA_FORMAT_RANGE_16G:
-			return (float) raw * my_gravity * kRatio16g;
+			return (float) raw * my_gravity * RATIO_16G;
 			break;
 		default:
 			return 0;

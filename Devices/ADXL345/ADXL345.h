@@ -24,15 +24,12 @@
 extern "C" {
 #endif
 
-#include "main.h"
-#include "Peripherals/I2C/MyI2C.h"
 #include "ADXL345_Register.h"
+#include "I2C_MiddleLevel/I2C_API.h"
 
 enum ADXL345_ADDRESS {
 	ADXL345_ADDR = 0xA6//Assumes ALT address pin low
 };
-
-const uint8_t ADXL345_DATA_LENGHT = 6;
 
 typedef struct ADXL345_RAW {
 	int16_t X;

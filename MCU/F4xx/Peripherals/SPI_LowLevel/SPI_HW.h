@@ -24,9 +24,8 @@
 extern "C" {
 #endif
 
-#include "main.h"
+#include <stm32f4xx_ll_spi.h>
 #include "DataTypes/InterfaceDataTypes.h"
-#include "FIFObuffer/FIFObuffer.h"
 //#include "DMA_Template/DMA_Template.h"
 
 

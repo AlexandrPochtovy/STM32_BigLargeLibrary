@@ -19,6 +19,13 @@
 
 #ifndef ADXL345_REGISTER_H_
 #define ADXL345_REGISTER_H_
+
+#define RATIO_2G						(float) (2 * 2) / 1024.0f
+#define RATIO_4G						(float) (4 * 2) / 1024.0f
+#define RATIO_8G  					(float) (8 * 2) / 1024.0f
+#define RATIO_16G  					(float) (16 * 2) / 1024.0f
+#define my_gravity 					9.80665 // m/s^2
+#define ADXL345_DATA_LENGHT 6
 /*************************** REGISTER MAP ***************************/
 enum ADXL345_Register {
 	ADXL345_DEVID_REG					= 0x00,	//R		Device ID

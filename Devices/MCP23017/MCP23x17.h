@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #include "MCP23x17_Register.h"
-#include "Peripherals/I2C/MyI2C.h"
+#include "I2C_MiddleLevel/I2C_API.h"
 
 enum MCP23017_ADDRESS {
 	MCP23017_ADDR = 0x40

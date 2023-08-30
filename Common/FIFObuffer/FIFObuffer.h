@@ -22,15 +22,15 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
-#include "DataTypes/BufferDataTypes.h"
+#include "DataTypes/CommonDataTypes.h"
 
 typedef struct fifo {
     uint8_t *buffer;
-    volatile size_t   buffer_size;
-    volatile size_t   head;
-    volatile size_t   tail;
-    volatile size_t   bytes_avail;
-    volatile BufferStatus_t lockState;
+    size_t   buffer_size;
+    size_t   head;
+    size_t   tail;
+    size_t   bytes_avail;
+    BufferStatus_t lockState;
 } fifo_t;
 
 /* Initializes the buffer, resets the head and tail indexes. */

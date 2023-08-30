@@ -19,28 +19,28 @@
 
 #include "SG90.h"
 
-uint16_t Servo_Init(Servo_t sg, uint16_t lowLimit, uint16_t hiLimit, uint16_t step) {
-	sg.max = hiLimit;
-	sg.min = lowLimit;
-	sg.step = step;
-	return (sg.max - sg.min) / 2;
+uint16_t Servo_Init(Servo_t *sg, uint16_t lowLimit, uint16_t hiLimit, uint16_t step) {
+	sg->max = hiLimit;
+	sg->min = lowLimit;
+	sg->step = step;
+	return (sg->max - sg->min) / 2 + sg->min;
 }
 
-uint16_t ServoSetPWM_IT(Servo_t sg, uint16_t actual, uint16_t SP) {
-	uint16_t value;
+uint16_t ServoSetPWM_IT(Servo_t *sg, uint16_t actual, uint16_t SP) {
 	if (SP > actual) {
-		if (actual < (sg.max - sg.step)) {
-			value = actual + sg.step;
+		if (actual < (sg->max - sg->step)) {
+			return actual + sg->step;
 		} else {
-			value = sg.max;
+			return sg->max;
 		}
 	}
 	else if (SP < actual) {
-		if (actual > (sg.min + sg.step)) {
-			value = actual - sg.step;
+		if (actual > (sg->min + sg->step)) {
+			return actual - sg->step;
 		} else {
-			value = sg.min;
+			return sg->min;
 		}
+	} else {
+		return actual;
 	}
-	return value;
 }

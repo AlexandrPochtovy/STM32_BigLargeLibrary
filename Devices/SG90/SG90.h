@@ -22,14 +22,13 @@
 
 #include <stdint.h>
 
-typedef struct SG90_dev_t {
-	const uint16_t max;
-	const uint16_t min;
-	int16_t step;
-	const uint16_t N;
-} SG90_dev;
+typedef struct Servo {
+	uint16_t max;
+	uint16_t min;
+	uint16_t step;
+} Servo_t;
 
-uint16_t SG90_Init(SG90_dev *sg);
-uint16_t SG90Write(SG90_dev *sg, uint16_t SP,  uint16_t act);
+uint16_t Servo_Init(Servo_t sg, uint16_t lowLimit, uint16_t hiLimit, uint16_t step);
+uint16_t ServoSetPWM_IT(Servo_t sg, uint16_t actual, uint16_t SP);
 
 #endif /* SG90_MASTER_SG90_H_ */

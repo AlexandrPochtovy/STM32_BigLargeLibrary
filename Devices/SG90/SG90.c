@@ -19,18 +19,28 @@
 
 #include "SG90.h"
 
-uint16_t SG90_Init(SG90_dev *sg) {
-	sg->step = (sg->max - sg->min) / sg->N;
-	return (sg->max - sg->min) / 2;
+uint16_t Servo_Init(Servo_t sg, uint16_t lowLimit, uint16_t hiLimit, uint16_t step) {
+	sg.max = hiLimit;
+	sg.min = lowLimit;
+	sg.step = step;
+	return (sg.max - sg.min) / 2;
 }
 
-uint16_t SG90Write(SG90_dev *sg, uint16_t SP,  uint16_t act) {
-	uint16_t angle;
-	if ((SP - sg->step / 2) > act) {
-		angle = act + sg->step;
+uint16_t SG90SetPWM_IT(Servo_t sg, uint16_t actual, uint16_t SP) {
+	uint16_t value;
+	if (SP > actual) {
+		if (actual < (sg.max - sg.step)) {
+			value = actual + sg.step;
+		} else {
+			value = sg.max;
+		}
 	}
-	if ((SP + sg->step / 2) < act) {
-		angle = act - sg->step;
+	else if (SP < actual) {
+		if (actual > (sg.min + sg.step)) {
+			value = actual - sg.step;
+		} else {
+			value = sg.min;
+		}
 	}
-	return angle;
+	return value;
 }

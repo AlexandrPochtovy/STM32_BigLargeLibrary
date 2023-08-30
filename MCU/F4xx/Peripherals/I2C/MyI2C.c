@@ -150,7 +150,7 @@ void I2C_EV_IRQ_DMA_CallBack(I2C_DMA_Conn_t *_i2c) {
 	else if (I2C_SR1 & I2C_SR1_ADDR) {// slave found and ASK recive
 		if (_i2c->mode == I2C_MODE_WRITE) {//work correct
 			(void) _i2c->i2c->SR2;	//Read SR2, clear ADDR
-			FIFO_GetOne(_i2c->buffer, ((uint8_t *)&_i2c->i2c->DR));//It's FIRST byte			//Send first byte reg address
+			_i2c->i2c->DR = _i2c->reg;
 			LL_I2C_EnableDMAReq_TX(_i2c->i2c);//i2c_conn->I2Cbus->CR2 |= I2C_CR2_DMAEN;
 		}
 		return;

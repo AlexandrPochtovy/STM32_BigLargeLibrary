@@ -26,7 +26,7 @@ uint16_t Servo_Init(Servo_t sg, uint16_t lowLimit, uint16_t hiLimit, uint16_t st
 	return (sg.max - sg.min) / 2;
 }
 
-uint16_t SG90SetPWM_IT(Servo_t sg, uint16_t actual, uint16_t SP) {
+uint16_t ServoSetPWM_IT(Servo_t sg, uint16_t actual, uint16_t SP) {
 	uint16_t value;
 	if (SP > actual) {
 		if (actual < (sg.max - sg.step)) {

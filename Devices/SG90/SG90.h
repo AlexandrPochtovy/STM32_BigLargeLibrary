@@ -20,6 +20,10 @@
 #ifndef SG90_MASTER_SG90_H_
 #define SG90_MASTER_SG90_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 typedef struct Servo {
@@ -31,4 +35,7 @@ typedef struct Servo {
 uint16_t Servo_Init(Servo_t sg, uint16_t lowLimit, uint16_t hiLimit, uint16_t step);
 uint16_t ServoSetPWM_IT(Servo_t sg, uint16_t actual, uint16_t SP);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* SG90_MASTER_SG90_H_ */

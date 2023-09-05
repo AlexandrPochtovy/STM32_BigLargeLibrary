@@ -26,8 +26,10 @@ extern "C" {
 
 #include "assert.h"
 #include "VL53L0x_Registers.h"
-#include "I2C_MiddleLevel/I2C_API.h"
 #include "Function/Function.h"
+#include "Function/BytesMath.h"
+#include "I2C_MiddleLevel/I2C_API.h"
+
 
 enum VL53L0x_ADDRESS {
 VL53L0x_ADDR_DEFAULT = 0x52//0b01010010
@@ -60,81 +62,35 @@ typedef struct __SequenceStepTimeouts {
 typedef struct __VL53L0X {
   uint8_t addr;
   DeviceStatus_t status;
-  uint8_t step_l1;
-  uint8_t step_l2;
-  uint8_t step_l3;
+  uint8_t stepL1;
+  uint8_t stepL2;
+  uint8_t stepL3;
   uint8_t modelID;
   uint8_t revisionID;
   uint16_t count_timeout;
   uint16_t limit_timeout;
   uint8_t timeoutFlag;
-  uint8_t stop_variable; // read by inused when starting measurement; is StopVariable field of VL53L0X_DevData_t structure in API
+  uint8_t stop_variable; // read by unused when starting measurement; is StopVariable field of VL53L0X_DevData_t structure in API
+  uint32_t sp_budget_us;
   uint32_t measurement_timing_budget_us;
   uint8_t spad_count;
   uint8_t spad_type_is_aperture;
   SequenceStepEnables enables;
   SequenceStepTimeouts timeouts;
+	uint8_t sequence_config;
+	uint8_t vcsel_period_reg;
+	uint16_t new_pre_range_timeout_mclks;
+	uint16_t new_msrc_timeout_mclks;
+	uint16_t new_final_range_timeout_mclks;
   uint8_t vcselPeriodValue;
   uint8_t ref_spad_map[6];
-  uint8_t tmp;
+  uint8_t tmp8;
+  uint16_t tmp16;
   uint16_t range;
   uint16_t smoothRange;
 } VL53L0X;
 
 
-
-//================================================================
-// VALUE CONVERTERS
-// ===============================================================
-/* Convert sequence step timeout from MCLKs to microseconds with given VCSEL period in PCLKs
- * based on VL53L0X_calc_timeout_us()
- */
-uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks);
-//----------------------------------------------------------------
-/* Convert sequence step timeout from microseconds to MCLKs with given VCSEL period in PCLKs
- * based on VL53L0X_calc_timeout_mclks()
- */
-uint32_t timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks);
-//----------------------------------------------------------------
-/* Decode sequence step timeout in MCLKs from register value
- * based on VL53L0X_decode_timeout()
- * Note: the original function returned a uint32_t, but the return value is
- * always stored in a uint16_t.
- */
-uint16_t decodeTimeout(uint16_t reg_val);
-//----------------------------------------------------------------
-/* Encode sequence step timeout register value from timeout in MCLKs
- * based on VL53L0X_encode_timeout()
- * Note: the original function took a uint16_t, but the argument passed to it
- * is always a uint16_t.
- */
-uint16_t encodeTimeout(uint16_t timeout_mclks);
-// ===============================================================
-// BUS FUNCTIONS
-// ===============================================================
-// Write an 8-bit register
-void writeReg(I2C_IRQ_Conn_t *_i2c,VL53L0X *lidar,uint8_t reg, uint8_t value);
-//----------------------------------------------------------------
-// Write a 16-bit register
-void writeReg16Bit(I2C_IRQ_Conn_t *_i2c,VL53L0X *lidar,uint8_t reg, uint16_t value);
-//----------------------------------------------------------------
-// Write a 32-bit register
-void writeReg32Bit(I2C_IRQ_Conn_t *_i2c,VL53L0X *lidar,uint8_t reg, uint32_t value);
-//----------------------------------------------------------------
-//write multibytes
-void writeMulti(I2C_IRQ_Conn_t *_i2c,VL53L0X *lidar,uint8_t reg, uint8_t * src, uint8_t count);
-//----------------------------------------------------------------
-// Read an 8-bit register
-uint8_t readReg(I2C_IRQ_Conn_t *_i2c,VL53L0X *lidar,uint8_t reg);
-//----------------------------------------------------------------
-// Read a 16-bit register
-uint16_t readReg16Bit(I2C_IRQ_Conn_t *_i2c,VL53L0X *lidar,uint8_t reg);
-//----------------------------------------------------------------
-//Read a 32-bit register
-uint32_t readReg32Bit(I2C_IRQ_Conn_t *_i2c,VL53L0X *lidar,uint8_t reg);
-//----------------------------------------------------------------
-//read multibytes
-void readMulti(I2C_IRQ_Conn_t *_i2c,VL53L0X *lidar,uint8_t reg, uint8_t * dst, uint8_t count);
 // ===============================================================
 // SETUP FUNCTIONS
 // ===============================================================

@@ -23,9 +23,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define BusRequestOn(req, mask) req |= mask
-#define BusRequestOff(req, mask) req &= ~mask
-
 float invSqrt(float x);
 
 int16_t signum_t(int16_t x);

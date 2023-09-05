@@ -199,7 +199,8 @@ void I2C_ERR_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 		LL_I2C_ClearSMBusFlag_ALERT(_i2c->i2c);
 	}
 	else if (I2C_SR2 & I2C_SR2_BUSY) {
-		ClearBusyI2C1();
+		LL_I2C_Disable(I2C1);
+		LL_I2C_Enable(I2C1);
 	}
 	else if (I2C_SR1 & I2C_SR1_STOPF) {//+
 		LL_I2C_Disable(I2C1);

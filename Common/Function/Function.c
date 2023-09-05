@@ -18,6 +18,44 @@
 
 #include "Function.h"
 
+/*****************************************************************
+  * @brief
+  * @param
+  * @retval
+  */
+size_t Min(size_t val, size_t min) {
+	return val > min ? val : min;
+}
+
+/*****************************************************************
+  * @brief
+  * @param
+  * @retval
+  */
+size_t Max(size_t val, size_t max) {
+	return val < max ? val : max;
+}
+
+/*****************************************************************
+  * @brief  concat two bytes into word
+  * @param  msb - hi byte, lsb - lo byte
+  * @retval uint16_t
+  */
+size_t CONCAT_TWO_BYTES(uint8_t msb, uint8_t lsb) {
+	return (((size_t)msb << 8) | (size_t)lsb);
+}
+
+/*****************************************************************
+  * @brief  concat four bytes into long
+  * @param  hh_b - most hi byte
+  * 				h_b - hi byte
+  * 				l_b - low byte
+  * 				ll_b - most low byte
+  * @retval uint32_t
+  */
+size_t CONCAT_FOUR_BYTES(uint8_t hh_b, uint8_t h_b, uint8_t l_b, uint8_t ll_b) {
+	return ((size_t)hh_b << 24) | ((size_t)h_b << 16) | ((size_t)l_b << 8) | (size_t)ll_b;
+}
 
 //-------------------------------------------------------------------------------
 // Fast inverse square-root

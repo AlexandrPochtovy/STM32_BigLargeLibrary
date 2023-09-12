@@ -13,11 +13,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  
- AnyCRC.c
+ F1_CRC_HW.c
  Created on: Sep 20, 2020
 *********************************************************************************/
 
-#include "AnyCRC.h"
+#include "F1_CRC_HW.h"
 
 uint32_t HW_CRC32(const uint8_t* pData, size_t count, uint32_t init) {
   uint32_t crc;

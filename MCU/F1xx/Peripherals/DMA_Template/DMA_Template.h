@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 /* include -------------------------------------------------------------------*/
-#include "main.h"
+#include "stm32f1xx.h"
 
 void DMA_Ch1_IRQ_Callback(DMA_TypeDef *DMAnum);
 void DMA_Ch2_IRQ_Callback(DMA_TypeDef *DMAnum);//SPI1 RX

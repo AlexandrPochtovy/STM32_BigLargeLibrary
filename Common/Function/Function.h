@@ -30,6 +30,13 @@ size_t Max(size_t val, size_t max);
 size_t CONCAT_TWO_BYTES(uint8_t msb, uint8_t lsb);
 size_t CONCAT_FOUR_BYTES(uint8_t hh_b, uint8_t h_b, uint8_t l_b, uint8_t ll_b);
 
+static inline void BusRequestOn(uint32_t req, uint32_t mask) {
+	req |= mask;
+}
+static inline void BusRequestOff(uint32_t req, uint32_t mask) {
+	req &= ~mask;
+}
+
 float invSqrt(float x);
 
 int16_t signum_t(int16_t x);

@@ -13,18 +13,18 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  
- AnyCRC.h
+ F1_CRC_HW.h
  Created on: Sep 20, 2020
 *********************************************************************************/
-#ifndef ANY_CRC_H_
-#define ANY_CRC_H_
+#ifndef _F1_CRC_HW_H_
+#define _F1_CRC_HW_H_
 
-#include "main.h"
-#include "math.h"
-#include "stdlib.h"
+#include <stddef.h>
+#include <stdint.h>
+#include "stm32f1xx.h"
 
 uint32_t HW_CRC32(const uint8_t* pData, size_t count, uint32_t init);
 
 uint32_t crc32_zlib(const uint32_t *data, size_t cnt);
 
-#endif /* ANY_CRC_H_ */
+#endif /* _F1_CRC_HW_H_ */

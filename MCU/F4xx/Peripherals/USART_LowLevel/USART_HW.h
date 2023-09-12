@@ -20,11 +20,22 @@
 #define SRC_MYUSART_H_
 
 #include <stm32f4xx_ll_usart.h>
-#include "DataTypes/InterfaceDataTypes.h"
+#include "Peripherals/DataTypes.h"
+#include "FIFObuffer/FIFObuffer.h"
 //#include "DMA_Template/DMA_Template.h"
 #ifdef DMA_H
 	#include "DMA_Template/DMA_Template.h"
 #endif
+
+typedef struct USART_Conn {
+	USART_TypeDef *USART;	//pointer to HW USART port
+	PortStatus_t txStatus;	//status USART port
+	fifo_t *txbuffer;		//pointer circular buffer
+	uint8_t txlen;			//length data
+	PortStatus_t rxStatus;	//status USART port
+	fifo_t *rxbuffer;		//pointer circular buffer
+	uint8_t rxlen;			//length data
+} USART_Conn_t;
 
 //==============================================================================================
 void USART_Send(USART_Conn_t *_usart, uint8_t len);//пишет в порт и устанавливает флаг "занято" для устройства

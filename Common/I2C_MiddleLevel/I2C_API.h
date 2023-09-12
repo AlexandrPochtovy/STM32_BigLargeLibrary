@@ -26,12 +26,6 @@ extern "C" {
 
 #include "Peripherals/I2C_LowLevel/I2C_HW.h"
 
-	__STATIC_INLINE void BusRequestOn(uint32_t req, uint32_t mask) {
-		req |= mask;
-	}
-	__STATIC_INLINE void BusRequestOff(uint32_t req, uint32_t mask) {
-		req &= ~mask;
-	}
 	/* @brief
  * write 3 bytes:addr reg value
  * @param

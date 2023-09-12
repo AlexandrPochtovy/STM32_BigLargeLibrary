@@ -22,7 +22,7 @@
 /*
  *
  * */
-void USART_Send(USART_Connection_t *usart, uint8_t len) {
+void USART_Send(USART_Conn_t *usart, uint8_t len) {
 	usart->txStatus = PORT_BUSY;
 	usart->txlen = len;
 	usart->USART->CR1 |= (  //USART_CR1_RE 		| // Receiver Enable
@@ -35,7 +35,7 @@ void USART_Send(USART_Connection_t *usart, uint8_t len) {
 	        USART_CR1_UE);
 }
 
-void USART_Receive(USART_Connection_t *usart) {  //читает из порта пока не будет тишина
+void USART_Receive(USART_Conn_t *usart) {  //читает из порта пока не будет тишина
 	usart->rxStatus = PORT_BUSY;
 	usart->rxlen = 0;
 	usart->USART->CR1 |= ( USART_CR1_RE |  // Receiver Enable
@@ -47,10 +47,10 @@ void USART_Receive(USART_Connection_t *usart) {  //читает из порта 
 	    //USART_CR1_PEIE	|// PE interrupt enable
 	    USART_CR1_UE);
 }
-void USART_Start_DMA(USART_Connection_t *usart) {  //запускает обмен и устанавливает флаг "занято" для устройства
+void USART_Start_DMA(USART_Conn_t *usart) {  //запускает обмен и устанавливает флаг "занято" для устройства
 }
 
-void USART_EV_IRQ_CallBack(USART_Connection_t *usart) {
+void USART_EV_IRQ_CallBack(USART_Conn_t *usart) {
 	volatile uint16_t SR = usart->USART->SR;  //read status register
 	if (SR
 	    & (USART_SR_RXNE | USART_SR_PE | USART_SR_IDLE | USART_SR_ORE | USART_SR_FE | USART_SR_NE)) {
@@ -93,6 +93,6 @@ void USART_EV_IRQ_CallBack(USART_Connection_t *usart) {
 	}
 }
 
-void USART_EV_DMA_CallBack(USART_Connection_t *_usart) {
+void USART_EV_DMA_CallBack(USART_Conn_t *_usart) {
 
 }

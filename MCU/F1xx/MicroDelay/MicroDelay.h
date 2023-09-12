@@ -24,7 +24,10 @@
 extern "C" {
 #endif
 
-#include "main.h"
+#include <stddef.h>
+#include <stdint.h>
+#include "stdlib.h"
+#include "stm32f1xx.h"
 
 #define DWT_CYCCNT	*(volatile uint32_t*)0xE0001004
 #define DWT_CONTROL *(volatile uint32_t*)0xE0001000

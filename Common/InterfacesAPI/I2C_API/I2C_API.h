@@ -17,8 +17,8 @@
  * Created on: Aug 30, 2023
  ********************************************************************************/
 
-#ifndef I2C_MIDDLELEVEL_I2C_API_H_
-#define I2C_MIDDLELEVEL_I2C_API_H_
+#ifndef _I2C_MIDDLELEVEL_I2C_API_H_
+#define _I2C_MIDDLELEVEL_I2C_API_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,39 +26,31 @@ extern "C" {
 
 #include "Peripherals/I2C_LowLevel/I2C_HW.h"
 
-	/* @brief
- * write 3 bytes:addr reg value
- * @param
- * i2c connection, addr, register and value data
- * @retval
- * 0 - processing, 1 - complite
-*/
+/*****************************************************************
+  * @brief  write 3 bytes in i2c bus: addr, reg, value in interrupt mode.
+  * @param  *_i2c - pointer to i2c connection struct
+  * @retval 0 - processing, 1 - complite
+  */
 uint8_t WriteOneRegByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t value);
 
-/*
- * @brief
- * write many bytes:addr, reg, values array
- * @param
- * i2c connection, addr, register and data array
- * @retval
- * 0 - processing, 1 - complite
-*/
+/*****************************************************************
+  * @brief  write multiple bytes in i2c bus: addr, reg, value's array in interrupt mode.
+  * @param  *_i2c - pointer to i2c connection struct
+  * @retval 0 - processing, 1 - complite
+  */
 uint8_t WriteRegBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, void *data, uint8_t size);
 
 /*****************************************************************
- * @brief
- * read one byte :addr, reg, value
- * @param
- * i2c connection, addr, register and pointer data
- * @retval
- * 0 - processing, 1 - complite
-*/
+  * @brief  read one byte frow i2c bus, but send 2 before: addr and reg
+  * @param  *_i2c - pointer to i2c connection struct
+  * @retval 0 - processing, 1 - complite
+  */
 uint8_t ReadOneRegByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t *value);
 
 /*****************************************************************
-  * @brief
-  * @param
-  * @retval
+  * @brief  read multiple bytes frow i2c bus, but send 2 before: addr and reg
+  * @param  *_i2c - pointer to i2c connection struct
+  * @retval 0 - processing, 1 - complite
   */
 uint8_t ReadRegBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, void *data, uint8_t size);
 
@@ -66,4 +58,4 @@ uint8_t ReadRegBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, void *data
 }
 #endif
 
-#endif /* I2C_MIDDLELEVEL_I2C_API_H_ */
+#endif /* _I2C_MIDDLELEVEL_I2C_API_H_ */

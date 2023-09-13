@@ -13,18 +13,19 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  
- * F1_CRC_HW.h
- * Created on: Sep 20, 2020
-*********************************************************************************/
-#ifndef _F1_CRC_HW_H_
-#define _F1_CRC_HW_H_
+ *	CommonDataTypes.h
+ *	Created on: Aug 30, 2023
+ */
 
-#include <stddef.h>
-#include <stdint.h>
-#include "stm32f1xx.h"
+#ifndef _BUFFER_DATATYPES_H_
+#define _BUFFER_DATATYPES_H_
 
-uint32_t HW_CRC32(const uint8_t* pData, size_t count, uint32_t init);
+/************************************************************************************
+*									COMMON											*
+************************************************************************************/
+typedef enum BufferStatus {
+	BUFFER_FREE,
+	BUFFER_BLOCKED
+} BufferStatus_t;
 
-uint32_t crc32_zlib(const uint32_t *data, size_t cnt);
-
-#endif /* _F1_CRC_HW_H_ */
+#endif /* _BUFFER_DATATYPES_H_ */

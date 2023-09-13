@@ -12,12 +12,12 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-
- * 	MyI2C.h
+ 
+ * 	I2C_HW.h
  *	Created on: 30 nov. 2020
- */
-#ifndef _MYI2C_H_
-#define _MYI2C_H_
+*********************************************************************************/
+#ifndef _I2C_HW_H_
+#define _I2C_HW_H_
 
 #ifdef __cplusplus
 extern "C" {

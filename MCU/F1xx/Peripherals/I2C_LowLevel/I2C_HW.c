@@ -18,9 +18,7 @@
  */
 
 #include "I2C_HW.h"
-/*запускает обмен с I2C через прерывания, использовать
- * после того как передали в кольцевой буфер все необходимые данные
- */
+
 void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c) {
 	_i2c->status = PORT_BUSY;
 	LL_I2C_EnableIT_BUF(_i2c->i2c);	//Enable TXE RxNE iterrupt for >1 byte

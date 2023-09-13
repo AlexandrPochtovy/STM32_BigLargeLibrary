@@ -16,8 +16,8 @@
  * 	MySPI.h
  *  Created on: 30 nov 2020
  */
-#ifndef SPI_MYSPI_H_
-#define SPI_MYSPI_H_
+#ifndef _SPI_HW_H_
+#define _SPI_HW_H_
 
 #ifdef __cplusplus
 extern "C" {

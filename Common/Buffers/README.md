@@ -1,4 +1,4 @@
-Common buffers for libraries: FIFO, FILO.
+Common buffers for libraries: simple ring buffer, simple stack.
 
 CommonDataTypes.h - data type for these buffers.
 

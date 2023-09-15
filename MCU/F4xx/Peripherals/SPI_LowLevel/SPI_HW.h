@@ -33,8 +33,8 @@ typedef enum SPI_Mode {
 	SPI_MODE_WRITE,		//half-duplex write only
 	SPI_MODE_READ,		//half-duplex read only
 	SPI_MODE_DUPLEX,	//full-duplex write and read both
-	SPI_MODE_RO,			//receive-only mode (3 wire)
-	SPI_MODE_TO				//transmit-only mode (3 wire)
+	SPI_HALFDUPLEX_READ,			//receive-only mode (3 wire)
+	SPI_HALFDUPLEX_WRITE				//transmit-only mode (3 wire)
 } SPI_Mode_t;
 
 typedef struct SPI_Conn_TWO {
@@ -51,7 +51,7 @@ typedef struct SPI_Conn_ONE {
 	SPI_TypeDef *SPIbus;	        //pointer to HW SPI port
 	volatile PortStatus_t status;//status port
 	volatile SPI_Mode_t mode;			//read write mode
-	fifo_t *data;		          //pointer circular buffer
+	fifo_t *buffer;		          //pointer circular buffer
 	volatile uint8_t len;			  //length data
 } SPI_Conn_ONE_t;
 

@@ -136,7 +136,7 @@ void setupVL53L0X(VL53L0x_t *lidar, uint16_t timeout) {
 uint8_t setAddress(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, const uint8_t new_addr)
 {
 	uint8_t st;
-	st = WriteOneRegByte(_i2c, lidar->addr, CHIP_I2C_ADDRESS, new_addr & 0x7F);
+	st = I2C_WriteOneByte(_i2c, lidar->addr, CHIP_I2C_ADDRESS, new_addr & 0x7F);
 	if (st) {
 		lidar->addr = new_addr;
 	}
@@ -215,7 +215,7 @@ uint8_t setSignalRateLimit(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint32_t limi
 {
 	uint8_t st;
 	uint16_t data = Min(Max((uint16_t)limit_Mcps, 65535), 32);
-	st = WriteRegBytes(_i2c, lidar->addr, FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, (uint8_t* )&data, 2);
+	st = I2C_WriteBytes(_i2c, lidar->addr, FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, (uint8_t* )&data, 2);
 	return st;
 }
 /*****************************************************************
@@ -228,25 +228,25 @@ uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 	uint8_t st;
 	switch (lidar->stepL1) {
 	case 0:
-		st = WriteOneRegByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
 		if (st) {
 			lidar->stepL1 = 1;
 		}
 		break;
 	case 1:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x01);
 		if (st) {
 			lidar->stepL1 = 2;
 		}
 		break;
 	case 2:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x00);
 		if (st) {
 			lidar->stepL1 = 3;
 		}
 		break;
 	case 3:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x06);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x06);
 		if (st) {
 			lidar->stepL1 = 4;
 		}
@@ -259,38 +259,38 @@ uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 		}
 		break;
 	case 5:
-		st = WriteOneRegByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, lidar->tmp8);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, lidar->tmp8);
 		if (st) {
 			lidar->stepL1 = 6;
 		}
 		break;
 	case 6:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x07);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x07);
 		if (st) {
 			lidar->stepL1 = 7;
 		}
 		break;
 	case 7:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_HISTOGRAM_BIN, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_HISTOGRAM_BIN, 0x01);
 		if (st) {
 			lidar->stepL1 = 8;
 		}
 		break;
 	case 8:
-		st = WriteOneRegByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
 		if (st) {
 			lidar->stepL1 = 9;
 		}
 		;
 		break;
 	case 9:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x94, 0x6b);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x94, 0x6b);
 		if (st) {
 			lidar->stepL1 = 10;
 		}
 		break;
 	case 10:
-		st = WriteOneRegByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, 0x00);
 		if (st) {
 			setTimeout(lidar, 100);
 			startTimeout(lidar);
@@ -311,7 +311,7 @@ uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 		}
 		break;
 	case 12:
-		st = WriteOneRegByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, 0x01);
 		if (st) {
 			lidar->stepL1 = 13;
 		}
@@ -325,13 +325,13 @@ uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 		}
 		break;
 	case 14:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_HISTOGRAM_BIN, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_HISTOGRAM_BIN, 0x00);
 		if (st) {
 			lidar->stepL1 = 15;
 		}
 		break;
 	case 15:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x06);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x06);
 		if (st) {
 			lidar->stepL1 = 16;
 		}
@@ -344,31 +344,31 @@ uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 		}
 		break;
 	case 17:
-		st = WriteOneRegByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, lidar->tmp8);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, lidar->tmp8);
 		if (st) {
 			lidar->stepL1 = 18;
 		}
 		break;
 	case 18:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x01);
 		if (st) {
 			lidar->stepL1 = 19;
 		}
 		break;
 	case 19:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x01);
 		if (st) {
 			lidar->stepL1 = 20;
 		}
 		break;
 	case 20:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x00);
 		if (st) {
 			lidar->stepL1 = 21;
 		}
 		break;
 	case 21:
-		st = WriteOneRegByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x00);
 		if (st) {
 			lidar->stepL1 = 0;
 			return 1;
@@ -450,7 +450,7 @@ uint8_t getSequenceStepTimeouts(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 		}
 		break;
 	case 2:
-		st = ReadRegBytes(_i2c, lidar->addr, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&lidar->tmp16, 2);
+		st = I2C_ReadBytes(_i2c, lidar->addr, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&lidar->tmp16, 2);
 		if (st) {
 			lidar->timeouts.pre_range_mclks = decodeTimeout(lidar->tmp16);
 			lidar->timeouts.pre_range_us = timeoutMclksToMicroseconds(lidar->timeouts.pre_range_mclks, lidar->timeouts.pre_range_vcsel_period_pclks);
@@ -465,7 +465,7 @@ uint8_t getSequenceStepTimeouts(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 		}
 		break;
 	case 4:
-		st = ReadRegBytes(_i2c, lidar->addr, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&lidar->tmp16, 2);
+		st = I2C_ReadBytes(_i2c, lidar->addr, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&lidar->tmp16, 2);
 		if (st) {
 			lidar->timeouts.final_range_mclks = decodeTimeout(lidar->tmp16);
 			if (lidar->enables.pre_range) {
@@ -622,7 +622,7 @@ uint8_t setMeasurementTimingBudget(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint3
 		}
 		break;
 	case 5:
-		st = WriteRegBytes(_i2c, lidar->addr, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&lidar->tmp16, 2);
+		st = I2C_WriteBytes(_i2c, lidar->addr, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&lidar->tmp16, 2);
 		st = 1;
 		if (st) {
 			// set_sequence_step_timeout() end
@@ -647,7 +647,7 @@ uint8_t performSingleRefCalibration(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint
 	uint8_t st;
 	switch (lidar->stepL1) {
 	case 0:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x01 | vhv_init_byte);// VL53L0X_REG_SYSRANGE_MODE_START_STOP
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x01 | vhv_init_byte);// VL53L0X_REG_SYSRANGE_MODE_START_STOP
 		if (st) {
 			startTimeout(lidar);
 			lidar->stepL1 = 1;
@@ -666,13 +666,13 @@ uint8_t performSingleRefCalibration(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint
 		}
 		break;
 	case 2:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_INTERRUPT_CLEAR, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_INTERRUPT_CLEAR, 0x01);
 		if (st) {
 			lidar->stepL1 = 3;
 		}
 		break;
 	case 3:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x00);
 		if (st) {
 			lidar->stepL1 = 0;
 			return 1;
@@ -760,37 +760,37 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar,vcselPeriodTyp
 		break;
 		//type == VcselPeriodPreRange
 	case 5:  //period_pclks = 12
-		st = WriteOneRegByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x18);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x18);
 		if (st) {
 			lidar->stepL3 = 9;
 		}
 		break;
 	case 6:  //period_pclks = 14
-		st = WriteOneRegByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x30);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x30);
 		if (st) {
 			lidar->stepL3 = 9;
 		}
 		break;
 	case 7:  //period_pclks = 16
-		st = WriteOneRegByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x40);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x40);
 		if (st) {
 			lidar->stepL3 = 9;
 		}
 		break;
 	case 8:  //period_pclks = 18
-		st = WriteOneRegByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x50);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x50);
 		if (st) {
 			lidar->stepL3 = 9;
 		}
 		break;
 	case 9:
-		st = WriteOneRegByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
 		if (st) {
 			lidar->stepL3 = 10;
 		}
 		break;
 	case 10:// apply new VCSEL period
-		st = WriteOneRegByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VCSEL_PERIOD, lidar->vcsel_period_reg);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VCSEL_PERIOD, lidar->vcsel_period_reg);
 		if (st) {
 			// set_sequence_step_timeout() begin
 			// (SequenceStepId == VL53L0X_SEQUENCESTEP_PRE_RANGE)
@@ -800,7 +800,7 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar,vcselPeriodTyp
 		}
 		break;
 	case 11:// update timeouts
-		st = WriteRegBytes(_i2c, lidar->addr, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&lidar->tmp16, 2);
+		st = I2C_WriteBytes(_i2c, lidar->addr, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&lidar->tmp16, 2);
 		// set_sequence_step_timeout() end
 		// set_sequence_step_timeout() begin
 		// (SequenceStepId == VL53L0X_SEQUENCESTEP_MSRC)
@@ -811,7 +811,7 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar,vcselPeriodTyp
 	case 12:
 		lidar->new_msrc_timeout_mclks = timeoutMicrosecondsToMclks(lidar->timeouts.msrc_dss_tcc_us, period_pclks);
 		lidar->tmp8 = lidar->new_msrc_timeout_mclks > 256 ? 255 : lidar->new_msrc_timeout_mclks - 1;
-		st = WriteOneRegByte(_i2c, lidar->addr, MSRC_CONFIG_TIMEOUT_MACROP, lidar->tmp8);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, MSRC_CONFIG_TIMEOUT_MACROP, lidar->tmp8);
 		if (st) {
 			lidar->stepL3 = 102;
 		}
@@ -819,136 +819,136 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar,vcselPeriodTyp
 
 	//type == VcselPeriodFinalRange
 	case 15:  //period_pclks = 8
-		st = WriteOneRegByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x10);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x10);
 		if (st) {
 			lidar->stepL3 = 16;
 		}
 		break;
 	case 16:
-		st = WriteOneRegByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
 		if (st) {
 			lidar->stepL3 = 17;
 		}
 		break;
 	case 17:
-		st = WriteOneRegByte(_i2c, lidar->addr, GLOBAL_CONFIG_VCSEL_WIDTH, 0x02);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, GLOBAL_CONFIG_VCSEL_WIDTH, 0x02);
 		if (st) {
 			lidar->stepL3 = 18;
 		}
 		break;
 	case 18:
-		st = WriteOneRegByte(_i2c, lidar->addr, ALGO_PHASECAL_CONFIG_TIMEOUT, 0x0C);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, ALGO_PHASECAL_CONFIG_TIMEOUT, 0x0C);
 		if (st) {
 			lidar->stepL3 = 19;
 		}
 		break;
 	case 19:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x01);
 		if (st) {
 			lidar->stepL3 = 20;
 		}
 		break;
 	case 20:
-		st = WriteOneRegByte(_i2c, lidar->addr, ALGO_PHASECAL_LIM, 0x30);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, ALGO_PHASECAL_LIM, 0x30);
 		if (st) {
 			lidar->stepL3 = 51;
 		}
 		break;
 
 	case 25:  //period_pclks = 10
-		st = WriteOneRegByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x28);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x28);
 		if (st) {
 			lidar->stepL3 = 26;
 		}
 		break;
 	case 26:
-		st = WriteOneRegByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
 		if (st) {
 			lidar->stepL3 = 27;
 		}
 		break;
 	case 27:
-		st = WriteOneRegByte(_i2c, lidar->addr, GLOBAL_CONFIG_VCSEL_WIDTH, 0x03);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, GLOBAL_CONFIG_VCSEL_WIDTH, 0x03);
 		if (st) {
 			lidar->stepL3 = 28;
 		}
 		break;
 	case 28:
-		st = WriteOneRegByte(_i2c, lidar->addr, ALGO_PHASECAL_CONFIG_TIMEOUT, 0x09);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, ALGO_PHASECAL_CONFIG_TIMEOUT, 0x09);
 		if (st) {
 			lidar->stepL3 = 49;
 		}
 		break;
 
 	case 35:  //period_pclks = 12
-		st = WriteOneRegByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x38);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x38);
 		if (st) {
 			lidar->stepL3 = 36;
 		}
 		break;
 	case 36:
-		st = WriteOneRegByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
 		if (st) {
 			lidar->stepL3 = 37;
 		}
 		break;
 	case 37:
-		st = WriteOneRegByte(_i2c, lidar->addr, GLOBAL_CONFIG_VCSEL_WIDTH, 0x03);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, GLOBAL_CONFIG_VCSEL_WIDTH, 0x03);
 		if (st) {
 			lidar->stepL3 = 38;
 		}
 		break;
 	case 38:
-		st = WriteOneRegByte(_i2c, lidar->addr, ALGO_PHASECAL_CONFIG_TIMEOUT, 0x08);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, ALGO_PHASECAL_CONFIG_TIMEOUT, 0x08);
 		if (st) {
 			lidar->stepL3 = 49;
 		}
 		break;
 
 	case 45:  //period_pclks = 14
-		st = WriteOneRegByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x48);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x48);
 		if (st) {
 			lidar->stepL3 = 46;
 		}
 		break;
 	case 46:
-		st = WriteOneRegByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
 		if (st) {
 			lidar->stepL3 = 47;
 		}
 		break;
 	case 47:
-		st = WriteOneRegByte(_i2c, lidar->addr, GLOBAL_CONFIG_VCSEL_WIDTH, 0x03);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, GLOBAL_CONFIG_VCSEL_WIDTH, 0x03);
 		if (st) {
 			lidar->stepL3 = 48;
 		}
 		break;
 	case 48:
-		st = WriteOneRegByte(_i2c, lidar->addr, ALGO_PHASECAL_CONFIG_TIMEOUT, 0x07);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, ALGO_PHASECAL_CONFIG_TIMEOUT, 0x07);
 		if (st) {
 			lidar->stepL3 = 49;
 		}
 		break;
 	case 49:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x01);
 		if (st) {
 			lidar->stepL3 = 50;
 		}
 		break;
 	case 50:
-		st = WriteOneRegByte(_i2c, lidar->addr, ALGO_PHASECAL_LIM, 0x20);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, ALGO_PHASECAL_LIM, 0x20);
 		if (st) {
 			lidar->stepL3 = 51;
 		}
 		break;
 	case 51:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x00);
 		if (st) {
 			lidar->stepL3 = 55;
 		}
 		break;
 	case 55:  // apply new VCSEL period
-		st = WriteOneRegByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VCSEL_PERIOD, lidar->vcsel_period_reg);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VCSEL_PERIOD, lidar->vcsel_period_reg);
 		if (st) {
 		// "For the final range timeout, the pre-range timeout
 		//  must be added. To do this both final and pre-range
@@ -964,7 +964,7 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar,vcselPeriodTyp
 		break;
 	case 56:// update timeouts
 		// set_sequence_step_timeout() begin
-		st = WriteRegBytes(_i2c, lidar->addr, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&lidar->tmp16, 2);
+		st = I2C_WriteBytes(_i2c, lidar->addr, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&lidar->tmp16, 2);
 		if (st) {
 			lidar->stepL3 = 102;
 		}
@@ -984,7 +984,7 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar,vcselPeriodTyp
 		break;
 	case 104:// "Perform the phase calibration. This is needed after changing on vcsel period."
 		// VL53L0X_perform_phase_calibration() begin
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, 0x02);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, 0x02);
 		if (st) {
 			lidar->stepL3 = 105;
 		}
@@ -996,7 +996,7 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar,vcselPeriodTyp
 		}
 		break;
 	case 106:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, lidar->sequence_config);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, lidar->sequence_config);
 		if (st) {
 			lidar->stepL3 = 0;
 			return 1;
@@ -1020,43 +1020,43 @@ uint8_t startContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint32_t period_
 	uint8_t st;
 	switch (lidar->stepL1) {
 	case 0:
-		st = WriteOneRegByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
 		if (st) {
 			lidar->stepL1 = 1;
 		}
 		break;
 	case 1:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x01);
 		if (st) {
 			lidar->stepL1 = 2;
 		}
 		break;
 	case 2:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x00);
 		if (st) {
 			lidar->stepL1 = 3;
 		}
 		break;
 	case 3:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_1, lidar->stop_variable);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_1, lidar->stop_variable);
 		if (st) {
 			lidar->stepL1 = 4;
 		}
 		break;
 	case 4:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x01);
 		if (st) {
 			lidar->stepL1 = 5;
 		}
 		break;
 	case 5:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x00);
 		if (st) {
 			lidar->stepL1 = 6;
 		}
 		break;
 	case 6:
-		st = WriteOneRegByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x00);
 		if (st) {
 			if (period_ms) {
 				lidar->stepL1 = 7;
@@ -1067,7 +1067,7 @@ uint8_t startContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint32_t period_
 		}
 		break;
 	case 7:// continuous timed mode
-		st = ReadRegBytes(_i2c, lidar->addr, OSC_CALIBRATE_VAL, &lidar->tmp16, 2);// VL53L0X_SetInterMeasurementPeriodMilliSeconds() begin
+		st = I2C_ReadBytes(_i2c, lidar->addr, OSC_CALIBRATE_VAL, &lidar->tmp16, 2);// VL53L0X_SetInterMeasurementPeriodMilliSeconds() begin
 		if (st) {
 			if (lidar->tmp16) {
 				lidar->tmp16 *= period_ms;
@@ -1076,13 +1076,13 @@ uint8_t startContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint32_t period_
 		}
 		break;
 	case 8:
-		st = WriteRegBytes(_i2c, lidar->addr, SYSTEM_INTERMEASUREMENT_PERIOD, (uint8_t *)&lidar->tmp16, 2);
+		st = I2C_WriteBytes(_i2c, lidar->addr, SYSTEM_INTERMEASUREMENT_PERIOD, (uint8_t *)&lidar->tmp16, 2);
 		if (st) {
 			lidar->stepL1 = 10;
 		}
 		break;
 	case 10:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x04);  // VL53L0X_REG_SYSRANGE_MODE_TIMED
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x04);  // VL53L0X_REG_SYSRANGE_MODE_TIMED
 		if (st) {
 			lidar->stepL1 = 0;
 			return 1;
@@ -1090,7 +1090,7 @@ uint8_t startContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint32_t period_
 		break;
 	case 11:
 		// continuous back-to-back mode
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x02);  // VL53L0X_REG_SYSRANGE_MODE_BACKTOBACK
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x02);  // VL53L0X_REG_SYSRANGE_MODE_BACKTOBACK
 		if (st) {
 			lidar->stepL1 = 0;
 			return 1;
@@ -1112,37 +1112,37 @@ uint8_t stopContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar)
 	uint8_t st;
 	switch (lidar->stepL1) {
 	case 0:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x01);  // VL53L0X_REG_SYSRANGE_MODE_SINGLESHOT
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x01);  // VL53L0X_REG_SYSRANGE_MODE_SINGLESHOT
 		if (st) {
 			lidar->stepL1 = 1;
 		}
 		break;
 	case 1:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x01);
 		if (st) {
 			lidar->stepL1 = 2;
 		}
 		break;
 	case 2:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x00);
 		if (st) {
 			lidar->stepL1 = 3;
 		}
 		break;
 	case 3:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_1, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_1, 0x00);
 		if (st) {
 			lidar->stepL1 = 4;
 		}
 		break;
 	case 4:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x01);
 		if (st) {
 			lidar->stepL1 = 5;
 		}
 		break;
 	case 5:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x00);
 		if (st) {
 			lidar->stepL1 = 0;
 			return 1;
@@ -1177,14 +1177,14 @@ uint8_t readRangeContinuousMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar)
 		}
 		break;
 	case 1:
-		st = ReadRegBytes(_i2c, lidar->addr, RESULT_RANGE_STATUS + 10, &lidar->range, 2);
+		st = I2C_ReadBytes(_i2c, lidar->addr, RESULT_RANGE_STATUS + 10, &lidar->range, 2);
 		if (st) {
 			lidar->status = DEVICE_DONE;
 			lidar->stepL1 = 2;
 		}
 		break;
 	case 2:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_INTERRUPT_CLEAR, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_INTERRUPT_CLEAR, 0x01);
 		if (st) {
 			startTimeout(lidar);
 			lidar->stepL1 = 0;
@@ -1206,49 +1206,49 @@ uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar)
 	uint8_t st;
 	switch (lidar->stepL2) {
 	case 0:
-		st = WriteOneRegByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
 		if (st) {
 			lidar->stepL2 = 1;
 		}
 		break;
 	case 1:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x01);
 		if (st) {
 			lidar->stepL2 = 2;
 		}
 		break;
 	case 2:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x00);
 		if (st) {
 			lidar->stepL2 = 3;
 		}
 		break;
 	case 3:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_1, lidar->stop_variable);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_1, lidar->stop_variable);
 		if (st) {
 			lidar->stepL2 = 4;
 		}
 		break;
 	case 4:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x01);
 		if (st) {
 			lidar->stepL2 = 5;
 		}
 		break;
 	case 5:
-		st = WriteOneRegByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, INTERNAL_TUNING_2, 0x00);
 		if (st) {
 			lidar->stepL2 = 6;
 		}
 		break;
 	case 6:
-		st = WriteOneRegByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x00);
 		if (st) {
 			lidar->stepL2 = 7;
 		}
 		break;
 	case 7:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSRANGE_START, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSRANGE_START, 0x01);
 		if (st) {
 			startTimeout(lidar);
 			lidar->stepL2 = 8;
@@ -1292,31 +1292,31 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		}
 		break;
 	case 1:// always 2.8v
-		st = WriteOneRegByte(_i2c, lidar->addr, VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, lidar->tmp8 | 0x01);  // set bit 0
+		st = I2C_WriteOneByte(_i2c, lidar->addr, VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, lidar->tmp8 | 0x01);  // set bit 0
 		if (st) {
 			lidar->stepL3 = 2;
 		}
 		break;
 	case 2:  //Set I2C standard mode
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x88, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x88, 0x00);
 		if (st) {
 			lidar->stepL3 = 3;
 		}
 		break;
 	case 3:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x80, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x80, 0x01);
 		if (st) {
 			lidar->stepL3 = 4;
 		}
 		break;
 	case 4:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x01);
 		if (st) {
 			lidar->stepL3 = 5;
 		}
 		break;
 	case 5:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x00, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x00, 0x00);
 		if (st) {
 			lidar->stepL3 = 6;
 		}
@@ -1328,19 +1328,19 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		}
 		break;
 	case 7:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x00, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x00, 0x01);
 		if (st) {
 			lidar->stepL3 = 8;
 		}
 		break;
 	case 8:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x00);
 		if (st) {
 			lidar->stepL3 = 9;
 		}
 		break;
 	case 9:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x80, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x80, 0x00);
 		if (st) {
 			lidar->stepL3 = 10;
 		}
@@ -1352,7 +1352,7 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		}
 		break;//tmp = 0x32
 	case 11:
-		st = WriteOneRegByte(_i2c, lidar->addr, MSRC_CONFIG_CONTROL, lidar->tmp8 | 0x12);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, MSRC_CONFIG_CONTROL, lidar->tmp8 | 0x12);
 		if (st) {
 			lidar->stepL3 = 12;
 		}
@@ -1364,7 +1364,7 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		}
 		break;
 	case 13:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, 0xFF);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, 0xFF);
 		if (st) {
 			lidar->stepL3 = 14;
 		}
@@ -1381,38 +1381,38 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		}
 		break;
 	case 15:
-		st = ReadRegBytes(_i2c, lidar->addr, GLOBAL_CONFIG_SPAD_ENABLES_REF_0, &lidar->ref_spad_map, 6);
+		st = I2C_ReadBytes(_i2c, lidar->addr, GLOBAL_CONFIG_SPAD_ENABLES_REF_0, &lidar->ref_spad_map, 6);
 		if (st) {
 			lidar->stepL3 = 16;
 		}
 		break;
 		// -- VL53L0X_set_reference_spads() begin (assume NVM values are valid)
 	case 16:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x01);
 		if (st) {
 			lidar->stepL3 = 17;
 		}
 		break;
 	case 17:
-		st = WriteOneRegByte(_i2c, lidar->addr, DYNAMIC_SPAD_REF_EN_START_OFFSET, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, DYNAMIC_SPAD_REF_EN_START_OFFSET, 0x00);
 		if (st) {
 			lidar->stepL3 = 18;
 		}
 		break;
 	case 18:
-		st = WriteOneRegByte(_i2c, lidar->addr, DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD, 0x2C);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD, 0x2C);
 		if (st) {
 			lidar->stepL3 = 19;
 		}
 		break;
 	case 19:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x00);
 		if (st) {
 			lidar->stepL3 = 20;
 		}
 		break;
 	case 20:
-		st = WriteOneRegByte(_i2c, lidar->addr, GLOBAL_CONFIG_REF_EN_START_SELECT, 0xB4);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, GLOBAL_CONFIG_REF_EN_START_SELECT, 0xB4);
 		if (st) {
 			uint8_t first_spad_to_enable = lidar->spad_type_is_aperture ? 12 : 0;  // 12 is the first aperture spad
 			uint8_t spads_enabled = 0;
@@ -1430,7 +1430,7 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		}
 		break;
 	case 21:
-		st = WriteRegBytes(_i2c, lidar->addr, GLOBAL_CONFIG_SPAD_ENABLES_REF_0, lidar->ref_spad_map, 6);
+		st = I2C_WriteBytes(_i2c, lidar->addr, GLOBAL_CONFIG_SPAD_ENABLES_REF_0, lidar->ref_spad_map, 6);
 		if (st) {
 			lidar->stepL3 = 22;
 		}
@@ -1440,487 +1440,487 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		// -- VL53L0X_load_tuning_settings() begin
 		// DefaultTuningSettings from vl53l0x_tuning.h
 	case 22:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x01);
 		if (st) {
 			lidar->stepL3 = 23;
 		}
 		break;
 	case 23:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x00, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x00, 0x00);
 		if (st) {
 			lidar->stepL3 = 24;
 		}
 		break;
 	case 24:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x00);
 		if (st) {
 			lidar->stepL3 = 25;
 		}
 		break;
 	case 25:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x09, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x09, 0x00);
 		if (st) {
 			lidar->stepL3 = 26;
 		}
 		break;
 	case 26:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x10, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x10, 0x00);
 		if (st) {
 			lidar->stepL3 = 27;
 		}
 		break;
 	case 27:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x11, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x11, 0x00);
 		if (st) {
 			lidar->stepL3 = 28;
 		}
 		break;//+
 	case 28:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x24, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x24, 0x01);
 		if (st) {
 			lidar->stepL3 = 29;
 		}
 		break;
 	case 29:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x25, 0xFF);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x25, 0xFF);
 		if (st) {
 			lidar->stepL3 = 30;
 		}
 		break;
 	case 30:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x75, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x75, 0x00);
 		if (st) {
 			lidar->stepL3 = 31;
 		}
 		break;
 	case 31:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x01);
 		if (st) {
 			lidar->stepL3 = 32;
 		}
 		break;
 	case 32:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x4E, 0x2C);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x4E, 0x2C);
 		if (st) {
 			lidar->stepL3 = 33;
 		}
 		break;
 	case 33:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x48, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x48, 0x00);
 		if (st) {
 			lidar->stepL3 = 34;
 		}
 		break;
 	case 34:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x30, 0x20);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x30, 0x20);
 		if (st) {
 			lidar->stepL3 = 35;
 		}
 		break;
 	case 35:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x00);
 		if (st) {
 			lidar->stepL3 = 36;
 		}
 		break;
 	case 36:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x30, 0x09);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x30, 0x09);
 		if (st) {
 			lidar->stepL3 = 37;
 		}
 		break;
 	case 37:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x54, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x54, 0x00);
 		if (st) {
 			lidar->stepL3 = 38;
 		}
 		break;
 	case 38:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x31, 0x04);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x31, 0x04);
 		if (st) {
 			lidar->stepL3 = 39;
 		}
 		break;
 	case 39:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x32, 0x03);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x32, 0x03);
 		if (st) {
 			lidar->stepL3 = 40;
 		}
 		break;
 	case 40:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x40, 0x83);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x40, 0x83);
 		if (st) {
 			lidar->stepL3 = 41;
 		}
 		break;
 	case 41:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x46, 0x25);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x46, 0x25);
 		if (st) {
 			lidar->stepL3 = 42;
 		}
 		break;
 	case 42:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x60, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x60, 0x00);
 		if (st) {
 			lidar->stepL3 = 43;
 		}
 		break;
 	case 43:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x27, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x27, 0x00);
 		if (st) {
 			lidar->stepL3 = 44;
 		}
 		break;
 	case 44:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x50, 0x06);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x50, 0x06);
 		if (st) {
 			lidar->stepL3 = 45;
 		}
 		break;
 	case 45:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x51, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x51, 0x00);
 		if (st) {
 			lidar->stepL3 = 46;
 		}
 		break;
 	case 46:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x52, 0x96);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x52, 0x96);
 		if (st) {
 			lidar->stepL3 = 47;
 		}
 		break;
 	case 47:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x56, 0x08);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x56, 0x08);
 		if (st) {
 			lidar->stepL3 = 48;
 		}
 		break;
 	case 48:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x57, 0x30);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x57, 0x30);
 		if (st) {
 			lidar->stepL3 = 49;
 		}
 		break;
 	case 49:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x61, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x61, 0x00);
 		if (st) {
 			lidar->stepL3 = 50;
 		}
 		break;
 	case 50:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x62, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x62, 0x00);
 		if (st) {
 			lidar->stepL3 = 51;
 		}
 		break;
 	case 51:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x64, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x64, 0x00);
 		if (st) {
 			lidar->stepL3 = 52;
 		}
 		break;
 	case 52:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x65, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x65, 0x00);
 		if (st) {
 			lidar->stepL3 = 53;
 		}
 		break;
 	case 53:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x66, 0xA0);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x66, 0xA0);
 		if (st) {
 			lidar->stepL3 = 54;
 		}
 		break;
 	case 54:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x01);
 		if (st) {
 			lidar->stepL3 = 55;
 		}
 		break;
 	case 55:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x22, 0x32);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x22, 0x32);
 		if (st) {
 			lidar->stepL3 = 56;
 		}
 		break;
 	case 56:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x47, 0x14);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x47, 0x14);
 		if (st) {
 			lidar->stepL3 = 57;
 		}
 		break;
 	case 57:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x49, 0xFF);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x49, 0xFF);
 		if (st) {
 			lidar->stepL3 = 58;
 		}
 		break;
 	case 58:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x4A, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x4A, 0x00);
 		if (st) {
 			lidar->stepL3 = 59;
 		}
 		break;
 	case 59:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x00);
 		if (st) {
 			lidar->stepL3 = 60;
 		}
 		break;
 	case 60:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x7A, 0x0A);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x7A, 0x0A);
 		if (st) {
 			lidar->stepL3 = 61;
 		}
 		break;
 	case 61:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x7B, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x7B, 0x00);
 		if (st) {
 			lidar->stepL3 = 62;
 		}
 		break;
 	case 62:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x78, 0x21);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x78, 0x21);
 		if (st) {
 			lidar->stepL3 = 63;
 		}
 		break;
 	case 63:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x01);
 		if (st) {
 			lidar->stepL3 = 64;
 		}
 		break;
 	case 64:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x23, 0x34);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x23, 0x34);
 		if (st) {
 			lidar->stepL3 = 65;
 		}
 		break;
 	case 65:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x42, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x42, 0x00);
 		if (st) {
 			lidar->stepL3 = 66;
 		}
 		break;
 	case 66:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x44, 0xFF);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x44, 0xFF);
 		if (st) {
 			lidar->stepL3 = 67;
 		}
 		break;
 	case 67:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x45, 0x26);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x45, 0x26);
 		if (st) {
 			lidar->stepL3 = 68;
 		}
 		break;
 	case 68:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x46, 0x05);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x46, 0x05);
 		if (st) {
 			lidar->stepL3 = 69;
 		}
 		break;
 	case 69:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x40, 0x40);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x40, 0x40);
 		if (st) {
 			lidar->stepL3 = 70;
 		}
 		break;
 	case 70:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x0E, 0x06);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x0E, 0x06);
 		if (st) {
 			lidar->stepL3 = 71;
 		}
 		break;
 	case 71:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x20, 0x1A);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x20, 0x1A);
 		if (st) {
 			lidar->stepL3 = 72;
 		}
 		break;
 	case 72:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x43, 0x40);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x43, 0x40);
 		if (st) {
 			lidar->stepL3 = 73;
 		}
 		break;
 	case 73:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x00);
 		if (st) {
 			lidar->stepL3 = 74;
 		}
 		break;
 	case 74:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x34, 0x03);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x34, 0x03);
 		if (st) {
 			lidar->stepL3 = 75;
 		}
 		break;
 	case 75:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x35, 0x44);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x35, 0x44);
 		if (st) {
 			lidar->stepL3 = 76;
 		}
 		break;
 	case 76:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x01);
 		if (st) {
 			lidar->stepL3 = 77;
 		}
 		break;
 	case 77:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x31, 0x04);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x31, 0x04);
 		if (st) {
 			lidar->stepL3 = 78;
 		}
 		break;
 	case 78:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x4B, 0x09);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x4B, 0x09);
 		if (st) {
 			lidar->stepL3 = 79;
 		}
 		break;
 	case 79:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x4C, 0x05);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x4C, 0x05);
 		if (st) {
 			lidar->stepL3 = 80;
 		}
 		break;
 	case 80:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x4D, 0x04);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x4D, 0x04);
 		if (st) {
 			lidar->stepL3 = 81;
 		}
 		break;
 	case 81:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x00);
 		if (st) {
 			lidar->stepL3 = 82;
 		}
 		break;
 	case 82:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x44, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x44, 0x00);
 		if (st) {
 			lidar->stepL3 = 83;
 		}
 		break;
 	case 83:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x45, 0x20);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x45, 0x20);
 		if (st) {
 			lidar->stepL3 = 84;
 		}
 		break;
 	case 84:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x47, 0x08);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x47, 0x08);
 		if (st) {
 			lidar->stepL3 = 85;
 		}
 		break;
 	case 85:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x48, 0x28);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x48, 0x28);
 		if (st) {
 			lidar->stepL3 = 86;
 		}
 		break;
 	case 86:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x67, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x67, 0x00);
 		if (st) {
 			lidar->stepL3 = 87;
 		}
 		break;
 	case 87:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x70, 0x04);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x70, 0x04);
 		if (st) {
 			lidar->stepL3 = 88;
 		}
 		break;
 	case 88:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x71, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x71, 0x01);
 		if (st) {
 			lidar->stepL3 = 89;
 		}
 		break;
 	case 89:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x72, 0xFE);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x72, 0xFE);
 		if (st) {
 			lidar->stepL3 = 90;
 		}
 		break;
 	case 90:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x76, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x76, 0x00);
 		if (st) {
 			lidar->stepL3 = 91;
 		}
 		break;
 	case 91:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x77, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x77, 0x00);
 		if (st) {
 			lidar->stepL3 = 92;
 		}
 		break;
 	case 92:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x01);
 		if (st) {
 			lidar->stepL3 = 93;
 		}
 		break;
 	case 93:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x0D, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x0D, 0x01);
 		if (st) {
 			lidar->stepL3 = 94;
 		}
 		break;
 	case 94:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x00);
 		if (st) {
 			lidar->stepL3 = 95;
 		}
 		break;
 	case 95:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x80, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x80, 0x01);
 		if (st) {
 			lidar->stepL3 = 96;
 		}
 		break;
 	case 96:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x01, 0xF8);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x01, 0xF8);
 		if (st) {
 			lidar->stepL3 = 97;
 		}
 		break;
 	case 97:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x01);
 		if (st) {
 			lidar->stepL3 = 98;
 		}
 		break;
 	case 98:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x8E, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x8E, 0x01);
 		if (st) {
 			lidar->stepL3 = 99;
 		}
 		break;
 	case 99:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x00, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x00, 0x01);
 		if (st) {
 			lidar->stepL3 = 100;
 		}
 		break;
 	case 100:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0xFF, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0xFF, 0x00);
 		if (st) {
 			lidar->stepL3 = 101;
 		}
 		break;
 	case 101:
-		st = WriteOneRegByte(_i2c, lidar->addr, 0x80, 0x00);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, 0x80, 0x00);
 		if (st) {
 			lidar->stepL3 = 102;
 		}
 		break;
 	case 102:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04);
 		if (st) {
 			lidar->stepL3 = 103;
 		}
@@ -1932,13 +1932,13 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		}
 		break;
 	case 104:
-		st = WriteOneRegByte(_i2c, lidar->addr, GPIO_HV_MUX_ACTIVE_HIGH, lidar->tmp8 & ~0x10);  // active low
+		st = I2C_WriteOneByte(_i2c, lidar->addr, GPIO_HV_MUX_ACTIVE_HIGH, lidar->tmp8 & ~0x10);  // active low
 		if (st) {
 			lidar->stepL3 = 105;
 		}
 		break;
 	case 105:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_INTERRUPT_CLEAR, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_INTERRUPT_CLEAR, 0x01);
 		if (st) {
 			lidar->stepL3 = 106;
 		}
@@ -1956,7 +1956,7 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		// TCC = Target CentreCheck
 		// -- VL53L0X_SetSequenceStepEnable() begin
 	case 107:
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, 0xE8);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, 0xE8);
 		if (st) {
 			lidar->stepL3 = 108;
 		}
@@ -1972,7 +1972,7 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		// VL53L0X_StaticInit() end
 		// VL53L0X_PerformRefCalibration() begin (VL53L0X_perform_ref_calibration())
 	case 109:  // -- VL53L0X_perform_vhv_calibration() begin
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, 0x01);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, 0x01);
 		if (st) {
 			lidar->stepL3 = 110;
 		}
@@ -1985,7 +1985,7 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		break;
 		// -- VL53L0X_perform_vhv_calibration() end
 	case 111:  // -- VL53L0X_perform_phase_calibration() begin
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, 0x02);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, 0x02);
 		if (st) {
 			lidar->stepL3 = 112;
 		}
@@ -1998,7 +1998,7 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		break;
 		// -- VL53L0X_perform_phase_calibration() end
 	case 113:  // "restore the previous Sequence Config"
-		st = WriteOneRegByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, 0xE8);
+		st = I2C_WriteOneByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, 0xE8);
 		if (st) {
 			lidar->stepL3 = 0;
 			setTimeout(lidar, 50);

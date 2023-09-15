@@ -29,9 +29,9 @@ void SPI_Start_IRQ_TWO_HWNSS(SPI_Conn_TWO_t *_spi) {
 
 void SPI_Start_IRQ_ONE_HWNSS(SPI_Conn_ONE_t *_spi) {
 	_spi->status = PORT_BUSY;
-	if (_spi->mode == SPI_MODE_TO) {
+	if (_spi->mode == SPI_HALFDUPLEX_WRITE) {
 		_spi->SPIbus->CR2 |= SPI_CR2_TXEIE;
-	} else if (_spi->mode == SPI_MODE_RO) {
+	} else if (_spi->mode == SPI_HALFDUPLEX_READ) {
 		_spi->SPIbus->CR2 |= SPI_CR2_RXNEIE;
 	}
 	/*попробовать просто отключать интерфейс без постоянного включения/выключения прерываний*/
@@ -104,7 +104,7 @@ void SPI_IRQ_TO_CallBack(SPI_Conn_ONE_t *_spi) {
 	if (SPI_SR & SPI_SR_TXE) {
  		if (_spi->len > 0) {
  			uint8_t tmp;
-			FIFO_GetOne(_spi->data, &tmp);
+			FIFO_GetOne(_spi->buffer, &tmp);
 			_spi->SPIbus->DR = tmp;
 			--_spi->len;
 		}
@@ -135,12 +135,12 @@ void SPI_IRQ_RO_CallBack(SPI_Conn_ONE_t *_spi) {
 	}*/
 	if (SPI_SR & SPI_SR_RXNE) {
 		if (_spi->len > 1) {
-			FIFO_PutOne(_spi->data, (uint8_t)_spi->SPIbus->DR); //read byte
+			FIFO_PutOne(_spi->buffer, (uint8_t)_spi->SPIbus->DR); //read byte
 			--_spi->len;
 		}
 		else {
 			_spi->SPIbus->CR2 &= ~SPI_CR2_RXNEIE; //interrupt off
-			FIFO_PutOne(_spi->data, (uint8_t)_spi->SPIbus->DR); //read last byte
+			FIFO_PutOne(_spi->buffer, (uint8_t)_spi->SPIbus->DR); //read last byte
 			LL_SPI_Disable(_spi->SPIbus);
 			_spi->status = PORT_DONE;
 		}

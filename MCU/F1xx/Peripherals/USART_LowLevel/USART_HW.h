@@ -13,28 +13,31 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
- * 	MyUsart.h
+ * 	USART_HW.h
  *  Created on: Sep 17, 2020
  */
 #ifndef SRC_MYUSART_H_
 #define SRC_MYUSART_H_
 
-#include "main.h"
+#include <stddef.h>
+#include <stdint.h>
+#include "stm32f1xx_ll_usart.h"
 #include "FIFObuffer/FIFObuffer.h"
-//#include "DMA_Template/DMA_Template.h"
+#include "DataTypes.h"
+
 #ifdef DMA_H
 	#include "DMA_Template/DMA_Template.h"
 #endif
 
-	typedef struct USART_Conn {
-		USART_TypeDef *USART;	//pointer to HW USART port
-		PortStatus_t txStatus;	//status USART port
-		fifo_t *txbuffer;		//pointer circular buffer
-		uint8_t txlen;			//length data
-		PortStatus_t rxStatus;	//status USART port
-		fifo_t *rxbuffer;		//pointer circular buffer
-		uint8_t rxlen;			//length data
-	} USART_Conn_t;
+typedef struct USART_Conn {
+	USART_TypeDef *USART;	  //pointer to HW USART port
+	PortStatus_t txStatus;	//status USART port
+	fifo_t *txbuffer;		    //pointer circular buffer
+	uint8_t txlen;			    //length data
+	PortStatus_t rxStatus;	//status USART port
+	fifo_t *rxbuffer;		    //pointer circular buffer
+	uint8_t rxlen;			    //length data
+} USART_Conn_t;
 
 //==============================================================================================
 void USART_Send(USART_Conn_t *_usart, uint8_t len);//пишет в порт и устанавливает флаг "занято" для устройства

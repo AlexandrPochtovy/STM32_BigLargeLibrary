@@ -45,14 +45,14 @@ uint8_t INA219_Init(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 									INA219_CFG_BVRANGE_16V;				// 0-16V Range
 			data[0] = (uint8_t)cfg;
 			data[1] = (uint8_t)(cfg >> 8);
-			if (WriteRegBytes(_i2c, dev->addr, INA219_REG_CONFIG, data, INA219_REG_LEN)) {
+			if (I2C_WriteBytes(_i2c, dev->addr, INA219_REG_CONFIG, data, INA219_REG_LEN)) {
 				dev->step = 1;
 			}
 			break;
 		case 1:
 			data[0] = (uint8_t)INA219_CalibrationVal;
 			data[1] = (uint8_t)(INA219_CalibrationVal >> 8);
-			if (WriteRegBytes(_i2c, dev->addr, INA219_REG_CALIBRATION, data, INA219_REG_LEN)) {
+			if (I2C_WriteBytes(_i2c, dev->addr, INA219_REG_CALIBRATION, data, INA219_REG_LEN)) {
 				dev->step = 0;
 				dev->status = DEVICE_INIT;
 				return 1;
@@ -93,7 +93,7 @@ uint8_t INA219_GetRawData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 						reg = INA219_REG_BUSVOLTAGE;//read voltage
 						break;
 			}
-			if (ReadRegBytes(_i2c, dev->addr, reg, dt, INA219_REG_LEN)) {
+			if (I2C_ReadBytes(_i2c, dev->addr, reg, dt, INA219_REG_LEN)) {
 				switch (dev->step) {
 					case 0://select reg
 						dev->raw.voltage = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);//read voltage

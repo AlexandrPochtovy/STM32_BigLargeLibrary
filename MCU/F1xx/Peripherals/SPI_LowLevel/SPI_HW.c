@@ -16,8 +16,6 @@
  * 	MySPI.c
  *  Created on: 30 nov 2020
  */
-#ifdef SPI_H
-
 #include "MySPI.h"
 
 void SPI_Start_IRQ_HWNSS(SPI_Connection_t *_spi) {
@@ -78,5 +76,3 @@ void SPI_IRQ_CallBack(SPI_Connection_t *_spi) {
 void SPI_IRQ_DMA_CallBack(SPI_Connection_t *_spi) {
 	__NOP(); //prototype
 }
-
-#endif

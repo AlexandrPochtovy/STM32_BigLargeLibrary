@@ -13,13 +13,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-
- *	F0xx_DataTypes.h
+ *	F4xx_DataTypes.h
  *  Created on: Aug 30, 2023
  */
 
-#ifndef _F0xx_DATATYPES_H_
-#define _F0xx_DATATYPES_H_
+#ifndef _F4xx_DATATYPES_H_
+#define _F4xx_DATATYPES_H_
 
 /************************************************************************************
 *									COMMON											*
@@ -48,4 +47,4 @@ typedef enum DeviceStatus {
 	DEVICE_FAULTH	//device mark as "lost", process read-write data is off
 } DeviceStatus_t;
 
-#endif /* _F0xx_DATATYPES_H_ */
+#endif /* _F4xx_DATATYPES_H_ */

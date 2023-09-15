@@ -27,36 +27,16 @@ See:https://x-io.co.uk/open-source-imu-and-ahrs-algorithms/
 The MIT License (MIT)
 Copyright (c) 2021 x-io Technologies
 *********************************************************************************/
-#ifndef MadgwickAHRS_h
-#define MadgwickAHRS_h
+#ifndef _MADGWICK_AHRS_h
+#define _MADGWICK_AHRS_h
 
 #include <stddef.h>
 #include <stdint.h>
 #include <math.h>
+#include "Quaternion.h"
 #include "Function/Function.h"
 
-//----------------------------------------------------------------------------------------------------
-// define declaration
-#ifndef sampleFreq
-#define sampleFreq	20.0f		// sample frequency in Hz
-#endif
-#ifndef betaDef
-#define betaDef		0.1f		// 2 * proportional gain
-#endif
-//----------------------------------------------------------------------------------------------------
-// Variable declaration
-typedef struct QuatMadgwick_t {
-  volatile float q0;
-  volatile float q1;
-  volatile float q2;
-  volatile float q3;
-  volatile float beta;
-  volatile float freq;
-} QuatMadgwick;
-//---------------------------------------------------------------------------------------------------
-// Function declarations
+Quaternion_t MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
+Quaternion_t MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az);
 
-void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
-void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az);
-
-#endif /* MadgwickAHRS_h */
+#endif /* _MADGWICK_AHRS_h */

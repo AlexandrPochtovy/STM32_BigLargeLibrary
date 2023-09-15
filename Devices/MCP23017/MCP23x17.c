@@ -46,7 +46,7 @@ uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev) {
 	data[19] = 0xAD;  //reg 0x13 GPIOB		RW main port data register port B
 	data[20] = 0xBE;  //reg 0x14 OLATA		RW output port data register port A
 	data[21] = 0xAF;  //reg 0x15 OLATB		RW output port data register port B;
-	if (WriteRegBytes(_i2c, dev->addr, MCP23017_IODIRA, data, MCP23017_CFG_LENGHT)) {
+	if (I2C_WriteBytes(_i2c, dev->addr, MCP23017_IODIRA, data, MCP23017_CFG_LENGHT)) {
 		dev->status = DEVICE_INIT;
 		return 1;
 	}
@@ -62,7 +62,7 @@ uint8_t MCP23_17_ReadPort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint
 }
 
 uint8_t MCP23_17_WritePort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t value) {
-	if (WriteOneRegByte(_i2c, dev->addr, port, value)) {
+	if (I2C_WriteOneByte(_i2c, dev->addr, port, value)) {
 		dev->status = DEVICE_DONE;
 		return 1;
 	}

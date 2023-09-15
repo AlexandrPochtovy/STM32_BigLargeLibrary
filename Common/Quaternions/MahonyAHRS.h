@@ -1,49 +1,60 @@
 /*********************************************************************************
-   Original author: Alexandr Pochtovy<alex.mail.prime@gmail.com>
+Original author: x-io Technologies 
+http://www.x-io.co.uk/
+https://github.com/xioTechnologies
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+The MIT License (MIT)
 
-       http://www.apache.org/licenses/LICENSE-2.0
+Copyright (c) 2021 x-io Technologies
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+Modification for STM32: Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+                        https://github.com/AlexandrPochtovy
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
    
  	MahonyAHRS.h
 	Created on: 18.04.2021
-
-Based on iIplementation of Madgwick's IMU and AHRS algorithms.
-See:https://x-io.co.uk/open-source-imu-and-ahrs-algorithms/
-	https://github.com/xioTechnologies/Fusion
-
-	Date	Author			Notes
-29/09/2011	SOH Madgwick    Initial release
-02/10/2011	SOH Madgwick	Optimised for reduced CPU load
-19/02/2012	SOH Madgwick	Magnetometer measurement is normalised
-The MIT License (MIT)
-Copyright (c) 2021 x-io Technologies
 *********************************************************************************/
-#ifndef MahonyAHRS_h
-#define MahonyAHRS_h
+#ifndef _MAHONY_AHRS_H_
+#define _MAHONY_AHRS_H_
 
 #include <stddef.h>
 #include <stdint.h>
 #include <math.h>
+#include "Quaternion.h"
 #include "Function/Function.h"
 
-//----------------------------------------------------------------------------------------------------
-// Variable declaration
-extern volatile float twoKp;			// 2 * proportional gain (Kp)
-extern volatile float twoKi;			// 2 * integral gain (Ki)
-extern volatile float q0, q1, q2, q3;	// quaternion of sensor frame relative to auxiliary frame
 
-//---------------------------------------------------------------------------------------------------
-// Function declarations
-void MahonyAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
-void MahonyAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az);
+Quaternion_t MahonyAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float twoKp, float twoKi, uint32_t deltat);
+Quaternion_t MahonyAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az, float twoKp, float twoKi, uint32_t deltat);
 
-#endif
+#endif /* _MAHONY_AHRS_H_ */

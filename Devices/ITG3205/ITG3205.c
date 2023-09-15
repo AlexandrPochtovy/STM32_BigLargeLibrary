@@ -31,12 +31,12 @@ uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 	dev->status = DEVICE_NOT_INIT;
 	switch (dev->step) {
 		case 0: //reset first
-			if (WriteOneRegByte(_i2c, dev->addr, ITG3205_PWR_MGM, ITG3205_PWR_MGM_RESET)) {
+			if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_PWR_MGM, ITG3205_PWR_MGM_RESET)) {
 				dev->step = 1;
 			}
 			break;
 		case 1: //setup clock
-			if (WriteOneRegByte(_i2c, dev->addr, ITG3205_PWR_MGM, ITG3205_PWR_CLOCK_INTERNAL)) {
+			if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_PWR_MGM, ITG3205_PWR_CLOCK_INTERNAL)) {
 				dev->step = 2;
 			}
 			break;
@@ -46,7 +46,7 @@ uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 			dt[1] = ITG3205_DLPF_FS_SEL | ITG3205_DLPF_CFG_256Hz;
 			dt[2] = ITG3205_INT_CFG_INT_ANYRD_2CLEAR;
 			FIFO_PutMulti(_i2c->buffer, dt, 3);
-			if (WriteRegBytes(_i2c, dev->addr, ITG3205_SMPLRT_DIV, dt, 3)) {
+			if (I2C_WriteBytes(_i2c, dev->addr, ITG3205_SMPLRT_DIV, dt, 3)) {
 				dev->status = DEVICE_INIT;
 				dev->step = 0;
 				return 1;
@@ -61,7 +61,7 @@ uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 
 uint8_t ITG3205_GetData(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 	uint8_t dt[ITG3205_DATA_LEN];
-	if (ReadRegBytes(_i2c, dev->addr, ITG3205_TEMP_OUT_H, dt, ITG3205_DATA_LEN)) {
+	if (I2C_ReadBytes(_i2c, dev->addr, ITG3205_TEMP_OUT_H, dt, ITG3205_DATA_LEN)) {
 		dev->raw.temp = (int16_t)CONCAT_BYTES(dt[0], dt[1]);
 		dev->raw.X = (int16_t)CONCAT_BYTES(dt[2], dt[3]);
 		dev->raw.Y = (int16_t)CONCAT_BYTES(dt[4], dt[5]);

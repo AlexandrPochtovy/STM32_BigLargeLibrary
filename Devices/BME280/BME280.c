@@ -96,25 +96,25 @@ uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
 		switch (dev->step) {
 		case 0://setup humidity
 			dev->status = DEVICE_NOT_INIT;
-			if (WriteOneRegByte(_i2c, dev->addr, BME280_REG_CTRL_HUM, BME280_HUM_OVERSAMPLING_16X)) {
+			if (I2C_WriteOneByte(_i2c, dev->addr, BME280_REG_CTRL_HUM, BME280_HUM_OVERSAMPLING_16X)) {
 				dev->step = 1;
 			}
 			break;
 		case 1://setup mode temp pressure
 			data[0] = BME280_NORMAL_MODE | BME280_PRESS_OVERSAMPLING_16X | BME280_TEMP_OVERSAMPLING_16X;
 			data[1] = BME280_SPI_3WIRE_MODE_OFF | BME280_FILTER_COEFF_16 | BME280_STANDBY_TIME_20_MS;
-			if (WriteRegBytes(_i2c, dev->addr, BME280_REG_CTRL_MEAS_PWR, data, 2)) {
+			if (I2C_WriteBytes(_i2c, dev->addr, BME280_REG_CTRL_MEAS_PWR, data, 2)) {
 				dev->step = 2;
 			}
 			break;
 		case 2://read calib temp data
-			if (ReadRegBytes(_i2c, dev->addr, BME280_REG_T_P_CALIB_DATA, data, BME280_T_P_CALIB_DATA_LEN)) {
+			if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_T_P_CALIB_DATA, data, BME280_T_P_CALIB_DATA_LEN)) {
 				parse_temp_press_calib_data(dev, data);
 				dev->step = 3;
 			}
 			break;
 		case 3:  //read calib pressure data
-			if (ReadRegBytes(_i2c, dev->addr, BME280_REG_HUM_CALIB_DATA, data, BME280_HUM_CALIB_DATA_LEN)) {
+			if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_HUM_CALIB_DATA, data, BME280_HUM_CALIB_DATA_LEN)) {
 				parse_humidity_calib_data(dev, data);
 				dev->status = DEVICE_INIT;
 				dev->step = 0;
@@ -129,7 +129,7 @@ uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
 
 uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
 	uint8_t data[BME280_DATA_LEN];
-	if (ReadRegBytes(_i2c, dev->addr, BME280_REG_DATA, data, BME280_DATA_LEN)) {
+	if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_DATA, data, BME280_DATA_LEN)) {
 		bme280_parse_sensor_data(dev, data);
 		bme280_calculate_data_int(dev);
 		bme280_calculate_data_float(dev);

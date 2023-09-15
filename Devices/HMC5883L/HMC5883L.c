@@ -24,7 +24,7 @@
 
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
     return (uint16_t)(((uint16_t)msb << 8) | (uint16_t)lsb);
-}	
+}
 
 uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev) {
 	dev->status = DEVICE_NOT_INIT;
@@ -33,7 +33,7 @@ uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev) {
 	data[0] = HMC5883L_SAMPLES_1 | HMC5883L_DATARATE_15HZ | HMC5883L_NORMAL;
 	data[1] = HMC5883L_GAIN_1_3GA;
 	data[2] = HMC5883L_CONTINOUS;
-	if (WriteRegBytes(_i2c, dev->addr, HMC5883L_REG_CONFIG_A, data, 3)) {
+	if (I2C_WriteBytes(_i2c, dev->addr, HMC5883L_REG_CONFIG_A, data, 3)) {
 		dev->status = DEVICE_INIT;
 		dev->step = 0;
 		return 1;
@@ -43,7 +43,7 @@ uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev) {
 
 uint8_t HMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev) {
 	uint8_t data[HMC5883L_DATA_LEN];
-	if (ReadRegBytes(_i2c, dev->addr, HMC5883L_REG_OUT_X_M, data, HMC5883L_DATA_LEN)) {
+	if (I2C_ReadBytes(_i2c, dev->addr, HMC5883L_REG_OUT_X_M, data, HMC5883L_DATA_LEN)) {
 		dev->raw.X = CONCAT_BYTES(data[0], data[1]);
 		dev->raw.Z = CONCAT_BYTES(data[2], data[3]);
 		dev->raw.Y = CONCAT_BYTES(data[4], data[5]);

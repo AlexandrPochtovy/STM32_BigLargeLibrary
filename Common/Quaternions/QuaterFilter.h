@@ -1,31 +1,48 @@
 /*********************************************************************************
-   Original author: Alexandr Pochtovy<alex.mail.prime@gmail.com>
+Original author: x-io Technologies 
+http://www.x-io.co.uk/
+https://github.com/xioTechnologies
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-   
- 	QuaterFilter.h
-	Created on: 11.02.2021
-
-Based on iIplementation of Madgwick's IMU and AHRS algorithms.
-See:https://x-io.co.uk/open-source-imu-and-ahrs-algorithms/
-	https://github.com/xioTechnologies/Fusion
-
-	Date	Author			Notes
-29/09/2011	SOH Madgwick    Initial release
-02/10/2011	SOH Madgwick	Optimised for reduced CPU load
-19/02/2012	SOH Madgwick	Magnetometer measurement is normalised
 The MIT License (MIT)
+
 Copyright (c) 2021 x-io Technologies
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+Modification for STM32: Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+                        https://github.com/AlexandrPochtovy
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+  QuaterFilter.h
+	Created on: 11.02.2021
 *********************************************************************************/
 
 #ifndef _QUATERFILTER_H_
@@ -35,59 +52,25 @@ Copyright (c) 2021 x-io Technologies
 extern "C" {
 #endif
 
-// Math library required for ‘sqrt’
+
 #include <stddef.h>
 #include <stdint.h>
-#include <math.h>
+#include <math.h>   // Math library required for ‘sqrt’
+#include <string.h>
+#include "Quaternion.h"
 #include "Function/Function.h"
 
-typedef struct AccelAxis_t {
-	float a_x;// accelerometer X- axis measurements
-	float a_y;// accelerometer Y- axis measurements
-	float a_z;// accelerometer Z- axis measurements
-} AccelAxis;
+Quaternion_t FilterUpdate_6DOF(Axis_t accel, Axis_t gyro, uint32_t deltat);
 
-typedef struct GyroAxis_t {
-	float w_x;// gyroscope X- axis measurements
-	float w_y;// gyroscope Y- axis measurements
-	float w_z;// gyroscope Z- axis measurements
-} GyroAxis;
+Quaternion_t FilterUpdate_6(float a_x, float a_y, float a_z, float g_x, float g_y, float g_z, uint32_t deltat);
 
-typedef struct MagAxis_t {
-	float m_x;// gyroscope X- axis measurements
-	float m_y;// gyroscope Y- axis measurements
-	float m_z;// gyroscope Z- axis measurements
-} MagAxis;
+Quaternion_t FilterUpdate_9DOF(Axis_t accel, Axis_t gyro, Axis_t mag, uint32_t deltat);
 
-typedef struct Quat_DOF_t {
-  volatile float SEq_1;
-  volatile float SEq_2;
-  volatile float SEq_3;
-  volatile float SEq_4;
-  //volatile float beta;
-  //volatile float freq;
-} Quat_DOF;
+Quaternion_t FilterUpdate9(float w_x, float w_y, float w_z, float a_x, float a_y, float a_z, float m_x, float m_y, float m_z, uint32_t deltat);
 
-//Quaternion
-typedef struct Quaternion_t {
-    float w;
-    float x;
-    float y;
-    float z;
-} Quaternion;
+Quaternion_t EulerAngleToQuaternion(double yaw, double pitch, double roll);
 
-typedef struct EulerAngles_t {
-    float roll;
-    float pitch;
-    float yaw;
-} EulerAngles;
-
-
-void FilterUpdate_6DOF(AccelAxis *accel, GyroAxis *gyro);
-void FilterUpdate6(float w_x, float w_y, float w_z, float a_x, float a_y, float a_z);
-void FilterUpdate_9DOF(AccelAxis *accel, GyroAxis *gyro, MagAxis *mag);
-void FilterUpdate9(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
-EulerAngles ToEulerAngles(Quaternion q, uint8_t deg);
+EulerAngles_t QuaternionToEulerAngles(Quaternion_t q, uint8_t deg);
 #ifdef __cplusplus
 }
 #endif

@@ -42,7 +42,7 @@ uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 				data[11] = 0x07; //0x28 free fall value detect 62.5mg/bit
 				data[12] = 0x28; //0x29 free fall time 5 msec/bit = 200msec
 				data[13] = 0x00; //0x2A disable TAP detection
-				if (WriteRegBytes(_i2c, dev->addr, ADXL345_THRESH_TAP_REG, data, 14)) {
+				if (I2C_WriteBytes(_i2c, dev->addr, ADXL345_THRESH_TAP_REG, data, 14)) {
 					dev->step = 1;
 				}
 				break;
@@ -53,18 +53,18 @@ uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 				data[1] = ADXL345_POWER_CTL_MEASURE | ADXL345_POWER_CTL_WAKEUP_8Hz; //0x2D
 				data[2] = ADXL345_INT_ENABLE_DATA_READY; 				//0x2E
 				data[3] = (uint8_t)~ADXL345_INT_MAP_DATA_READY; //0x2F
-				if (WriteRegBytes(_i2c, dev->addr, ADXL345_BW_RATE_REG, data, 4)) {
+				if (I2C_WriteBytes(_i2c, dev->addr, ADXL345_BW_RATE_REG, data, 4)) {
 					dev->step = 2;
 				}
 				break;
 			}
 			case 2: //setup data format
-				if (WriteOneRegByte(_i2c, dev->addr, ADXL345_DATA_FORMAT_REG, 0x00)) {
+				if (I2C_WriteOneByte(_i2c, dev->addr, ADXL345_DATA_FORMAT_REG, 0x00)) {
 					dev->step = 3;
 				}
 				break;
 			case 3: //setup FIFO
-				if (WriteOneRegByte(_i2c, dev->addr, ADXL345_FIFO_CTL_REG, 0x00)) {
+				if (I2C_WriteOneByte(_i2c, dev->addr, ADXL345_FIFO_CTL_REG, 0x00)) {
 					dev->step = 4;
 				}
 				break;
@@ -102,7 +102,7 @@ float ADXL345_ConvertData(int16_t raw) {
 
 uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 	uint8_t val[ADXL345_DATA_LENGHT];
-	if (ReadRegBytes(_i2c, dev->addr, ADXL345_DATAX0_REG, &val, ADXL345_DATA_LENGHT)) {
+	if (I2C_ReadBytes(_i2c, dev->addr, ADXL345_DATAX0_REG, &val, ADXL345_DATA_LENGHT)) {
 		dev->raw.X = (int16_t)CONCAT_BYTES(val[1], val[0]);
 		dev->data.X = ADXL345_ConvertData(dev->raw.X);
 		dev->raw.Y = (int16_t)CONCAT_BYTES(val[3], val[2]);

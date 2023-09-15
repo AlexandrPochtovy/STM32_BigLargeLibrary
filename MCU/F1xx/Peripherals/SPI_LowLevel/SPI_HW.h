@@ -25,37 +25,35 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdint.h>
-#include "stm32f1xx.h"
 #include "stm32f1xx_ll_spi.h"
 #include "FIFObuffer/FIFObuffer.h"
 #include "DataTypes.h"
 
 typedef enum SPI_Mode {
-	SPI_MODE_WRITE,		//half-duplex write only
-	SPI_MODE_READ,		//half-duplex read only
-	SPI_MODE_DUPLEX,	//full-duplex write and read both
-	SPI_MODE_RO,			//receive-only mode (3 wire)
-	SPI_MODE_TO				//transmit-only mode (3 wire)
+	SPI_FULLDUPLEX_RW,		//full-duplex write and read both
+	SPI_HALFDUPLEX_READ,	//receive-only mode (3 wire)
+	SPI_HALFDUPLEX_WRITE	//transmit-only mode (3 wire)
 } SPI_Mode_t;
 
 typedef struct SPI_Conn_TWO {
-	SPI_TypeDef *SPIbus;	        //pointer to HW SPI port
-	volatile PortStatus_t status;//status port
-	volatile SPI_Mode_t mode;			//read write mode
-	fifo_t *txbuffer;		          //pointer circular buffer
-	volatile uint8_t txlen;			  //length data
-	fifo_t *rxbuffer;		          //pointer circular buffer
-	volatile uint8_t rxlen;			  //length data
+	SPI_TypeDef *SPIbus;	//pointer to HW SPI port
+	PortStatus_t status;	//status port
+	uint8_t step;			//processing step
+	SPI_Mode_t mode;		//read write mode
+	fifo_t *txbuffer;		//pointer circular buffer
+	uint8_t txlen;			//length data
+	fifo_t *rxbuffer;		//pointer circular buffer
+	uint8_t rxlen;			//length data
 } SPI_Conn_TWO_t;
 
 typedef struct SPI_Conn_ONE {
-	SPI_TypeDef *SPIbus;	        //pointer to HW SPI port
-	volatile PortStatus_t status;//status port
-	volatile SPI_Mode_t mode;			//read write mode
-	fifo_t *data;		          //pointer circular buffer
-	volatile uint8_t len;			  //length data
+	SPI_TypeDef *SPIbus;	//pointer to HW SPI port
+	PortStatus_t status;	//status port
+	uint8_t step;			//processing step
+	SPI_Mode_t mode;		//read write mode
+	fifo_t *buffer;			//pointer circular buffer
+	uint8_t len;			//length data
 } SPI_Conn_ONE_t;
-
 
 /*	control function	******************************************/
 void SPI_Start_IRQ_HWNSS(SPI_Conn_TWO_t *_spi);//

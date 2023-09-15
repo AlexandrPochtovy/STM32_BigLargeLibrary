@@ -13,20 +13,29 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
- 
- *	CommonDataTypes.h
- *	Created on: Aug 30, 2023
- */
 
-#ifndef _BUFFER_DATATYPES_H_
-#define _BUFFER_DATATYPES_H_
+ * Quaternion.h
+ * Created on: Sep 15, 2023
+*********************************************************************************/
+#include <stdint.h>
+#include <stddef.h>
 
-/************************************************************************************
-*									COMMON											*
-************************************************************************************/
-typedef enum BufferStatus {
-	BUFFER_FREE,
-	BUFFER_BLOCKED
-} BufferStatus_t;
+typedef struct Axis {
+	float x;// X- axis measurements
+	float y;// Y- axis measurements
+	float z;// Z- axis measurements
+} Axis_t;
 
-#endif /* _BUFFER_DATATYPES_H_ */
+//Quaternion
+typedef struct Quaternion {
+    float w;
+    float x;
+    float y;
+    float z;
+} Quaternion_t;
+
+typedef struct EulerAngles {
+    float roll;
+    float pitch;
+    float yaw;
+} EulerAngles_t;

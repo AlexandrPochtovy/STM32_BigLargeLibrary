@@ -23,7 +23,7 @@ static const uint8_t TCA9548A_PORT = 0x00;
 
 uint8_t TCA9548A_Init(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev) {
 	dev->status = DEVICE_NOT_INIT;
-	if (WriteOneRegByte(_i2c, dev->addr, TCA9548A_PORT, 0x00)) {
+	if (I2C_WriteOneByte(_i2c, dev->addr, TCA9548A_PORT, 0x00)) {
 		dev->status = DEVICE_INIT;
 		dev->step = 0;
 		return 1;
@@ -39,7 +39,7 @@ uint8_t TCA9548A_OnChannel(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, TCA9548A_ch_t 
 			}
 			break;
 		case 1://apply channels
-			if (WriteOneRegByte(_i2c, dev->addr, TCA9548A_PORT, dev->port | ch)) {
+			if (I2C_WriteOneByte(_i2c, dev->addr, TCA9548A_PORT, dev->port | ch)) {
 				dev->status = DEVICE_DONE;
 				dev->step = 0;
 				return 1;
@@ -60,7 +60,7 @@ uint8_t TCA9548A_OffChannel(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, TCA9548A_ch_t
 			}
 			break;
 		case 1://apply channels
-			if (WriteOneRegByte(_i2c, dev->addr, TCA9548A_PORT, dev->port & ~ch)) {
+			if (I2C_WriteOneByte(_i2c, dev->addr, TCA9548A_PORT, dev->port & ~ch)) {
 				dev->status = DEVICE_DONE;
 				dev->step = 0;
 				return 1;

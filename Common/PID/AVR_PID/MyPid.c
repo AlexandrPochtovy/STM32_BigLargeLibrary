@@ -1,5 +1,5 @@
 /*********************************************************************************
- Original author: Atmel Corporation: http://www.atmel.com \n
+ Original author: Atmel Corporation: http://www.atmel.com
  *                       Support email: avr@atmel.com
  * AppNote:              AVR221 - Discrete PID controller
  * $Name$
@@ -7,21 +7,22 @@
  * $RCSfile$
  * $Date: 2006-02-16 12:46:13 +0100 (to, 16 feb 2006) $
 
- Modification for STM32: Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+Modification for STM32: Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+                        https://github.com/AlexandrPochtovy
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
- http://www.apache.org/licenses/LICENSE-2.0
+      http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
- *****************************************************************************/
+*****************************************************************************/
 
 #include "MyPid.h"
 
@@ -34,18 +35,13 @@
  *  \param d_factor  Derivate term.
  *  \param pid  Struct with PID status.
  */
-void pid_Init(int16_t p_factor, int16_t i_factor, int16_t d_factor, pidData_t *pid)
-// Set up PID controller parameters
-{
-  // Start values for PID controller
+void pid_Init(int16_t p_factor, int16_t i_factor, int16_t d_factor, pidData_t *pid) {
   pid->lastProcessValue = 0;
   pid->integral = 0;
   // Tuning constants for PID loop
   pid->P_Factor = p_factor;
   pid->I_Factor = i_factor;
   pid->D_Factor = d_factor;
-  // Limits to avoid overflow
-  pid->maxInt = INT16_MAX  * MY_SCALING_FACTOR;
 }
 
 /*! \brief PID control algorithm.
@@ -56,21 +52,7 @@ void pid_Init(int16_t p_factor, int16_t i_factor, int16_t d_factor, pidData_t *p
  *  \param processValue  Measured value.
  *  \param pid_st  PID status struct.
  */
-
-int16_t LIMIT16(int16_t value, int16_t min, int16_t max) {
-  if (value > max) {return max;}
-  else if (value < min) {return min;}
-  else return value;
-}
-
-int16_t LIMIT32(int32_t value, int32_t min, int32_t max) {
-  if (value > max) {return max;}
-  else if (value < min) {return min;}
-  else return value; 
-}
-
-int16_t pid_Controller(int32_t setPoint, int32_t processValue, pidData_t *pid, int32_t cycle)
-{
+int16_t pid_Controller(int32_t setPoint, int32_t processValue, pidData_t *pid, int32_t cycle) {
   int32_t error, p_term, d_term, i_term;
   // Calculate Pterm and limit error overflow
   error = setPoint - processValue;

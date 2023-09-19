@@ -26,9 +26,9 @@ uint8_t SPI_WriteReadOneByte(SPI_Conn_TWO_t *_spi, uint8_t tx, uint8_t *rx) {
 		FIFO_PutOne(_spi->txbuffer, tx);
 		_spi->txlen = 1;
         _spi->rxlen = 1;
-		_spi->mode = SPI_FULLDUPLEX_RW;
+		_spi->mode = SPI_MODE_DUPLEX;
 		_spi->step = 1;
-		SPI_Start_IRQ_HWNSS(_spi);
+		SPI_Start_IRQ_TWO_HWNSS(_spi);
 		return 0;
 	}
 	else if ((_spi->status == PORT_DONE) && (_spi->step == 1)) {
@@ -52,9 +52,9 @@ uint8_t SPI_WriteReadBytes(SPI_Conn_TWO_t *_spi, uint8_t *tx, uint8_t txLen, uin
 		FIFO_PutMulti(_spi->txbuffer, tx, txLen);
 		_spi->txlen = txLen;
         _spi->rxlen = rxLen;
-		_spi->mode = SPI_FULLDUPLEX_RW;
+		_spi->mode = SPI_MODE_DUPLEX;
 		_spi->step = 1;
-		SPI_Start_IRQ_HWNSS(_spi);
+		SPI_Start_IRQ_TWO_HWNSS(_spi);
 		return 0;
 	}
 	else if ((_spi->status == PORT_DONE) && (_spi->step == 1)) {
@@ -79,7 +79,7 @@ uint8_t SPI_WriteOnlyOneByte(SPI_Conn_ONE_t *_spi, uint8_t tx) {
 		_spi->len = 1;
 		_spi->mode = SPI_HALFDUPLEX_WRITE; 
 		_spi->step = 1;
-		SPI_Start_IRQ_HWNSS(_spi);
+		SPI_Start_IRQ_ONE_HWNSS(_spi);
 		return 0;
 	}
 	else if ((_spi->status == PORT_DONE) && (_spi->step == 1)) {
@@ -102,7 +102,7 @@ uint8_t SPI_WriteOnlyBytes(SPI_Conn_ONE_t *_spi, uint8_t *tx, uint8_t txLen) {
 		_spi->len = txLen;
 		_spi->mode = SPI_HALFDUPLEX_WRITE; 
 		_spi->step = 1;
-		SPI_Start_IRQ_HWNSS(_spi);
+		SPI_Start_IRQ_ONE_HWNSS(_spi);
 		return 0;
 	}
 	else if ((_spi->status == PORT_DONE) && (_spi->step == 1)) {
@@ -124,7 +124,7 @@ uint8_t SPI_ReadOnlyOneByte(SPI_Conn_ONE_t *_spi, uint8_t *rx) {
         _spi->len = 1;
 		_spi->mode = SPI_HALFDUPLEX_READ;
 		_spi->step = 1;
-		SPI_Start_IRQ_HWNSS(_spi);
+		SPI_Start_IRQ_ONE_HWNSS(_spi);
 		return 0;
 	}
 	else if ((_spi->status == PORT_DONE) && (_spi->step == 1)) {
@@ -147,7 +147,7 @@ uint8_t SPI_ReadOnlyBytes(SPI_Conn_ONE_t *_spi, uint8_t *rx, uint8_t rxLen) {
         _spi->len = rxLen;
 		_spi->mode = SPI_HALFDUPLEX_READ;
 		_spi->step = 1;
-		SPI_Start_IRQ_HWNSS(_spi);
+		SPI_Start_IRQ_ONE_HWNSS(_spi);
 		return 0;
 	}
 	else if ((_spi->status == PORT_DONE) && (_spi->step == 1)) {

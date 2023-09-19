@@ -1,17 +1,18 @@
 /*********************************************************************************
-   Original author: Alexandr Pochtovy<alex.mail.prime@gmail.com>
+  Original author:  Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+                    https://github.com/AlexandrPochtovy
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+      http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
  * 	MySPI.h
  *  Created on: 30 nov 2020
@@ -26,7 +27,7 @@ extern "C" {
 
 #include <stm32f4xx_ll_spi.h>
 #include "Peripherals/DataTypes.h"
-#include "FIFObuffer/FIFObuffer.h"
+#include "Buffers/FIFObuffer/FIFObuffer.h"
 //#include "DMA_Template/DMA_Template.h"
 
 typedef enum SPI_Mode {
@@ -39,20 +40,22 @@ typedef enum SPI_Mode {
 
 typedef struct SPI_Conn_TWO {
 	SPI_TypeDef *SPIbus;	        //pointer to HW SPI port
-	volatile PortStatus_t status;//status port
-	volatile SPI_Mode_t mode;			//read write mode
+	PortStatus_t status;//status port
+	uint8_t step;
+	SPI_Mode_t mode;			//read write mode
 	fifo_t *txbuffer;		          //pointer circular buffer
-	volatile uint8_t txlen;			  //length data
+	uint8_t txlen;			  //length data
 	fifo_t *rxbuffer;		          //pointer circular buffer
-	volatile uint8_t rxlen;			  //length data
+	uint8_t rxlen;			  //length data
 } SPI_Conn_TWO_t;
 
 typedef struct SPI_Conn_ONE {
 	SPI_TypeDef *SPIbus;	        //pointer to HW SPI port
-	volatile PortStatus_t status;//status port
-	volatile SPI_Mode_t mode;			//read write mode
+	PortStatus_t status;//status port
+	uint8_t step;
+	SPI_Mode_t mode;			//read write mode
 	fifo_t *buffer;		          //pointer circular buffer
-	volatile uint8_t len;			  //length data
+	uint8_t len;			  //length data
 } SPI_Conn_ONE_t;
 
 /*	control function	******************************************/

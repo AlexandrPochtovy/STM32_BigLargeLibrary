@@ -1,17 +1,18 @@
 /*********************************************************************************
-ginal author: Alexandr Pochtovy<alex.mail.prime@gmail.com>
+  Original author:  Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+                    https://github.com/AlexandrPochtovy
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
- http://www.apache.org/licenses/LICENSE-2.0
+      http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
  * 	VL53L0x.cpp
  *	Created on: Jul 25, 2022
@@ -159,7 +160,7 @@ uint8_t getAddress(VL53L0x_t *lidar)
 uint8_t getModelId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar)
 {
 	uint8_t st;
-	st = ReadOneRegByte(_i2c, lidar->addr, IDENTIFICATION_MODEL_ID, &lidar->modelID);
+	st = I2C_ReadOneByte(_i2c, lidar->addr, IDENTIFICATION_MODEL_ID, &lidar->modelID);
 	return st;
 }
 /*****************************************************************
@@ -170,7 +171,7 @@ uint8_t getModelId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar)
 uint8_t getRevisionId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar)
 {
 	uint8_t st;
-	st = ReadOneRegByte(_i2c, lidar->addr, IDENTIFICATION_REVISION_ID, &lidar->revisionID);
+	st = I2C_ReadOneByte(_i2c, lidar->addr, IDENTIFICATION_REVISION_ID, &lidar->revisionID);
 	return st;
 }
 /*****************************************************************
@@ -252,7 +253,7 @@ uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 		}
 		break;
 	case 4:
-		st = ReadOneRegByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, &lidar->tmp8);
 		if (st) {
 			lidar->tmp8 |= 0x04;
 			lidar->stepL1 = 5;
@@ -298,7 +299,7 @@ uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 		}
 		break;
 	case 11:
-		st = ReadOneRegByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, &lidar->tmp8);
 		if (st) {
 			if (lidar->tmp8 != 0x00) {
 				lidar->stepL1 = 12;
@@ -317,7 +318,7 @@ uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 		}
 		break;
 	case 13:
-		st = ReadOneRegByte(_i2c, lidar->addr, 0x92, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, 0x92, &lidar->tmp8);
 		if (st) {
 			lidar->spad_count = lidar->tmp8 & 0x7f;
 			lidar->spad_type_is_aperture = (lidar->tmp8 >> 7) & 0x01;
@@ -337,7 +338,7 @@ uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 		}
 		break;
 	case 16:
-		st = ReadOneRegByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, SOMETHING_MAGIC_REG, &lidar->tmp8);
 		if (st) {
 			lidar->tmp8 &= ~0x04;
 			lidar->stepL1 = 17;
@@ -389,7 +390,7 @@ uint8_t getSequenceStepEnables(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 {
 	uint8_t st;
 	uint8_t sequence_config;
-	st = ReadOneRegByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, &sequence_config);
+	st = I2C_ReadOneByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, &sequence_config);
 	if (st) {
 		lidar->enables.tcc = (sequence_config >> 4) & 0x1;
 		lidar->enables.dss = (sequence_config >> 3) & 0x1;
@@ -408,13 +409,13 @@ uint8_t getVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, vcselPeriodT
 {
 	uint8_t st = 0;
 	if (type == VcselPeriodPreRange) {
-		st = ReadOneRegByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VCSEL_PERIOD, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, PRE_RANGE_CONFIG_VCSEL_PERIOD, &lidar->tmp8);
 		if (st) {
 			lidar->vcselPeriodValue = __decodeVcselPeriod(lidar->tmp8);
 		}
 	}
 	else if (type == VcselPeriodFinalRange) {
-		st = ReadOneRegByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VCSEL_PERIOD, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, FINAL_RANGE_CONFIG_VCSEL_PERIOD, &lidar->tmp8);
 		if (st) {
 			lidar->vcselPeriodValue = __decodeVcselPeriod(lidar->tmp8);
 		}
@@ -441,7 +442,7 @@ uint8_t getSequenceStepTimeouts(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 		}
 		break;
 	case 1:
-		st = ReadOneRegByte(_i2c, lidar->addr, MSRC_CONFIG_TIMEOUT_MACROP, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, MSRC_CONFIG_TIMEOUT_MACROP, &lidar->tmp8);
 		if (st) {
 			lidar->timeouts.msrc_dss_tcc_mclks = lidar->tmp8 + 1;
 			lidar->timeouts.msrc_dss_tcc_us = timeoutMclksToMicroseconds(
@@ -654,7 +655,7 @@ uint8_t performSingleRefCalibration(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint
 		}
 		break;
 	case 1:
-		st = ReadOneRegByte(_i2c, lidar->addr, RESULT_INTERRUPT_STATUS, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, RESULT_INTERRUPT_STATUS, &lidar->tmp8);
 		if (st) {
 			if ((lidar->tmp8 & 0x07) != 0) {
 				lidar->stepL1 = 2;
@@ -977,7 +978,7 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar,vcselPeriodTyp
 		}
 		break;
 	case 103:
-		st = ReadOneRegByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, &lidar->sequence_config);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, SYSTEM_SEQUENCE_CONFIG, &lidar->sequence_config);
 		if (st) {
 			lidar->stepL3 = 104;
 		}
@@ -1163,7 +1164,7 @@ uint8_t readRangeContinuousMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar)
 	uint8_t st;
 	switch (lidar->stepL1) {
 	case 0:
-		st = ReadOneRegByte(_i2c, lidar->addr, RESULT_INTERRUPT_STATUS, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, RESULT_INTERRUPT_STATUS, &lidar->tmp8);
 		if (st){
 			if ((lidar->tmp8 & 0x07)) {
 				lidar->stepL1 = 1;
@@ -1255,7 +1256,7 @@ uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar)
 		}
 		break;
 	case 8:// "Wait until start bit has been cleared"
-		st = ReadOneRegByte(_i2c, lidar->addr, SYSRANGE_START, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, SYSRANGE_START, &lidar->tmp8);
 		if (st) {
 			if ((lidar->tmp8 & 0x01) == 0) {
 				lidar->stepL2 = 9;
@@ -1286,7 +1287,7 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 	// VL53L0X_DataInit() begin
 	switch (lidar->stepL3) {
 	case 0://+
-		st = ReadOneRegByte(_i2c, lidar->addr, VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, &lidar->tmp8);
 		if (st) {
 			lidar->stepL3 = 1;
 		}
@@ -1322,7 +1323,7 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		}
 		break;
 	case 6://stop variable 0x11
-		st = ReadOneRegByte(_i2c, lidar->addr, 0x91, &lidar->stop_variable);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, 0x91, &lidar->stop_variable);
 		if (st) {
 			lidar->stepL3 = 7;
 		}
@@ -1346,7 +1347,7 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		}
 		break;
 	case 10:// disable SIGNAL_RATE_MSRC (bit 1) and SIGNAL_RATE_PRE_RANGE (bit 4) limit checks//+
-		st = ReadOneRegByte(_i2c, lidar->addr, MSRC_CONFIG_CONTROL, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, MSRC_CONFIG_CONTROL, &lidar->tmp8);
 		if (st) {
 			lidar->stepL3 = 11;
 		}
@@ -1926,7 +1927,7 @@ uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar) {
 		}
 		break;
 	case 103:
-		st = ReadOneRegByte(_i2c, lidar->addr, GPIO_HV_MUX_ACTIVE_HIGH, &lidar->tmp8);
+		st = I2C_ReadOneByte(_i2c, lidar->addr, GPIO_HV_MUX_ACTIVE_HIGH, &lidar->tmp8);
 		if (st) {
 			lidar->stepL3 = 104;
 		}

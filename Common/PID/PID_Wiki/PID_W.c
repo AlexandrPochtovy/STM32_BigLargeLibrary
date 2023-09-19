@@ -37,7 +37,7 @@ void Pid_Init(pid_t *pid, int32_t kp, int32_t ki, int32_t kd, int32_t dt) {
     pid->out = 0;
 }
 
-int32_t PidProcessingSimple(pid_t *pid, int32_t actual, int32_t sp, int32_t min, int32_t max, uint32_t dt) {
+int32_t PidProcessingSimple(pid_t *pid, float actual, float sp, int32_t min, int32_t max, uint32_t dt) {
     float A0 = pid->Kp + pid->Ki*dt + pid->Kd/dt;
     float A1 = -pid->Kp - 2*pid->Kd/dt;
     float A2 = pid->Kd/dt;
@@ -46,16 +46,22 @@ int32_t PidProcessingSimple(pid_t *pid, int32_t actual, int32_t sp, int32_t min,
     pid->e[1] = pid->e[0];
     pid->e[0] = sp - actual;
     pid->out = pid->out + A0 * pid->e[0] + A1 * pid->e[1] + A2 * pid->e[2];
-    return Max(Min(pid->out, 0), 1000);
+    if (pid->out < 0) {
+    	pid->out = 0;
+    }
+    else if (pid->out > 1000) {
+    	pid->out = 1000;
+    }
+    return (uint16_t)pid->out;
 }
 
-int32_t PidProcessingFiltered(pid_t *pid, int32_t actual, int32_t sp, int32_t min, int32_t max, uint32_t dt) {
+int32_t PidProcessingFiltered(pid_t *pid, float actual, float sp, int32_t min, int32_t max, uint32_t dt) {
     float A0 = pid->Kp + pid->Ki*dt;
     float A1 = -pid->Kp;
-    float A0d = pid->Kd/dt;
-    float A1d = - 2.0 * pid->Kd/dt;
-    float A2d = pid->Kd / dt;
-    float tau = pid->Kd / (pid->Kp * N); // IIR filter time constant
+    float A0d = (float)pid->Kd/dt;
+    float A1d = - 2.0 * (float)pid->Kd/dt;
+    float A2d = (float)pid->Kd / dt;
+    float tau = (float)pid->Kd / (float)(pid->Kp * pid->N); // IIR filter time constant
     float alpha = dt / (2 * tau);
 
     pid->e[2] = pid->e[1];
@@ -69,5 +75,11 @@ int32_t PidProcessingFiltered(pid_t *pid, int32_t actual, int32_t sp, int32_t mi
     pid->fd1 = pid->fd0;
     pid->fd0 = ((alpha) / (alpha + 1)) * (pid->d0 + pid->d1) - ((alpha - 1) / (alpha + 1)) * pid->fd1;
     pid->out = pid->out + pid->fd0;    
-    return Max(Min(pid->out, 0), 1000); 
+    if (pid->out < 0) {
+    	pid->out = 0;
+    }
+    else if (pid->out > 1000) {
+    	pid->out = 1000;
+    }
+    return (uint16_t)pid->out;
 }

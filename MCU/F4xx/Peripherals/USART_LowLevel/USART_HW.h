@@ -1,17 +1,18 @@
 /*********************************************************************************
-   Original author: Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+  Original author:  Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+                    https://github.com/AlexandrPochtovy
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+      http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
  * 	USART_HW.h
  *  Created on: Aug 30, 2023
@@ -19,9 +20,13 @@
 #ifndef SRC_MYUSART_H_
 #define SRC_MYUSART_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stm32f4xx_ll_usart.h>
 #include "Peripherals/DataTypes.h"
-#include "FIFObuffer/FIFObuffer.h"
+#include "Buffers/FIFObuffer/FIFObuffer.h"
 //#include "DMA_Template/DMA_Template.h"
 #ifdef DMA_H
 	#include "DMA_Template/DMA_Template.h"
@@ -45,6 +50,11 @@ void USART_Start_DMA(USART_Conn_t *usart);//запускает обмен и у�
 void USART_EV_IRQ_CallBack(USART_Conn_t *usart);
 void USART_EV_DMA_CallBack(USART_Conn_t *usart);
 /*********************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* SRC_MYFUNCTION_MYUSART_H_ */
 

@@ -1,17 +1,18 @@
 /*********************************************************************************
-   Original author: Alexandr Pochtovy<alex.mail.prime@gmail.com>
+  Original author:  Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+                    https://github.com/AlexandrPochtovy
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+      http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
    
  * 	MCP23_17.h
  *  Created on: 12 jan 2021
@@ -25,7 +26,7 @@ extern "C" {
 #endif
 
 #include "MCP23x17_Register.h"
-#include "I2C_MiddleLevel/I2C_API.h"
+#include "InterfacesAPI/I2C_API/I2C_API.h"
 
 enum MCP23017_ADDRESS {
 	MCP23017_ADDR = 0x40

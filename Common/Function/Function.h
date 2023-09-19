@@ -19,24 +19,32 @@
 #ifndef _FUNCTION_H_
 #define _FUNCTION_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <math.h>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846f
+#endif
 
 /*****************************************************************
   * @brief  selects the minimum value from two
   * @param  value, min
   * @retval minimal
   */
-static inline size_t Min(size_t val, size_t min);
+size_t Min(size_t val, size_t min);
 
 /*****************************************************************
   * @brief selects the maximum value from two
   * @param value, max
   * @retval max
   */
-static inline size_t Max(size_t val, size_t max);
+size_t Max(size_t val, size_t max);
 
 /*****************************************************************
   * @brief  concat two bytes into 16bits value
@@ -61,7 +69,7 @@ size_t CONCAT_FOUR_BYTES(uint8_t msbh, uint8_t msb, uint8_t lsbh, uint8_t lsb);
   * @param  req - value, mask - mask
   * @retval inline
   */
-inline void BusRequestOn(uint32_t req, uint32_t mask) {
+static inline void BusRequestOn(uint32_t req, uint32_t mask) {
 	req |= mask;
 }
 
@@ -70,7 +78,7 @@ inline void BusRequestOn(uint32_t req, uint32_t mask) {
   * @param  req - value, mask - mask
   * @retval inline
   */
-inline void BusRequestOff(uint32_t req, uint32_t mask) {
+static inline void BusRequestOff(uint32_t req, uint32_t mask) {
 	req &= ~mask;
 }
 
@@ -108,5 +116,11 @@ float sigmoida_zero(float x, float a);
   * @retval filtered value
   */
 uint16_t alphabeta(uint16_t act, uint16_t last, uint8_t deep);
+
+size_t SimpleRamp_IT(size_t actual, size_t SP, size_t min, size_t max, size_t step);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _FUNCTION_H_ */

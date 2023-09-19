@@ -24,7 +24,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-  
+
+https://habr.com/ru/articles/255661/
 
 Modification for STM32: Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
                         https://github.com/AlexandrPochtovy
@@ -43,6 +44,9 @@ Modification for STM32: Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
 
   QuaterFilter.h
 	Created on: 11.02.2021
+
+Add fix 
+https://diydrones.com/forum/topics/madgwick-imu-ahrs-and-fast-inverse-square-root?id=705844%3ATopic%3A1018435&page=4#comments
 *********************************************************************************/
 
 #ifndef _QUATERFILTER_H_
@@ -52,24 +56,67 @@ Modification for STM32: Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
 extern "C" {
 #endif
 
-
 #include <stddef.h>
 #include <stdint.h>
-#include <math.h>   // Math library required for ‘sqrt’
+#include <math.h>   // Math library required for ‘sqrt’ and PI
 #include <string.h>
-#include "Quaternion.h"
 #include "Function/Function.h"
 
-Quaternion_t FilterUpdate_6DOF(Axis_t accel, Axis_t gyro, uint32_t deltat);
+typedef struct Axis {
+	float x;// X- axis measurements
+	float y;// Y- axis measurements
+	float z;// Z- axis measurements
+} vector_t;
 
-Quaternion_t FilterUpdate_6(float a_x, float a_y, float a_z, float g_x, float g_y, float g_z, uint32_t deltat);
+//Quaternion
+typedef struct Quaternion {
+    float w;
+    float x;
+    float y;
+    float z;
+} Quaternion_t;
 
-Quaternion_t FilterUpdate_9DOF(Axis_t accel, Axis_t gyro, Axis_t mag, uint32_t deltat);
+typedef struct EulerAngles {
+    float roll;
+    float pitch;
+    float yaw;
+} EulerAngles_t;
 
-Quaternion_t FilterUpdate9(float w_x, float w_y, float w_z, float a_x, float a_y, float a_z, float m_x, float m_y, float m_z, uint32_t deltat);
+// System constants
+#ifndef M_PI
+#define M_PI 3.14159265358979323846f
+#endif
+#define gyroMeasError (M_PI * (5.0f / 180.0f))      // gyroscope measurement error in rad/s (shown as 5 deg/s)
+#define gyroMeasDrift (M_PI * (0.2f / 180.0f))      // gyroscope measurement error in rad/s/s (shown as 0.2f deg/s/s)
+#define betaVal (sqrtf(3.0f / 4.0f) * gyroMeasError)   // compute beta
+#define zetaVal (sqrtf(3.0f / 4.0f) * gyroMeasDrift)// compute zeta
+#define betaDef		0.1f					                    // 2 * proportional gain
 
+static const float beta = betaVal;
+static const float zeta = zetaVal;
+
+/*****************************************************************************************
+*                   HABR.COM                                                             *
+*****************************************************************************************/
+uint8_t QuaternionCalcHabr_6Axis(vector_t accel, vector_t gyro, uint32_t deltat, Quaternion_t *SIQ);
+uint8_t QuaternionCalcHabr_6(float a_x, float a_y, float a_z, float g_x, float g_y, float g_z, uint32_t deltat, Quaternion_t *SIQ);
+uint8_t QuaternionCalcHabr_9Axis(vector_t accel, vector_t gyro, vector_t mag, uint32_t deltat, Quaternion_t *SIQ);
+uint8_t QuaternionCalcHabr_9(float w_x, float w_y, float w_z, float a_x, float a_y, float a_z, float m_x, float m_y, float m_z, uint32_t deltat, Quaternion_t *SIQ);
+
+/*****************************************************************************************
+*                   MAHONY                                                               *
+*****************************************************************************************/
+uint8_t MahonyAHRS_9(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float twoKp, float twoKi, uint32_t deltat, Quaternion_t *SIQ);
+uint8_t MahonyAHRS_6(float gx, float gy, float gz, float ax, float ay, float az, float twoKp, float twoKi, uint32_t deltat, Quaternion_t *SIQ);
+/*****************************************************************************************
+*                   MADGWICK_AHRS                                                        *
+*****************************************************************************************/
+uint8_t MadgwickAHRS_9(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, uint32_t deltat, Quaternion_t *SIQ);
+uint8_t MadgwickAHRS_6(float gx, float gy, float gz, float ax, float ay, float az, uint32_t deltat, Quaternion_t *SIQ);
+/*****************************************************************************************
+*                   CONVERSION                                                           *
+*****************************************************************************************/
 Quaternion_t EulerAngleToQuaternion(double yaw, double pitch, double roll);
-
 EulerAngles_t QuaternionToEulerAngles(Quaternion_t q, uint8_t deg);
 #ifdef __cplusplus
 }

@@ -19,11 +19,11 @@
 
 #include "Function.h"
 
-static inline size_t Min(size_t val, size_t min) {
+size_t Min(size_t val, size_t min) {
 	return (val > min ? val : min);
 }
 
-static inline size_t Max(size_t val, size_t max) {
+size_t Max(size_t val, size_t max) {
 	return (val < max ? val : max);
 }
 
@@ -66,3 +66,21 @@ uint16_t alphabeta(uint16_t new, uint16_t last, uint8_t deep) {
 	return tmp / deep;
 }
 
+size_t SimpleRamp_IT(size_t actual, size_t SP, size_t min, size_t max, size_t step) {
+	if (SP > actual) {
+		if (actual <= (max - step)) {
+			return actual + step;
+		} else {
+			return max;
+		}
+	}
+	else if (SP < actual) {
+		if (actual >= (min + step)) {
+			return actual - step;
+		} else {
+			return min;
+		}
+	} else {
+		return actual;
+	}
+}

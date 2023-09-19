@@ -54,7 +54,7 @@ uint8_t FILO_PutMulti(filo_t *q, size_t *data, size_t size) {
         return 0;
     }
     else {
-      memcpy(q->buffer[q->ind], data, size * sizeof(q->buffer[0]));
+      memcpy(&q->buffer[q->ind], data, size * sizeof(q->buffer[0]));
       q->ind = (q->ind + size) % q->buffer_size;
       q->bytes_avail += size;
       return 1;
@@ -66,7 +66,7 @@ uint8_t FILO_GetMulti(filo_t *q, size_t *data, size_t size) {
       return 0;
   }
   else {
-    memcpy(data, q->buffer[q->ind], size * sizeof(q->buffer[0]));
+    memcpy(data, &q->buffer[q->ind], size * sizeof(q->buffer[0]));
     q->ind = (q->ind + size) % q->buffer_size;
     q->bytes_avail -= size;
     return 1;

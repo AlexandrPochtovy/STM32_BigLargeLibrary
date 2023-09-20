@@ -31,9 +31,9 @@ uint16_t PID_MotoCalc(float sp, float act, int32_t min, int32_t max, PID_M_t *pi
     else if (pid->out > max) { 
 		pid->out = max; 
 		}
-	else {// Anti-windup
+	//else {// Anti-windup
 		pid->intgErr = actInt;
-	}
+	//}
 	pid->oldEf = ef;// store the state for the next iteration
     return (int32_t)pid->out;
 }

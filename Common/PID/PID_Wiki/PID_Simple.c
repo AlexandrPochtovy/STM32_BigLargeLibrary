@@ -66,7 +66,7 @@ void PidFiltered_Init(float kp, float ki, float kd, uint8_t N, int32_t dT, pidF_
     pid->out = 0;
 }
 
-int32_t PidFiltered_Processing(float sp, float act, int32_t min, int32_t max, uint32_t dt, pidF_t *pid) {
+int32_t PidFiltered_Processing(float sp, float act, int32_t min, int32_t max, pidF_t *pid) {
     pid->e[2] = pid->e[1];
     pid->e[1] = pid->e[0];
     pid->e[0] = sp - act;

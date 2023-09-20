@@ -60,7 +60,9 @@ void PidSimple_Init(float kp, float ki, float kd, uint8_t N, int32_t dT, pidS_t 
 
 int32_t PidSimple_Processing(float sp, float actual, int32_t min, int32_t max, pidS_t *pid);
 
-int32_t PidSimple_ProcessingFiltered(float sp, float actual, int32_t min, int32_t max, uint32_t dt, pidS_t *pid);
+void PidFiltered_Init(float kp, float ki, float kd, uint8_t N, int32_t dT, pidF_t *pid);
+
+int32_t PidFiltered_Processing(float sp, float actual, int32_t min, int32_t max, pidF_t *pid);
 
 
 #ifdef __cplusplus

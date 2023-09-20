@@ -25,14 +25,14 @@
  */
 void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c) {
 	_i2c->status = PORT_BUSY;
-	LL_I2C_EnableIT_BUF(_i2c->i2c);	//Enable TXE RxNE iterrupt for >1 byte
+	_i2c->i2c->CR2 |= I2C_CR2_ITBUFEN;//Enable TXE RxNE iterrupt for >1 byte
 	if (_i2c->len > 1) {
 		LL_I2C_AcknowledgeNextData(_i2c->i2c, LL_I2C_ACK); 	// Ack enable if more one bytes read
 	}
 	else {
 		LL_I2C_AcknowledgeNextData(_i2c->i2c, LL_I2C_NACK);//Ack disable if only one byte read
 	}
-	LL_I2C_GenerateStartCondition(_i2c->i2c);
+	_i2c->i2c->CR1 |= I2C_CR1_START;//I2C_GenerateStartCondition(_i2c->i2c);
 }
 /*запускает обмен по I2C с использованием DMA, не дописано*/
 void I2C_Start_DMA(I2C_DMA_Conn_t *_i2c) {
@@ -45,14 +45,14 @@ void I2C_Start_DMA(I2C_DMA_Conn_t *_i2c) {
 		LL_I2C_AcknowledgeNextData(_i2c->i2c, LL_I2C_NACK);//Ack disable if only one byte read
 	}
 	//DMA_Ch4_Restart(DMA1, _i2c->buffer, (uint16_t)_i2c->len);
-	LL_I2C_GenerateStartCondition(_i2c->i2c);
+	_i2c->i2c->CR1 |= I2C_CR1_START;//LL_I2C_GenerateStartCondition(_i2c->i2c);
 }
 /* альтернативный основной обработчик прерывания, использовать в блоке обработки прерываний
  * после окончания обработки присваивает соединению статус "свободно"
  * при ошибках будет выполняться обработчик ошибок*/
 void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 	//_i2c->status = PORT_BUSY;
-	volatile uint16_t I2C_SR1 = LL_I2C_ReadReg(_i2c->i2c, SR1);//Read SR1 first
+	volatile uint16_t I2C_SR1 = _i2c->i2c->SR1;//LL_I2C_ReadReg(_i2c->i2c, SR1);//Read SR1 first
 	//EV5 Start condition generated. Clear: read SR1 and write slave addr to DR final
 	if (I2C_SR1 & I2C_SR1_SB) {//start signal send device address
 		if (_i2c->mode == I2C_MODE_RW) {// Read mode
@@ -69,7 +69,7 @@ void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 			FIFO_GetOne(_i2c->buffer, (uint8_t *)&_i2c->i2c->DR);//It's FIRST byte (reg or value)
 			if (_i2c->len == 0) {						//write one byte
 				LL_I2C_GenerateStopCondition(_i2c->i2c);//use errata & AN2824
-				_i2c->status = PORT_FREE;				//set bus status free
+				_i2c->status = PORT_DONE;				//set bus status free
 			}
 		}
 		else if (_i2c->mode == I2C_MODE_RW) {
@@ -91,7 +91,7 @@ void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 	//byte transref finished
 	else if (I2C_SR1 & I2C_SR1_BTF) {
 		if ((_i2c->mode == I2C_MODE_WRITE) && (_i2c->len == 0)) {	//if data end and TXE not pass
-			_i2c->status = PORT_FREE;//set bus free status
+			_i2c->status = PORT_DONE;//set bus free status
 		}
 		else if (_i2c->mode == I2C_MODE_READ) {
 			_i2c->mode = I2C_MODE_RW;	//switch mode to read-write
@@ -110,7 +110,7 @@ void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 			_i2c->i2c->CR2 &= ~I2C_CR2_ITBUFEN; 	//Disable RxNE
 			FIFO_PutOne(_i2c->buffer, ((uint8_t)_i2c->i2c->DR));//read byte from data reg
 			--_i2c->len;
-			_i2c->status = PORT_FREE;//set bus free status
+			_i2c->status = PORT_DONE;//set bus free status
 		}
 		else if (_i2c->len == 2) {
 			LL_I2C_AcknowledgeNextData(_i2c->i2c, LL_I2C_NACK);//Ack disable if only one byte read

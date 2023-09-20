@@ -28,7 +28,7 @@ extern "C" {
 #include "VL53L0x_Registers.h"
 #include "Function/Function.h"
 //#include "Function/BytesMath.h"
-#include "InterfacesAPI/I2C_API/I2C_API.h"
+#include "I2C_API.h"
 
 
 enum VL53L0x_ADDRESS {

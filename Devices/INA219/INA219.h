@@ -27,7 +27,7 @@ extern "C" {
 
 
 #include "INA219_Register.h"
-#include "InterfacesAPI/I2C_API/I2C_API.h"
+#include "I2C_API.h"
 //============================================================================================
 enum INA219_ADDRESS {
 	INA219_ADDR = 0x88

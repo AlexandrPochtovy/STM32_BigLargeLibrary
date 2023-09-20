@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 #include "ADXL345_Register.h"
-#include "InterfacesAPI/I2C_API/I2C_API.h"
+#include "I2C_API.h"
 
 enum ADXL345_ADDRESS {
 	ADXL345_ADDR = 0xA6//Assumes ALT address pin low

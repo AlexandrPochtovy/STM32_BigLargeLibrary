@@ -34,6 +34,10 @@ extern "C" {
 /**********************************************************************
 *                       TYPEDEF's PID                                 * 
 ***********************************************************************/
+#ifndef M_PI
+#define M_PI		3.14159265358979323846
+#endif
+
 typedef struct pidSimple {
     float Kp;       // the Proportional tuning constant, multiplied with SCALING_FACTOR
     float Ki;	    // the Integral tuning constant, multiplied with SCALING_FACTOR

@@ -21,6 +21,38 @@
 #include "I2C_API.h"
 
 uint8_t I2C_WriteOneByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t value) {
+	/*switch (_i2c->status) {
+	case PORT_FREE:
+		if (_i2c->step == 0) {
+			_i2c->status = PORT_BUSY;
+			_i2c->addr = addr;
+			FIFO_PutOne(_i2c->buffer, reg);
+			FIFO_PutOne(_i2c->buffer, value);
+			_i2c->len = 1;
+			_i2c->mode = I2C_MODE_WRITE;
+			_i2c->step = 1;
+			I2C_Start_IRQ(_i2c);
+			return 0;
+		}
+		break;
+	case PORT_DONE:
+		if (_i2c->step == 1) {
+		_i2c->step = 0;
+		_i2c->status = PORT_FREE;
+		return 1;// exit
+		}
+		break;
+	case PORT_ERROR:
+		if (_i2c->step == 1) {
+			FIFO_Init(_i2c->buffer);
+			_i2c->step = 0;
+			_i2c->status = PORT_FREE;
+			return 1;//repeat
+		}
+		break;
+	default:
+		break;
+	}*/
 	if ((_i2c->status == PORT_FREE) && (_i2c->step == 0)) {
 		_i2c->status = PORT_BUSY;
 		_i2c->addr = addr;
@@ -37,12 +69,13 @@ uint8_t I2C_WriteOneByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_
 		_i2c->status = PORT_FREE;
 		return 1;// exit
 	}
-	else {//TODO  ADD error processing HERE
+	/*else {//TODO  ADD error processing HERE
 		FIFO_Init(_i2c->buffer);
 		_i2c->step = 0;
 		_i2c->status = PORT_FREE;
 		return 0;//repeat
-	}
+	}*/
+	return 0;
 }
 
 uint8_t I2C_WriteBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, void *data, uint8_t size) {
@@ -62,12 +95,13 @@ uint8_t I2C_WriteBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, void *da
 		_i2c->status = PORT_FREE;
 		return 1;// exit
 	}
-	else {//TODO  ADD error processing HERE
+	/*else {//TODO  ADD error processing HERE
 		FIFO_Init(_i2c->buffer);
 		_i2c->step = 0;
 		_i2c->status = PORT_FREE;
 		return 0;//repeat
-	}
+	}*/
+	return 0;
 }
 
 uint8_t I2C_ReadOneByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t *value) {
@@ -87,12 +121,13 @@ uint8_t I2C_ReadOneByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t
 		_i2c->status = PORT_FREE;
 		return 1;// exit
 	}
-	else {//TODO  ADD error processing HERE
+	/*else {//TODO  ADD error processing HERE
 		FIFO_Init(_i2c->buffer);
 		_i2c->step = 0;
 		_i2c->status = PORT_FREE;
 		return 0;//repeat
-	}
+	}*/
+	return 0;
 }
 
 uint8_t I2C_ReadBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, void *data, uint8_t size) {
@@ -112,10 +147,11 @@ uint8_t I2C_ReadBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, void *dat
 		_i2c->status = PORT_FREE;
 		return 1;// exit
 	}
-	else {//TODO  ADD error processing HERE
+	/*else {//TODO  ADD error processing HERE
 		FIFO_Init(_i2c->buffer);
 		_i2c->step = 0;
 		_i2c->status = PORT_FREE;
 		return 0;//repeat
-	}
+	}*/
+	return 0;
 }

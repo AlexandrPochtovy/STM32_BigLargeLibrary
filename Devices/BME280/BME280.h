@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #include "BME280_Registers.h"
-#include "InterfacesAPI/I2C_API/I2C_API.h"
+#include "I2C_API.h"
 
 //===========================================================================================
 enum BME280_ADDRESS {

@@ -20,7 +20,7 @@
 #ifndef TCA9548A_H_
 #define TCA9548A_H_
 
-#include "InterfacesAPI/I2C_API/I2C_API.h"
+#include "I2C_API.h"
 
 enum TCA9548A_ADDRESS {
 	TCA9548A_ADDR = 0x70//Assumes ALT address pin low

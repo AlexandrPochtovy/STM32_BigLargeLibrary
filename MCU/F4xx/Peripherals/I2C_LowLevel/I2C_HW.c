@@ -32,7 +32,7 @@ void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c) {
 	else {
 		LL_I2C_AcknowledgeNextData(_i2c->i2c, LL_I2C_NACK);//Ack disable if only one byte read
 	}
-	_i2c->i2c->CR1 |= I2C_CR1_START;//I2C_GenerateStartCondition(_i2c->i2c);
+	LL_I2C_GenerateStartCondition(_i2c->i2c);
 }
 /*запускает обмен по I2C с использованием DMA, не дописано*/
 void I2C_Start_DMA(I2C_DMA_Conn_t *_i2c) {

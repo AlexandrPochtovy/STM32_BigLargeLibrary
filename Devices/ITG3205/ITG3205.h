@@ -26,7 +26,7 @@ extern "C" {
 
 #include "math.h"
 #include "ITG3205_Register.h"
-#include "InterfacesAPI/I2C_API/I2C_API.h"
+#include "I2C_API.h"
 
 enum ITG3205_ADDRESS {
 	ITG3205_ADDR = 0xD0

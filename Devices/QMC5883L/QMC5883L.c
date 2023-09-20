@@ -47,7 +47,6 @@ uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
 					dev->status = DEVICE_INIT;
 					return 1;
 				}
-				_i2c->step = 2;
 				break;}
 			default:
 				dev->step = 0;

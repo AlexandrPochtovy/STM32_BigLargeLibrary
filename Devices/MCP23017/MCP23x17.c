@@ -55,7 +55,7 @@ uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev) {
 }
 
 uint8_t MCP23_17_ReadPort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t *value) {
-	if (ReadOneRegByte(_i2c, dev->addr, port, value)) {
+	if (I2C_ReadOneByte(_i2c, dev->addr, port, value)) {
 		dev->status = DEVICE_DONE;
 		return 1;
 	}

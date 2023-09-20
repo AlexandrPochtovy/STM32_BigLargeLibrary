@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #include "QMC5883L_Register.h"
-#include "InterfacesAPI/I2C_API/I2C_API.h"
+#include "I2C_API.h"
 
 enum QMC5883L_ADDRESS {
 	QMC5883L_ADDR = 0x1A

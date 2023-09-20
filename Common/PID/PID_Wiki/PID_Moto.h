@@ -10,6 +10,10 @@
 // @param  fc  Cutoff frequency    @f$ f_c @f$ of derivative filter in Hz
 // @param  dT  Controller sampling time    @f$ T_s @f$ in seconds
 // The derivative filter can be disabled by setting `fc` to zero.
+#ifndef M_PI
+#define M_PI		3.14159265358979323846
+#endif
+
 typedef struct PID_M {
     float kp;		
 	float ki;		
@@ -17,7 +21,7 @@ typedef struct PID_M {
 	float alpha;	
 	uint32_t dT;		
     float intgErr;	
-    float oldEf;	
+    float oldErrFilter;	
 	float out;      // output value
 } PID_M_t;
 
@@ -35,7 +39,7 @@ typedef struct PID_MF {
 
 void PID_MotoInit(float kp, float ki, float kd, float fc, uint32_t dT, PID_M_t *pid);
 
-uint16_t PID_MotoCalc(float sp, float act, int32_t min, int32_t max, PID_M_t *pid);
+int32_t PID_MotoCalc(float sp, float act, int32_t min, int32_t max, PID_M_t *pid);
 
 void PID_MotoFilteredInit(float kp, float ki, float kd, uint8_t N, uint32_t dT, PID_MF_t *pid);
 

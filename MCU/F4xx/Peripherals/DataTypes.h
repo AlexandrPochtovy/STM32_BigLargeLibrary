@@ -30,12 +30,10 @@
 * with multiple errors or timeouts, the peripheral is considered faulty
 */
 typedef enum PortStatus {	//состояние порта используется внутри функций
-	PORT_FREE,				//свободно можно работать
-	PORT_BUSY,				//занято
-	PORT_DONE,    			//операция завершена успешно
-	PORT_ERROR,				//возникли ошибки, повторить последний запрос
-	PORT_TIMEOUT,			//таймаут, устройство не отвечает
-	PORT_WTF				//произошла НЕХОРОШАЯ МАГИЯ, полный перезапуск с нуля
+	PORT_FREE,		//свободно можно работать
+	PORT_BUSY,		//занято
+	PORT_DONE,    //операция завершена успешно
+	PORT_ERROR		//возникли ошибки, повторить последний запрос
 } PortStatus_t;
 
 /* state of data exchange with the device as with a bus element
@@ -46,6 +44,7 @@ typedef enum DeviceStatus {//состояние устройства на шин
 	DEVICE_INIT,		//устройство настроено
 	DEVICE_DONE,		//опрос выполняется без ошибок
 	DEVICE_ERROR,		//опрос данных завершился с ошибкой
+  DEVICE_TIMEOUT, //таймаут связи с устройством
 	DEVICE_FAULTH		//ошибки при опросе устройства, потеря связи и тд
 } DeviceStatus_t;
 

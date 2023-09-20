@@ -22,7 +22,7 @@
 #include "stddef.h"
 #include "math.h"
 #include "Function/Function.h"
-#include "PID/PID_Moto/PID_Moto.h"
+#include "PID/PID_Wiki/PID_Moto.h"
 
 #define WHEEL_RAD_mm	    20	        // радиуc колеcа, мм
 #define WHEEL_PULSE_COUNT   900          // число импульсов энкодера на один оборот колеса

@@ -31,8 +31,8 @@
   * @param  *buffer - pointer to array
   *         buffer_size - array length
   *         ind - index for put/get element
-  *         bytes_avail - quantity data in buffer
-  *         lockState - status buffer: free or lock   
+  *         bytes_avail - quantity data elements in buffer
+  *         state - status buffer: free or lock   
   * @retval none
   */
 typedef struct filo {
@@ -40,11 +40,11 @@ typedef struct filo {
     size_t   buffer_size;
     size_t   ind;
     size_t   bytes_avail;
-    BufferStatus_t lockState;
+    BufferStatus_t state;
 } filo_t;
 
 /*****************************************************************
-  * @brief  Initializes the buffer, resets the head and tail indexes.
+  * @brief  Initializes the buffer, reset the head and tail indexes to zero.
   * @param  *q - pointer to buffer fifo_t
   * @retval none
   */

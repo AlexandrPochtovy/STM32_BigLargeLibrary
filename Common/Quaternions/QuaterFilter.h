@@ -58,9 +58,13 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdint.h>
-#include <math.h>   // Math library required for ‘sqrt’ and PI
+#include <math.h>
 #include <string.h>
 #include "Function/Function.h"
+
+/**********************************************************************
+*                       TYPEDEF's                                     * 
+***********************************************************************/
 
 typedef struct Axis {
 	float x;// X- axis measurements
@@ -82,41 +86,155 @@ typedef struct EulerAngles {
     float yaw;
 } EulerAngles_t;
 
-// System constants
-#ifndef M_PI
-#define M_PI 3.14159265358979323846f
-#endif
-#define gyroMeasError (M_PI * (5.0f / 180.0f))      // gyroscope measurement error in rad/s (shown as 5 deg/s)
-#define gyroMeasDrift (M_PI * (0.2f / 180.0f))      // gyroscope measurement error in rad/s/s (shown as 0.2f deg/s/s)
-#define betaVal (sqrtf(3.0f / 4.0f) * gyroMeasError)   // compute beta
-#define zetaVal (sqrtf(3.0f / 4.0f) * gyroMeasDrift)// compute zeta
-#define betaDef		0.1f					                    // 2 * proportional gain
-
-static const float beta = betaVal;
-static const float zeta = zetaVal;
-
 /*****************************************************************************************
 *                   HABR.COM                                                             *
 *****************************************************************************************/
-uint8_t QuaternionCalcHabr_6Axis(vector_t accel, vector_t gyro, uint32_t deltat, Quaternion_t *SIQ);
-uint8_t QuaternionCalcHabr_6(float a_x, float a_y, float a_z, float g_x, float g_y, float g_z, uint32_t deltat, Quaternion_t *SIQ);
-uint8_t QuaternionCalcHabr_9Axis(vector_t accel, vector_t gyro, vector_t mag, uint32_t deltat, Quaternion_t *SIQ);
-uint8_t QuaternionCalcHabr_9(float w_x, float w_y, float w_z, float a_x, float a_y, float a_z, float m_x, float m_y, float m_z, uint32_t deltat, Quaternion_t *SIQ);
+/*****************************************************************
+  * @brief calculate quaternion vector for 6 value axis: accelerometer and gyroscope without magnetometer
+  * @param accel - accelerometer axis structure value
+  * @param gyro - gyroscope axis structure value
+  * @param dT - time between calcilation in msec
+  * @param *SIQ - pointer for Quaternion_t quaternion structure
+  * @retval 1 when end
+  */
+uint8_t QuaternionCalcHabr_6Axis(vector_t accel, vector_t gyro, uint32_t dT, Quaternion_t *SIQ);
+
+/*****************************************************************
+  * @brief calculate quaternion vector for 6 value axis: accelerometer and gyroscope without magnetometer
+  * @param ax - accelerometer X-axis value
+  * @param ay - accelerometer Y-axis value
+  * @param az - accelerometer Z-axis value
+  * @param gx - gyroscope X-axis value
+  * @param gy - gyroscope Y-axis value
+  * @param gz - gyroscope Z-axis value
+  * @param dT - time between calcilation in msec
+  * @param *SIQ - pointer for Quaternion_t quaternion structure
+  * @retval 1 when end
+  */
+uint8_t QuaternionCalcHabr_6(float ax, float ay, float az, float gx, float gy, float gz, uint32_t dT, Quaternion_t *SIQ);
+
+/*****************************************************************
+  * @brief calculate quaternion vector for 9 value axis: accelerometer, gyroscope and magnetometer
+  * @param accel - accelerometer axis structure value
+  * @param gyro - gyroscope axis structure value
+  * @param mag - magnetometer axis structure value
+  * @param dT - time between calcilation in msec
+  * @param *SIQ - pointer for Quaternion_t quaternion structure
+  * @retval 1 when end
+  */
+uint8_t QuaternionCalcHabr_9Axis(vector_t accel, vector_t gyro, vector_t mag, uint32_t dT, Quaternion_t *SIQ);
+
+/*****************************************************************
+  * @brief calculate quaternion vector for 9 value axis: accelerometer, gyroscope and magnetometer
+  * @param ax - accelerometer X-axis value
+  * @param ay - accelerometer Y-axis value
+  * @param az - accelerometer Z-axis value
+  * @param gx - gyroscope X-axis value
+  * @param gy - gyroscope Y-axis value
+  * @param gz - gyroscope Z-axis value
+  * @param mx - magnetometer X-axis value
+  * @param my - magnetometer Y-axis value
+  * @param mz - magnetometer Z-axis value
+  * @param dT - time between calcilation in msec
+  * @param *SIQ - pointer for Quaternion_t quaternion structure
+  * @retval 1 when end
+  */
+uint8_t QuaternionCalcHabr_9(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, uint32_t dT, Quaternion_t *SIQ);
 
 /*****************************************************************************************
 *                   MAHONY                                                               *
+Mahony's algorythm for quaternion calculating
 *****************************************************************************************/
-uint8_t MahonyAHRS_9(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float twoKp, float twoKi, uint32_t deltat, Quaternion_t *SIQ);
-uint8_t MahonyAHRS_6(float gx, float gy, float gz, float ax, float ay, float az, float twoKp, float twoKi, uint32_t deltat, Quaternion_t *SIQ);
+/*****************************************************************
+  * @brief calculate quaternion vector for 9 value axis: accelerometer, gyroscope and magnetometer
+  * @param ax - accelerometer X-axis value
+  * @param ay - accelerometer Y-axis value
+  * @param az - accelerometer Z-axis value
+  * @param gx - gyroscope X-axis value
+  * @param gy - gyroscope Y-axis value
+  * @param gz - gyroscope Z-axis value
+  * @param mx - magnetometer X-axis value
+  * @param my - magnetometer Y-axis value
+  * @param mz - magnetometer Z-axis value
+  * @param twoKp - proportional gain factor
+  * @param twoKi - integral gain factor
+  * @param dT - time between calcilation in msec
+  * @param *SIQ - pointer for Quaternion_t quaternion structure
+  * @retval 1 when end
+  */
+uint8_t MahonyAHRS_9(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float twoKp, float twoKi, uint32_t dT, Quaternion_t *SIQ);
+
+/*****************************************************************
+  * @brief calculate quaternion vector for 6 value axis: accelerometer and gyroscope without magnetometer
+  * @param ax - accelerometer X-axis value
+  * @param ay - accelerometer Y-axis value
+  * @param az - accelerometer Z-axis value
+  * @param gx - gyroscope X-axis value
+  * @param gy - gyroscope Y-axis value
+  * @param gz - gyroscope Z-axis value
+  * @param twoKp - proportional gain factor
+  * @param twoKi - integral gain factor
+  * @param dT - time between calcilation in msec
+  * @param *SIQ - pointer for Quaternion_t quaternion structure
+  * @retval 1 when end
+  */
+uint8_t MahonyAHRS_6(float ax, float ay, float az, float gx, float gy, float gz, float twoKp, float twoKi, uint32_t dT, Quaternion_t *SIQ);
+
 /*****************************************************************************************
 *                   MADGWICK_AHRS                                                        *
+Madgwick's algorythm for quaternion calculating
 *****************************************************************************************/
-uint8_t MadgwickAHRS_9(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, uint32_t deltat, Quaternion_t *SIQ);
-uint8_t MadgwickAHRS_6(float gx, float gy, float gz, float ax, float ay, float az, uint32_t deltat, Quaternion_t *SIQ);
+/*****************************************************************
+  * @brief calculate quaternion vector for 9 value axis: accelerometer, gyroscope and magnetometer
+  * @param ax - accelerometer X-axis value
+  * @param ay - accelerometer Y-axis value
+  * @param az - accelerometer Z-axis value
+  * @param gx - gyroscope X-axis value
+  * @param gy - gyroscope Y-axis value
+  * @param gz - gyroscope Z-axis value
+  * @param mx - magnetometer X-axis value
+  * @param my - magnetometer Y-axis value
+  * @param mz - magnetometer Z-axis value
+  * @param dT - time between calcilation in msec
+  * @param *SIQ - pointer for Quaternion_t quaternion structure
+  * @retval 1 when end
+  */
+uint8_t MadgwickAHRS_9(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, uint32_t dT, Quaternion_t *SIQ);
+
+/*****************************************************************
+  * @brief calculate quaternion vector for 6 value axis: accelerometer and gyroscope without magnetometer
+  * @param ax - accelerometer X-axis value
+  * @param ay - accelerometer Y-axis value
+  * @param az - accelerometer Z-axis value
+  * @param gx - gyroscope X-axis value
+  * @param gy - gyroscope Y-axis value
+  * @param gz - gyroscope Z-axis value
+  * @param twoKp - proportional gain factor
+  * @param twoKi - integral gain factor
+  * @param dT - time between calcilation in msec
+  * @param *SIQ - pointer for Quaternion_t quaternion structure
+  * @retval 1 when end
+  */
+uint8_t MadgwickAHRS_6(float ax, float ay, float az, float gx, float gy, float gz, uint32_t deltat, Quaternion_t *SIQ);
 /*****************************************************************************************
 *                   CONVERSION                                                           *
 *****************************************************************************************/
+
+/*****************************************************************
+  * @brief converter from Euler angle to quaternion
+  * @param yaw - yaw rotation
+  * @param pitch - pitch rotation
+  * @param rollaz - roll rotation
+  * @retval Quaternion_t quaternion vector
+  */
 Quaternion_t EulerAngleToQuaternion(double yaw, double pitch, double roll);
+
+/*****************************************************************
+  * @brief converter from quaternion to Euler angle
+  * @param q - Quaternion_t quaternion vector
+  * @param deg - select Euler output: 0 - rad, 1 - degree
+  * @retval EulerAngles_t angle rotation vector
+  */
 EulerAngles_t QuaternionToEulerAngles(Quaternion_t q, uint8_t deg);
 #ifdef __cplusplus
 }

@@ -49,6 +49,8 @@ typedef struct MCP23 {
 uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev);
 uint8_t MCP23_17_ReadPort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t *value);
 uint8_t MCP23_17_WritePort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t value);
+uint8_t MCP23_17_ReadAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value);
+uint8_t MCP23_17_WriteAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value);
 
 
 #ifdef __cplusplus

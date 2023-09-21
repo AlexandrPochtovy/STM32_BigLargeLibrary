@@ -51,19 +51,23 @@ https://diydrones.com/forum/topics/madgwick-imu-ahrs-and-fast-inverse-square-roo
 
 #include "QuaterFilter.h"
 
-
-
+#define gyroMeasError (M_PI * (5.0f / 180.0f))      // gyroscope measurement error in rad/s (shown as 5 deg/s)
+#define gyroMeasDrift (M_PI * (0.2f / 180.0f))      // gyroscope measurement error in rad/s/s (shown as 0.2f deg/s/s)
+#define betaVal (sqrt(3.0f / 4.0f) * gyroMeasError)// compute beta
+#define zetaVal (sqrt(3.0f / 4.0f) * gyroMeasDrift)// compute zeta
+#define betaDef		0.1f					        // 2 * proportional gain
 //ADD calculate coeff as parameters
+static float beta = betaVal;
+static float zeta = zetaVal;
 static float b_x = 1, b_z = 0;                          // reference direction of flux in earth frame
 static float w_bx = 0, w_by = 0, w_bz = 0;              // estimate gyroscope biases error
-//extern static Quaternion_t SIQ = {1.0, 0.0, 0.0, 0.0}; 	// static internal quaternion of sensor frame relative to auxiliary frame
-static vector_t integralFB = {0.0f,  0.0f, 0.0f};	        // integral error terms scaled by Ki
+static vector_t integralFB = {0.0f,  0.0f, 0.0f};	    // integral error terms scaled by Ki
 Quaternion_t Q = {1.0, 0.0, 0.0, 0.0};	                // quaternion of sensor frame relative to auxiliary frame
 
 /*****************************************************************************************
 *                   HABR.COM                                                             *
 *****************************************************************************************/
-uint8_t QuaternionCalcHabr_6Axis(vector_t accel, vector_t gyro, uint32_t deltat, Quaternion_t *SIQ) {
+uint8_t QuaternionCalcHabr_6Axis(vector_t accel, vector_t gyro, uint32_t dT, Quaternion_t *SIQ) {
     // Local system variables
     float norm;             // vector norm
     float SEqDot_omega[4];  // quaternion derrivative from gyroscopes elements
@@ -109,10 +113,10 @@ uint8_t QuaternionCalcHabr_6Axis(vector_t accel, vector_t gyro, uint32_t deltat,
     SEqDot_omega[2] = halfSEq[0] * gyro.y - halfSEq[1] * gyro.z + halfSEq[3] * gyro.x;
     SEqDot_omega[3] = halfSEq[0] * gyro.z + halfSEq[1] * gyro.y - halfSEq[2] * gyro.x;
     // Compute then integrate the estimated quaternion derrivative
-    SIQ->w += (SEqDot_omega[0] - (beta * SEqHatDot[0])) * deltat / 1000;
-    SIQ->x += (SEqDot_omega[1] - (beta * SEqHatDot[1])) * deltat / 1000;
-    SIQ->y += (SEqDot_omega[2] - (beta * SEqHatDot[2])) * deltat / 1000;
-    SIQ->z += (SEqDot_omega[3] - (beta * SEqHatDot[3])) * deltat / 1000;
+    SIQ->w += (SEqDot_omega[0] - (beta * SEqHatDot[0])) * dT / 1000;
+    SIQ->x += (SEqDot_omega[1] - (beta * SEqHatDot[1])) * dT / 1000;
+    SIQ->y += (SEqDot_omega[2] - (beta * SEqHatDot[2])) * dT / 1000;
+    SIQ->z += (SEqDot_omega[3] - (beta * SEqHatDot[3])) * dT / 1000;
     // Normalise quaternion
     norm = sqrt(SIQ->w * SIQ->w + SIQ->x * SIQ->x + SIQ->y *SIQ->y + SIQ->z * SIQ->z);
     SIQ->w /= norm;
@@ -122,7 +126,7 @@ uint8_t QuaternionCalcHabr_6Axis(vector_t accel, vector_t gyro, uint32_t deltat,
     return 1;
 }
 
-uint8_t QuaternionCalcHabr_6(float ax, float ay, float az, float gx, float gy, float gz, uint32_t deltat, Quaternion_t *SIQ) {
+uint8_t QuaternionCalcHabr_6(float ax, float ay, float az, float gx, float gy, float gz, uint32_t dT, Quaternion_t *SIQ) {
     // Local system variables
     float norm;             // vector norm
     float SEqDot_omega[4];  // quaternion derrivative from gyroscopes elements
@@ -168,10 +172,10 @@ uint8_t QuaternionCalcHabr_6(float ax, float ay, float az, float gx, float gy, f
     SEqDot_omega[2] = halfSEq[0] * gy - halfSEq[1] * gz + halfSEq[3] * gx;
     SEqDot_omega[3] = halfSEq[0] * gz + halfSEq[1] * gy - halfSEq[2] * gx;
     // Compute then integrate the estimated quaternion derrivative
-    SIQ->w += (SEqDot_omega[0] - (beta * SEqHatDot[0])) * deltat / 1000;
-    SIQ->x += (SEqDot_omega[1] - (beta * SEqHatDot[1])) * deltat / 1000;
-    SIQ->y += (SEqDot_omega[2] - (beta * SEqHatDot[2])) * deltat / 1000;
-    SIQ->z += (SEqDot_omega[3] - (beta * SEqHatDot[3])) * deltat / 1000;
+    SIQ->w += (SEqDot_omega[0] - (beta * SEqHatDot[0])) * dT / 1000;
+    SIQ->x += (SEqDot_omega[1] - (beta * SEqHatDot[1])) * dT / 1000;
+    SIQ->y += (SEqDot_omega[2] - (beta * SEqHatDot[2])) * dT / 1000;
+    SIQ->z += (SEqDot_omega[3] - (beta * SEqHatDot[3])) * dT / 1000;
     // Normalise quaternion
     norm = sqrt(SIQ->w * SIQ->w + SIQ->x * SIQ->x + SIQ->y *SIQ->y + SIQ->z * SIQ->z);
     SIQ->w /= norm;
@@ -181,7 +185,7 @@ uint8_t QuaternionCalcHabr_6(float ax, float ay, float az, float gx, float gy, f
     return 1;
 }
 
-uint8_t QuaternionCalcHabr_9Axis(vector_t accel, vector_t gyro, vector_t mag, uint32_t deltat, Quaternion_t *SIQ) {
+uint8_t QuaternionCalcHabr_9Axis(vector_t accel, vector_t gyro, vector_t mag, uint32_t dT, Quaternion_t *SIQ) {
     // local system variables
     float norm; // vector norm
     float SEqDot_omega[4];  // quaternion derrivative from gyroscopes elements
@@ -270,9 +274,9 @@ uint8_t QuaternionCalcHabr_9Axis(vector_t accel, vector_t gyro, vector_t mag, ui
     w_err_y = twow * SEqHatDot_3 + twox * SEqHatDot_4 - twoy * SEqHatDot_1 - twoz * SEqHatDot_2;
     w_err_z = twow * SEqHatDot_4 - twox * SEqHatDot_3 + twoy * SEqHatDot_2 - twoz * SEqHatDot_1;
     // compute and remove the gyroscope baises
-    w_bx += w_err_x * deltat * zeta;
-    w_by += w_err_y * deltat * zeta;
-    w_bz += w_err_z * deltat * zeta;
+    w_bx += w_err_x * dT * zeta;
+    w_by += w_err_y * dT * zeta;
+    w_bz += w_err_z * dT * zeta;
     gyro.x -= w_bx;
     gyro.y -= w_by;
     gyro.z -= w_bz;
@@ -282,10 +286,10 @@ uint8_t QuaternionCalcHabr_9Axis(vector_t accel, vector_t gyro, vector_t mag, ui
     SEqDot_omega[2] = halfw * gyro.y - halfx * gyro.z + halfz * gyro.x;
     SEqDot_omega[3] = halfw * gyro.z + halfx * gyro.y - halfy * gyro.x;
     // compute then integrate the estimated quaternion rate
-    SIQ->w += (SEqDot_omega[0] - (beta * SEqHatDot_1)) * deltat / 1000;
-    SIQ->x += (SEqDot_omega[1] - (beta * SEqHatDot_2)) * deltat / 1000;
-    SIQ->y += (SEqDot_omega[2] - (beta * SEqHatDot_3)) * deltat / 1000;
-    SIQ->z += (SEqDot_omega[3] - (beta * SEqHatDot_4)) * deltat / 1000;
+    SIQ->w += (SEqDot_omega[0] - (beta * SEqHatDot_1)) * dT / 1000;
+    SIQ->x += (SEqDot_omega[1] - (beta * SEqHatDot_2)) * dT / 1000;
+    SIQ->y += (SEqDot_omega[2] - (beta * SEqHatDot_3)) * dT / 1000;
+    SIQ->z += (SEqDot_omega[3] - (beta * SEqHatDot_4)) * dT / 1000;
     // normalise quaternion
     norm = sqrt(SIQ->w * SIQ->w + SIQ->x * SIQ->x + SIQ->y * SIQ->y + SIQ->z * SIQ->z);
     SIQ->w /= norm;
@@ -308,7 +312,7 @@ uint8_t QuaternionCalcHabr_9Axis(vector_t accel, vector_t gyro, vector_t mag, ui
     return 1;
 }
 
-uint8_t QuaternionCalcHabr_9(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, uint32_t deltat, Quaternion_t *SIQ) {
+uint8_t QuaternionCalcHabr_9(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, uint32_t dT, Quaternion_t *SIQ) {
     // local system variables
     float norm; // vector norm
     float SEqDot_omega[4];  // quaternion derrivative from gyroscopes elements
@@ -397,9 +401,9 @@ uint8_t QuaternionCalcHabr_9(float ax, float ay, float az, float gx, float gy, f
     w_err_y = twow * SEqHatDot_3 + twox * SEqHatDot_4 - twoy * SEqHatDot_1 - twoz * SEqHatDot_2;
     w_err_z = twow * SEqHatDot_4 - twox * SEqHatDot_3 + twoy * SEqHatDot_2 - twoz * SEqHatDot_1;
     // compute and remove the gyroscope baises
-    w_bx += w_err_x * deltat * zeta;
-    w_by += w_err_y * deltat * zeta;
-    w_bz += w_err_z * deltat * zeta;
+    w_bx += w_err_x * dT * zeta;
+    w_by += w_err_y * dT * zeta;
+    w_bz += w_err_z * dT * zeta;
     gx -= w_bx;
     gy -= w_by;
     gz -= w_bz;
@@ -409,10 +413,10 @@ uint8_t QuaternionCalcHabr_9(float ax, float ay, float az, float gx, float gy, f
     SEqDot_omega[2] = halfw * gy - halfx * gz + halfz * gx;
     SEqDot_omega[3] = halfw * gz + halfx * gy - halfy * gx;
     // compute then integrate the estimated quaternion rate
-    SIQ->w += (SEqDot_omega[0] - (beta * SEqHatDot_1)) * deltat / 1000;
-    SIQ->x += (SEqDot_omega[1] - (beta * SEqHatDot_2)) * deltat / 1000;
-    SIQ->y += (SEqDot_omega[2] - (beta * SEqHatDot_3)) * deltat / 1000;
-    SIQ->z += (SEqDot_omega[3] - (beta * SEqHatDot_4)) * deltat / 1000;
+    SIQ->w += (SEqDot_omega[0] - (beta * SEqHatDot_1)) * dT / 1000;
+    SIQ->x += (SEqDot_omega[1] - (beta * SEqHatDot_2)) * dT / 1000;
+    SIQ->y += (SEqDot_omega[2] - (beta * SEqHatDot_3)) * dT / 1000;
+    SIQ->z += (SEqDot_omega[3] - (beta * SEqHatDot_4)) * dT / 1000;
     // normalise quaternion
     norm = sqrt(SIQ->w * SIQ->w + SIQ->x * SIQ->x + SIQ->y * SIQ->y + SIQ->z * SIQ->z);
     SIQ->w /= norm;
@@ -438,7 +442,7 @@ uint8_t QuaternionCalcHabr_9(float ax, float ay, float az, float gx, float gy, f
 /*****************************************************************************************
 *                   MAHONY                                                               *
 *****************************************************************************************/
-uint8_t MahonyAHRS_9(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float twoKp, float twoKi, uint32_t deltat, Quaternion_t *SIQ) {
+uint8_t MahonyAHRS_9(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float twoKp, float twoKi, uint32_t dT, Quaternion_t *SIQ) {
 	float recipNorm;
     float q0q0, q0q1, q0q2, q0q3, q1q1, q1q2, q1q3, q2q2, q2q3, q3q3;  
 	float hx, hy, bx, bz;
@@ -447,7 +451,7 @@ uint8_t MahonyAHRS_9(float ax, float ay, float az, float gx, float gy, float gz,
 	float qa, qb, qc;
 	// Use IMU algorithm if magnetometer measurement invalid (avoids NaN in magnetometer normalisation)
 	if((mx == 0.0f) && (my == 0.0f) && (mz == 0.0f)) {
-		return MahonyAHRS_6(gx, gy, gz, ax, ay, az, twoKp, twoKi, deltat, SIQ);
+		return MahonyAHRS_6(gx, gy, gz, ax, ay, az, twoKp, twoKi, dT, SIQ);
 	}
 	// Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
 	if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
@@ -490,9 +494,9 @@ uint8_t MahonyAHRS_9(float ax, float ay, float az, float gx, float gy, float gz,
 		halfez = (ax * halfvy - ay * halfvx) + (mx * halfwy - my * halfwx);
 		// Compute and apply integral feedback if enabled
 		if(twoKi > 0.0f) {
-			integralFB.x += twoKi * halfex * deltat / 1000.0f;	// integral error scaled by Ki
-			integralFB.y += twoKi * halfey * deltat / 1000.0f;
-			integralFB.z += twoKi * halfez * deltat / 1000.0f;
+			integralFB.x += twoKi * halfex * dT / 1000.0f;	// integral error scaled by Ki
+			integralFB.y += twoKi * halfey * dT / 1000.0f;
+			integralFB.z += twoKi * halfez * dT / 1000.0f;
 			gx += integralFB.x;	// apply integral feedback
 			gy += integralFB.y;
 			gz += integralFB.z;
@@ -508,9 +512,9 @@ uint8_t MahonyAHRS_9(float ax, float ay, float az, float gx, float gy, float gz,
 		gz += twoKp * halfez;
 	}
 	// Integrate rate of change of quaternion
-	gx *= (0.5f * deltat / 1000.0f);		// pre-multiply common factors
-	gy *= (0.5f * deltat / 1000.0f);
-	gz *= (0.5f * deltat / 1000.0f);
+	gx *= (0.5f * dT / 1000.0f);		// pre-multiply common factors
+	gy *= (0.5f * dT / 1000.0f);
+	gz *= (0.5f * dT / 1000.0f);
 	qa = SIQ->w;
 	qb = SIQ->x;
 	qc = SIQ->y;
@@ -527,7 +531,7 @@ uint8_t MahonyAHRS_9(float ax, float ay, float az, float gx, float gy, float gz,
 	return 1;
 }
 
-uint8_t MahonyAHRS_6(float ax, float ay, float az, float gx, float gy, float gz, float twoKp, float twoKi, uint32_t deltat, Quaternion_t *SIQ) {
+uint8_t MahonyAHRS_6(float ax, float ay, float az, float gx, float gy, float gz, float twoKp, float twoKi, uint32_t dT, Quaternion_t *SIQ) {
 	float recipNorm;
 	float halfvx, halfvy, halfvz;
 	float halfex, halfey, halfez;
@@ -549,9 +553,9 @@ uint8_t MahonyAHRS_6(float ax, float ay, float az, float gx, float gy, float gz,
 		halfez = (ax * halfvy - ay * halfvx);
 		// Compute and apply integral feedback if enabled
 		if(twoKi > 0.0f) {
-			integralFB.x += twoKi * halfex * deltat / 1000.0f;	// integral error scaled by Ki
-			integralFB.y += twoKi * halfey * deltat / 1000.0f;
-			integralFB.z += twoKi * halfez * deltat / 1000.0f;
+			integralFB.x += twoKi * halfex * dT / 1000.0f;	// integral error scaled by Ki
+			integralFB.y += twoKi * halfey * dT / 1000.0f;
+			integralFB.z += twoKi * halfez * dT / 1000.0f;
 			gx += integralFB.x;	// apply integral feedback
 			gy += integralFB.y;
 			gz += integralFB.z;
@@ -567,9 +571,9 @@ uint8_t MahonyAHRS_6(float ax, float ay, float az, float gx, float gy, float gz,
 		gz += twoKp * halfez;
 	}
 	// Integrate rate of change of quaternion
-	gx *= (0.5f * deltat / 1000.0f);		// pre-multiply common factors
-	gy *= (0.5f * deltat / 1000.0f);
-	gz *= (0.5f * deltat / 1000.0f);
+	gx *= (0.5f * dT / 1000.0f);		// pre-multiply common factors
+	gy *= (0.5f * dT / 1000.0f);
+	gz *= (0.5f * dT / 1000.0f);
 	qa = SIQ->w;
 	qb = SIQ->x;
 	qc = SIQ->y;
@@ -589,7 +593,7 @@ uint8_t MahonyAHRS_6(float ax, float ay, float az, float gx, float gy, float gz,
 /*****************************************************************************************
 *                   MADGWICK_AHRS                                                        *
 *****************************************************************************************/
-uint8_t MadgwickAHRS_9(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, uint32_t deltat, Quaternion_t *SIQ) {
+uint8_t MadgwickAHRS_9(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, uint32_t dT, Quaternion_t *SIQ) {
 	float recipNorm;
 	float s0, s1, s2, s3;
 	float qDot1, qDot2, qDot3, qDot4;
@@ -600,7 +604,7 @@ uint8_t MadgwickAHRS_9(float ax, float ay, float az, float gx, float gy, float g
 	float _2q0mx, _2q0my, _2q0mz, _2q1mx, _2bx, _2bz, _4bx, _4bz, _8bx, _8bz, _2q0, _2q1, _2q2, _2q3, q0q0, q0q1, q0q2, q0q3, q1q1, q1q2, q1q3, q2q2, q2q3, q3q3;
 	// Use IMU algorithm if magnetometer measurement invalid (avoids NaN in magnetometer normalisation)
 	if((mx == 0.0f) && (my == 0.0f) && (mz == 0.0f)) {
-		return MadgwickAHRS_6(ax, ay, az, gx, gy, gz, deltat, SIQ);
+		return MadgwickAHRS_6(ax, ay, az, gx, gy, gz, dT, SIQ);
 	}
 	// Rate of change of quaternion from gyroscope
 	qDot1 = 0.5f * (-Q.x * gx - Q.y * gy - Q.z * gz);
@@ -672,10 +676,10 @@ uint8_t MadgwickAHRS_9(float ax, float ay, float az, float gx, float gy, float g
 		qDot4 -= betaDef * s3;
 	}
 	// Integrate rate of change of quaternion to yield quaternion
-	Q.w += qDot1 * deltat / 1000.0f;
-	Q.x += qDot2 * deltat / 1000.0f;
-	Q.y += qDot3 * deltat / 1000.0f;
-	Q.z += qDot4 * deltat / 1000.0f;
+	Q.w += qDot1 * dT / 1000.0f;
+	Q.x += qDot2 * dT / 1000.0f;
+	Q.y += qDot3 * dT / 1000.0f;
+	Q.z += qDot4 * dT / 1000.0f;
 	// Normalise quaternion
 	recipNorm = invSqrt(Q.w * Q.w + Q.x * Q.x + Q.y * Q.y + Q.z * Q.z);
 	Q.w *= recipNorm;
@@ -685,7 +689,7 @@ uint8_t MadgwickAHRS_9(float ax, float ay, float az, float gx, float gy, float g
 	return 1;
 }
 
-uint8_t MadgwickAHRS_6(float ax, float ay, float az, float gx, float gy, float gz, uint32_t deltat, Quaternion_t *SIQ) {
+uint8_t MadgwickAHRS_6(float ax, float ay, float az, float gx, float gy, float gz, uint32_t dT, Quaternion_t *SIQ) {
 	float recipNorm;
 	float s0, s1, s2, s3;
 	float qDot1, qDot2, qDot3, qDot4;
@@ -733,10 +737,10 @@ uint8_t MadgwickAHRS_6(float ax, float ay, float az, float gx, float gy, float g
 		qDot4 -= betaDef * s3;
 	}
 	// Integrate rate of change of quaternion to yield quaternion
-	Q.w += qDot1 * deltat / 1000.0f;
-	Q.x += qDot2 * deltat / 1000.0f;
-	Q.y += qDot3 * deltat / 1000.0f;
-	Q.z += qDot4 * deltat / 1000.0f;
+	Q.w += qDot1 * dT / 1000.0f;
+	Q.x += qDot2 * dT / 1000.0f;
+	Q.y += qDot3 * dT / 1000.0f;
+	Q.z += qDot4 * dT / 1000.0f;
 	// Normalise quaternion
 	recipNorm = invSqrt(Q.w * Q.w + Q.x * Q.x + Q.y * Q.y + Q.z * Q.z);
 	Q.w *= recipNorm;
@@ -750,21 +754,18 @@ uint8_t MadgwickAHRS_6(float ax, float ay, float az, float gx, float gy, float g
 *                   CONVERSION                                                           *
 *****************************************************************************************/
 Quaternion_t EulerAngleToQuaternion(double yaw, double pitch, double roll) // yaw (Z), pitch (Y), roll (X)
-{
-    // Abbreviations for the various angular functions
+{   // Abbreviations for the various angular functions
     double cy = cos(yaw * 0.5);
     double sy = sin(yaw * 0.5);
     double cp = cos(pitch * 0.5);
     double sp = sin(pitch * 0.5);
     double cr = cos(roll * 0.5);
     double sr = sin(roll * 0.5);
-
     Quaternion_t q;
     q.w = cr * cp * cy + sr * sp * sy;
     q.x = sr * cp * cy - cr * sp * sy;
     q.y = cr * sp * cy + sr * cp * sy;
     q.z = cr * cp * sy - sr * sp * cy;
-
     return q;
 }
 

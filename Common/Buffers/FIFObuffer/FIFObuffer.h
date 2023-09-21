@@ -21,7 +21,6 @@
 #define _BUFFERS_FIFOBUFFERS_H_
 
 #include <stdint.h>
-#include <stddef.h>
 #include <string.h>
 #include "Buffers/BufferDataTypes.h"
 
@@ -46,7 +45,7 @@ typedef struct fifo
 } fifo_t;
 
 /*****************************************************************
- * @brief  Initializes the buffer, resets the head and tail indexes.
+ * @brief  Initializes the buffer, resets the head and tail indexes to zero.
  * @param  *q - pointer to buffer fifo_t
  * @retval none
  */

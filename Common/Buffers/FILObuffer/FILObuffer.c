@@ -24,7 +24,7 @@
 void FILO_Init(filo_t *q) {
 	q->ind = 0;
 	q->bytes_avail = 0;
-	q->lockState = BUFFER_FREE;
+	q->state = BUFFER_FREE;
 }
 
 uint8_t FILO_PutOne(filo_t *q, size_t data) {

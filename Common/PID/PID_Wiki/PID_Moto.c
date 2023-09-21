@@ -4,7 +4,6 @@ void PID_MotoInit(float kp, float ki, float kd, float fc, uint32_t dT, PID_M_t *
 	pid->kp = kp;
 	pid->ki = ki;
 	pid->kd = kd;
-	pid->dT = dT;
 	float fn = fc * dT / 1000.0f;
 	// Compute the weight factor α for an exponential moving average filter
     // with a given normalized cutoff frequency `fn`.
@@ -42,11 +41,9 @@ void PID_MotoFilteredInit(float kp, float ki, float kd, uint8_t N, uint32_t dT, 
 	pid->kp = kp;
 	pid->ki = ki;
 	pid->kd = kd;
-	pid->dT = dT;
 	float tmp = (float)(N * dT) / 1000.0f;
 	pid->a[0] = 1 + tmp;
 	pid->a[1] = -(2.0f + tmp);
-	pid->a[2] = 1.0f;
 	float b0 = kp * pid->a[0] + ki * dT * pid->a[0] / 1000.0f + kd * N;
 	float b1 = -(kp * (2 + tmp) + ki * dT / 1000.0f + 2 * kd * N);
 	float b2 = kp + kd * N;

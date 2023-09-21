@@ -22,7 +22,7 @@
 
 #include "PID_Simple.h"
 
-void PidSimple_Init(float kp, float ki, float kd, uint8_t N, int32_t dT, pidS_t *pid) {
+void PidSimple_Init(float kp, float ki, float kd, int32_t dT, pidS_t *pid) {
     pid->Kp = kp;
     pid->Ki = ki;
     pid->Kd = kd;
@@ -51,10 +51,10 @@ void PidFiltered_Init(float kp, float ki, float kd, uint8_t N, int32_t dT, pidF_
     pid->ki = ki;
     pid->kd = kd;
     pid->a = kp + ki * dT / 1000;
-    pid->e[2] = 0; // e(t-2)
-    pid->e[1] = 0; // e(t-1)
-    pid->e[0] = 0; // e(t)
-    pid->out = 0;  // Usually the current value of the actuator
+    pid->e[2] = 0;
+    pid->e[1] = 0;
+    pid->e[0] = 0;
+    pid->out = 0;  //the current value of the actuator
     pid->ad[0] = kd *1000 / dT;
     pid->ad[1] = -2.0 * pid->ad[0];
     float tau = kd / (kp * N); // IIR filter time constant
@@ -71,8 +71,7 @@ int32_t PidFiltered_Processing(float sp, float act, int32_t min, int32_t max, pi
     pid->e[1] = pid->e[0];
     pid->e[0] = sp - act;
     pid->out = pid->out + pid->a * pid->e[0] - pid->kp * pid->e[1];// PI
-    // Filtered D
-    pid->d[1] = pid->d[0];
+    pid->d[1] = pid->d[0];// Filtered D
     pid->d[0] = pid->ad[0] * pid->e[0] + pid->ad[1] * pid->e[1] + pid->ad[0] * pid->e[2];
     pid->fd[1] = pid->fd[0];
     pid->fd[0] = ((pid->alpha) / (pid->alpha + 1)) * (pid->d[0] + pid->d[1]) - ((pid->alpha - 1) / (pid->alpha + 1)) * pid->fd[1];

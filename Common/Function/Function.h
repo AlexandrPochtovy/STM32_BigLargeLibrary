@@ -50,7 +50,7 @@ size_t Max(size_t val, size_t max);
   * @brief  concat two bytes into 16bits value
   * @param  msb - hi byte
   * 				lsb - low byte
-  * @retval uint16_t value
+  * @retval uint16_t or int16_t value
   */
 size_t CONCAT_TWO_BYTES(uint8_t msb, uint8_t lsb);
 
@@ -60,7 +60,7 @@ size_t CONCAT_TWO_BYTES(uint8_t msb, uint8_t lsb);
   *         msb - hi byte
   * 				lsbh - low byte
   * 				lsb - most low byte
-  * @retval uint32_t value
+  * @retval uint32_t or int32_t value
   */
 size_t CONCAT_FOUR_BYTES(uint8_t msbh, uint8_t msb, uint8_t lsbh, uint8_t lsb);
 

@@ -25,6 +25,7 @@
  */
 void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c) {
 	_i2c->status = PORT_BUSY;
+	_i2c->buffer->lockState = BUFFER_BLOCKED;
 	_i2c->i2c->CR2 |= I2C_CR2_ITBUFEN;//Enable TXE RxNE iterrupt for >1 byte
 	if (_i2c->len > 1) {
 		LL_I2C_AcknowledgeNextData(_i2c->i2c, LL_I2C_ACK); 	// Ack enable if more one bytes read
@@ -32,7 +33,7 @@ void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c) {
 	else {
 		LL_I2C_AcknowledgeNextData(_i2c->i2c, LL_I2C_NACK);//Ack disable if only one byte read
 	}
-	LL_I2C_GenerateStartCondition(_i2c->i2c);
+	_i2c->i2c->CR1 |= I2C_CR1_START;//LL_I2C_GenerateStartCondition(_i2c->i2c);
 }
 /*запускает обмен по I2C с использованием DMA, не дописано*/
 void I2C_Start_DMA(I2C_DMA_Conn_t *_i2c) {

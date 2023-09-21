@@ -55,7 +55,7 @@ typedef struct ADXL345 {
 
 uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev);
 uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev);
-float ADXL345_ConvertData (int16_t raw);
+float ADXL345_ConvertData (int16_t raw, enum conversion factor);
 
 #ifdef __cplusplus
 }

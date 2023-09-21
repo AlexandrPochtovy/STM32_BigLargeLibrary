@@ -21,6 +21,13 @@
 #ifndef ADXL345_REGISTER_H_
 #define ADXL345_REGISTER_H_
 
+enum conversion {
+	RATIO_2G = 2,
+	RATIO_4G = 4,
+	RATIO_8G = 8,
+	RATIO_16G = 16
+} conversio_en;
+
 #define RATIO_2G						(float) (2 * 2) / 1024.0f
 #define RATIO_4G						(float) (4 * 2) / 1024.0f
 #define RATIO_8G  					(float) (8 * 2) / 1024.0f

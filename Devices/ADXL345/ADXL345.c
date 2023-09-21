@@ -20,6 +20,8 @@
 
 #include "ADXL345.h"
 
+#define my_gravity 					9.80665 // m/s^2
+
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (((uint16_t) msb << 8) | (uint16_t) lsb);
 }
@@ -80,25 +82,8 @@ uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 	return 0;
 }
 
-float ADXL345_ConvertData(int16_t raw) {
-	uint8_t range = ADXL345_DATA_FORMAT_RANGE_2G;
-	switch (range) {
-		case ADXL345_DATA_FORMAT_RANGE_2G:
-			return (float) raw * my_gravity * RATIO_2G;
-			break;
-		case ADXL345_DATA_FORMAT_RANGE_4G:
-			return (float) raw * my_gravity * RATIO_4G;
-			break;
-		case ADXL345_DATA_FORMAT_RANGE_8G:
-			return (float) raw * my_gravity * RATIO_8G;
-			break;
-		case ADXL345_DATA_FORMAT_RANGE_16G:
-			return (float) raw * my_gravity * RATIO_16G;
-			break;
-		default:
-			return 0;
-			break;
-	}
+float ADXL345_ConvertData(int16_t raw, enum conversion factor) {
+	return ((2 * raw * factor) * my_gravity) / 1000.0f;
 }
 
 uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {

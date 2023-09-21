@@ -20,7 +20,8 @@
 
 #include "ADXL345.h"
 
-#define my_gravity 					9.80665 // m/s^2
+#define my_gravity			9.80665 // m/s^2
+#define ADXL345_DATA_LENGHT 6
 
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (((uint16_t) msb << 8) | (uint16_t) lsb);
@@ -82,22 +83,29 @@ uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 	return 0;
 }
 
-float ADXL345_ConvertData(int16_t raw, enum conversion factor) {
-	return ((2 * raw * factor) * my_gravity) / 1000.0f;
-}
 
 uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 	uint8_t val[ADXL345_DATA_LENGHT];
 	if (I2C_ReadBytes(_i2c, dev->addr, ADXL345_DATAX0_REG, &val, ADXL345_DATA_LENGHT)) {
 		dev->raw.X = (int16_t)CONCAT_BYTES(val[1], val[0]);
-		dev->data.X = ADXL345_ConvertData(dev->raw.X);
+		dev->data.X = ADXL345_ConvertData(dev->raw.X, RATIO_2G);
 		dev->raw.Y = (int16_t)CONCAT_BYTES(val[3], val[2]);
-		dev->data.Y = ADXL345_ConvertData(dev->raw.Y);
+		dev->data.Y = ADXL345_ConvertData(dev->raw.Y, RATIO_2G);
 		dev->raw.Z = (int16_t)CONCAT_BYTES(val[5], val[4]);
-		dev->data.Z = ADXL345_ConvertData(dev->raw.Z);
+		dev->data.Z = ADXL345_ConvertData(dev->raw.Z, RATIO_2G);
 		dev->status = DEVICE_DONE;
 		return 1;
 	}
 	return 0;
 }
 
+/*****************************************************************
+  * @brief convert gyroscope raw data to normal float data and store in main gyroscope structure
+  * internal use only
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to gyroscope main structure
+  * @retval 1 when end
+  */
+float ADXL345_ConvertData(int16_t raw, enum ratio factor) {
+	return ((2 * raw * factor) * my_gravity) / 1000.0f;
+}

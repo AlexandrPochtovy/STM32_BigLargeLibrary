@@ -25,9 +25,13 @@
 extern "C" {
 #endif
 
+
 #include "ADXL345_Register.h"
 #include "I2C_API.h"
 
+/**********************************************************************
+*                       TYPEDEF & ENUM                                * 
+***********************************************************************/
 enum ADXL345_ADDRESS {
 	ADXL345_ADDR = 0xA6//Assumes ALT address pin low
 };
@@ -46,16 +50,28 @@ typedef struct ADXL345_data {
 
 //common data struct for sensor
 typedef struct ADXL345 {
-	const uint8_t addr;
-	uint8_t step;
+	const enum ADXL345_ADDRESS addr;
 	DeviceStatus_t status;
+	uint8_t step;
 	ADXL345_RAW_t raw;
 	ADXL345_data_t data;
 } ADXL345_t;
 
+/*****************************************************************
+  * @brief init gyroscope: send settings
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to gyroscope main structure
+  * @retval 1 when end
+  */
 uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev);
+
+/*****************************************************************
+  * @brief get all axis data from gyroscope and store in main gyroscope structure in RAW format
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to gyroscope main structure
+  * @retval 1 when end
+  */
 uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev);
-float ADXL345_ConvertData (int16_t raw, enum conversion factor);
 
 #ifdef __cplusplus
 }

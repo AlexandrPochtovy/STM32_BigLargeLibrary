@@ -27,10 +27,11 @@ extern "C" {
 
 #include "VL53L0x_Registers.h"
 #include "Function/Function.h"
-//#include "Function/BytesMath.h"
 #include "I2C_API.h"
 
-
+/**********************************************************************
+*                       TYPEDEF & ENUM                                * 
+***********************************************************************/
 enum VL53L0x_ADDRESS {
 VL53L0x_ADDR_DEFAULT = 0x52//0b01010010
 };

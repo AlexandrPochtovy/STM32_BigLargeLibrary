@@ -18,8 +18,8 @@
 	Created on: 30.05.2021
  ********************************************************************************/
  
-#ifndef BME280_BME280_REGISTERS_H_
-#define BME280_BME280_REGISTERS_H_
+#ifndef _BME280_BME280_REGISTERS_H_
+#define _BME280_BME280_REGISTERS_H_
 
 //=============================================================
 //calib & data size
@@ -112,4 +112,4 @@ enum BME280_STANDBY_TIME {
 	BME280_STANDBY_TIME_20_MS		= 0xE0		//111x xxxx
 };
 //=============================================================================================
-#endif /* SRC_BME280_BME280_REGISTERS_H_ */
+#endif /* _BME280_REGISTERS_H_ */

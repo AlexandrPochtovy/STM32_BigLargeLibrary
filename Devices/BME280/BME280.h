@@ -27,39 +27,42 @@ extern "C" {
 #include "BME280_Registers.h"
 #include "I2C_API.h"
 
-//===========================================================================================
+/**********************************************************************
+*                       TYPEDEF & ENUM                                * 
+***********************************************************************/
 enum BME280_ADDRESS {
-	BME280_ADDR1 = 0xEC,	//address 1 chip 0x76
-	BME280_ADDR2 = 0xED		//address 2 chip 0x77
+	BME280_ADDR1 = (uint8_t)0xEC,	//address 1 chip 0x76 shifted
+	BME280_ADDR2 = (uint8_t)0xED	//address 2 chip 0x77 shifted
 };
-/*!
- * @brief Calibration data
- */
+
+/*****************************************************************
+  * @brief bme280 temperature's calibration coefficients, must be read and store for
+  * temperature calculating
+  */
 typedef struct bme280_calib_data {
-		uint16_t dig_t1;	// Calibration coefficient for the temperature sensor
-		int16_t dig_t2; 	// Calibration coefficient for the temperature sensor
-		int16_t dig_t3;		// Calibration coefficient for the temperature sensor
-		uint16_t dig_p1;	// Calibration coefficient for the pressure sensor
-		int16_t dig_p2;		// Calibration coefficient for the pressure sensor
-		int16_t dig_p3;		// Calibration coefficient for the pressure sensor
-		int16_t dig_p4;		// Calibration coefficient for the pressure sensor
-		int16_t dig_p5;		// Calibration coefficient for the pressure sensor
-		int16_t dig_p6;		// Calibration coefficient for the pressure sensor
-		int16_t dig_p7;		// Calibration coefficient for the pressure sensor
-		int16_t dig_p8;		// Calibration coefficient for the pressure sensor
-		int16_t dig_p9;		// Calibration coefficient for the pressure sensor
-		uint8_t dig_h1;		// Calibration coefficient for the humidity sensor
-		int16_t dig_h2;		// Calibration coefficient for the humidity sensor
-		uint8_t dig_h3;		// Calibration coefficient for the humidity sensor
-		int16_t dig_h4;		// Calibration coefficient for the humidity sensor
-		int16_t dig_h5;		// Calibration coefficient for the humidity sensor
-		int8_t dig_h6;		// Calibration coefficient for the humidity sensor
-		int32_t t_fine;		// Variable to store the intermediate temperature coefficient
+	uint16_t dig_t1;	// Calibration coefficient for the temperature sensor
+	int16_t dig_t2; 	// Calibration coefficient for the temperature sensor
+	int16_t dig_t3;		// Calibration coefficient for the temperature sensor
+	uint16_t dig_p1;	// Calibration coefficient for the pressure sensor
+	int16_t dig_p2;		// Calibration coefficient for the pressure sensor
+	int16_t dig_p3;		// Calibration coefficient for the pressure sensor
+	int16_t dig_p4;		// Calibration coefficient for the pressure sensor
+	int16_t dig_p5;		// Calibration coefficient for the pressure sensor
+	int16_t dig_p6;		// Calibration coefficient for the pressure sensor
+	int16_t dig_p7;		// Calibration coefficient for the pressure sensor
+	int16_t dig_p8;		// Calibration coefficient for the pressure sensor
+	int16_t dig_p9;		// Calibration coefficient for the pressure sensor
+	uint8_t dig_h1;		// Calibration coefficient for the humidity sensor
+	int16_t dig_h2;		// Calibration coefficient for the humidity sensor
+	uint8_t dig_h3;		// Calibration coefficient for the humidity sensor
+	int16_t dig_h4;		// Calibration coefficient for the humidity sensor
+	int16_t dig_h5;		// Calibration coefficient for the humidity sensor
+	int8_t dig_h6;		// Calibration coefficient for the humidity sensor
+	int32_t t_fine;		// Variable to store the intermediate temperature coefficient
 } bme280_calib_data_t;
 
-/*!
- * @brief bme280 sensor structure which comprises of uncompensated temperature,
- * pressure and humidity data
+/*****************************************************************
+ * @brief bme280 sensor structure of uncompensated temperature, pressure and humidity data
  */
 typedef struct bme280_uncomp_data {
 	uint32_t pressure;		// un-compensated pressure
@@ -67,36 +70,56 @@ typedef struct bme280_uncomp_data {
 	uint32_t humidity; 		// un-compensated humidity
 } bme280_uncomp_data_t;
 
+/*****************************************************************
+ * @brief bme280 sensor structure of compensated temperature, pressure 
+ * and humidity data in integer datatype
+ */
 typedef struct bme280_dataInt {
-		uint32_t pressure; 		// Compensated pressure
+		uint32_t pressure; 		// Compensated pressure in Pa
 		int32_t temperature;	// Compensated temperature
-		uint32_t humidity;		// Compensated humidity
+		uint32_t humidity;		// Compensated humidity in xxx.xx %
 } bme280_dataInt_t;
 
-/*!
- * @brief bme280 sensor structure which comprises of temperature, pressure and
- * humidity data
+/*****************************************************************
+ * @brief bme280 sensor structure of compensated temperature, pressure 
+ * and humidity data in float datatype
  */
 typedef struct bme280_dataFloat {
 		float pressure; 		// Compensated pressure
-		float temperature;	// Compensated temperature
+		float temperature;		// Compensated temperature
 		float humidity;			// Compensated humidity
 } bme280_dataFloat_t;
 
-//common data struct for sensor
+/*****************************************************************
+ * @brief bme280 sensor main structure: store calibration data, uncompensated data,
+ * compensated data 
+ */
 typedef struct bme280_dev {
-		const uint8_t addr;
-		uint8_t step;
+		const enum BME280_ADDRESS addr;
 		DeviceStatus_t status;
+		uint8_t step;
 		bme280_calib_data_t calib_data;
 		bme280_uncomp_data_t uncomp_data;
 		bme280_dataInt_t data_int;
 		bme280_dataFloat_t data_float;
 } BME280_t;
 
-//INITIALIZATION	================================================================
+/*****************************************************************
+  * @brief init bme280: send settings, read calibration data
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to bme280 main structure
+  * @retval 1 when end
+  */
 uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev);
+
+/*****************************************************************
+  * @brief get data from bme280 receives data in raw format, converts it to normal values
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to bme280 main structure
+  * @retval 1 when end
+  */
 uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev);
+//TODO
 //CALCULATING	==========================================================================
 int32_t compensate_temperature_int(BME280_t *dev);
 float compensate_temperature_float(BME280_t *dev);

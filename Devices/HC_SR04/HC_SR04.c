@@ -19,18 +19,19 @@
  */
 #include "HC_SR04.h"
 
-//calculate distance from HC-SR04
-void HC_SR04DistanceSimpleCalc(HC_SR04_t *data, uint16_t soundSpeed, uint16_t countLimit) {
+#define defaultSoundSpeed 343 //speed of sound in dry air at a temperature of 20C 343m/sec
+
+void HC_SR04DistanceSimpleCalc(HC_SR04_t *data, uint16_t countLimit) {
 	 uint32_t delta;
 	if (data->stop >= data->start) {
 		delta = data->stop - data->start;
 	} else {
 		delta = countLimit - data->start + data->stop;
 	}
-	data->distance_mm =  (uint16_t)(((delta / 2) * soundSpeed) / 1000);
+	data->distance_mm =  (uint16_t)(((delta / 2) * defaultSoundSpeed) / 1000);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * **
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * temp		| -20.0 | -10.0 |  0.0  |  10.0 | 20.0  | 30.0  |
  * speed	| 318.8 | 325.1 | 331.5 | 337.3 | 343.1 | 348.9 |
  *

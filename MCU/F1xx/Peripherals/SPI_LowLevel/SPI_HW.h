@@ -24,7 +24,6 @@
 extern "C" {
 #endif
 
-#include <stddef.h>
 #include <stdint.h>
 #include "stm32f1xx_ll_spi.h"
 #include "FIFObuffer/FIFObuffer.h"
@@ -39,7 +38,6 @@ typedef enum SPI_Mode {
 typedef struct SPI_Conn_TWO {
 	SPI_TypeDef *SPIbus;	//pointer to HW SPI port
 	PortStatus_t status;	//status port
-	uint8_t step;			//processing step
 	SPI_Mode_t mode;		//read write mode
 	fifo_t *txbuffer;		//pointer circular buffer
 	uint8_t txlen;			//length data
@@ -50,7 +48,6 @@ typedef struct SPI_Conn_TWO {
 typedef struct SPI_Conn_ONE {
 	SPI_TypeDef *SPIbus;	//pointer to HW SPI port
 	PortStatus_t status;	//status port
-	uint8_t step;			//processing step
 	SPI_Mode_t mode;		//read write mode
 	fifo_t *buffer;			//pointer circular buffer
 	uint8_t len;			//length data

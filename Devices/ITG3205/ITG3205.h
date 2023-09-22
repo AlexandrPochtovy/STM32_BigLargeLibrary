@@ -24,6 +24,7 @@
 extern "C" {
 #endif
 
+#include "sdtint.h" 
 #include "math.h"
 #include "ITG3205_Register.h"
 #include "I2C_API.h"
@@ -31,6 +32,10 @@ extern "C" {
 /**********************************************************************
 *                       TYPEDEF & ENUM                                * 
 ***********************************************************************/
+#ifndef M_PI
+#define M_PI		3.14159265358979323846
+#endif
+
 enum ITG3205_ADDRESS {
 	ITG3205_ADDR = 0xD0
 };
@@ -50,14 +55,28 @@ typedef struct ITG3205_data_t {
 } ITG3205_data;
 //common data struct for sensor
 typedef struct ITG3205 {
-	const uint8_t addr;
+	const enum ITG3205_ADDRESS addr;
 	DeviceStatus_t status;
 	uint8_t step;
 	ITG3205_RAW raw;
 	ITG3205_data data;
 } ITG3205_t;
-//===========================================================================
+
+/*****************************************************************
+  * @brief init gyroscope: send settings
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to gyroscope main structure
+  * @retval 1 when end
+  */
 uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev);
+
+/*****************************************************************
+  * @brief get all axis data from gyroscope and store in main gyroscope structure in RAW format
+  * and normalization values
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to gyroscope main structure
+  * @retval 1 when end
+  */
 uint8_t ITG3205_GetData(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev);
 
 #ifdef __cplusplus

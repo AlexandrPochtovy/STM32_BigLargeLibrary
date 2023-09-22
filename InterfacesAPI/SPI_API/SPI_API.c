@@ -21,146 +21,174 @@
 #include "SPI_API.h"
 
 uint8_t SPI_WriteReadOneByte(SPI_Conn_TWO_t *_spi, uint8_t tx, uint8_t *rx) {
-	if ((_spi->status == PORT_FREE) && (_spi->step == 0)) {
+	switch (_spi->status) {
+	case PORT_FREE:
 		_spi->status = PORT_BUSY;
 		FIFO_PutOne(_spi->txbuffer, tx);
 		_spi->txlen = 1;
         _spi->rxlen = 1;
 		_spi->mode = SPI_FULLDUPLEX_RW;
-		_spi->step = 1;
 		SPI_Start_IRQ_HWNSS(_spi);
 		return 0;
-	}
-	else if ((_spi->status == PORT_DONE) && (_spi->step == 1)) {
+		break;
+	case PORT_DONE:
+		_spi->txbuffer->lockState = BUFFER_FREE;
+		_spi->rxbuffer->lockState = BUFFER_FREE;
 		FIFO_GetOne(_spi->rxbuffer, rx);
-        _spi->step = 0;
 		_spi->status = PORT_FREE;
 		return 1;// exit
-	}
-	else {//TODO  ADD error processing HERE
+		break;
+	case PORT_ERROR://TODO ADD error processing
+		_spi->txbuffer->lockState = BUFFER_FREE;
+		_spi->rxbuffer->lockState = BUFFER_FREE;
 		FIFO_Init(_spi->txbuffer);
         FIFO_Init(_spi->rxbuffer);
-		_spi->step = 0;
 		_spi->status = PORT_FREE;
-		return 0;//repeat
+		return 1;
+		break;
+	default:
+		return 0;
+		break;
 	}
 }
 
 uint8_t SPI_WriteReadBytes(SPI_Conn_TWO_t *_spi, uint8_t *tx, uint8_t txLen, uint8_t *rx, uint8_t rxLen) {
-	if ((_spi->status == PORT_FREE) && (_spi->step == 0)) {
+	switch (_spi->status) {
+	case PORT_FREE:
 		_spi->status = PORT_BUSY;
 		FIFO_PutMulti(_spi->txbuffer, tx, txLen);
 		_spi->txlen = txLen;
         _spi->rxlen = rxLen;
-		_spi->mode = SPI_MODE_DUPLEX;
-		_spi->step = 1;
-		SPI_Start_IRQ_TWO_HWNSS(_spi);
+		_spi->mode = SPI_FULLDUPLEX_RW;
+		SPI_Start_IRQ_HWNSS(_spi);
 		return 0;
-	}
-	else if ((_spi->status == PORT_DONE) && (_spi->step == 1)) {
+		break;
+	case PORT_DONE:
+		_spi->txbuffer->lockState = BUFFER_FREE;
+		_spi->rxbuffer->lockState = BUFFER_FREE;
 		FIFO_GetMulti(_spi->rxbuffer, rx, rxLen);
-        _spi->step = 0;
 		_spi->status = PORT_FREE;
 		return 1;// exit
-	}
-	else {//TODO  ADD error processing HERE
+		break;
+	case PORT_ERROR://TODO ADD error processing
+		_spi->txbuffer->lockState = BUFFER_FREE;
+		_spi->rxbuffer->lockState = BUFFER_FREE;
 		FIFO_Init(_spi->txbuffer);
         FIFO_Init(_spi->rxbuffer);
-		_spi->step = 0;
 		_spi->status = PORT_FREE;
-		return 0;//repeat
+		return 1;
+		break;
+	default:
+		return 0;
+		break;
 	}
 }
 
 uint8_t SPI_WriteOnlyOneByte(SPI_Conn_ONE_t *_spi, uint8_t tx) {
-    if ((_spi->status == PORT_FREE) && (_spi->step == 0)) {
+	switch (_spi->status) {
+	case PORT_FREE:
 		_spi->status = PORT_BUSY;
 		FIFO_PutOne(_spi->buffer, tx);
 		_spi->len = 1;
-		_spi->mode = SPI_HALFDUPLEX_WRITE; 
-		_spi->step = 1;
+		_spi->mode = SPI_HALFDUPLEX_WRITE;
 		SPI_Start_IRQ_ONE_HWNSS(_spi);
 		return 0;
-	}
-	else if ((_spi->status == PORT_DONE) && (_spi->step == 1)) {
-		_spi->step = 0;
+		break;
+	case PORT_DONE:
+		_spi->buffer->lockState = BUFFER_FREE;
 		_spi->status = PORT_FREE;
 		return 1;// exit
-	}
-	else {//TODO  ADD error processing HERE
-        FIFO_Init(_spi->buffer);
-		_spi->step = 0;
+		break;
+	case PORT_ERROR://TODO ADD error processing
+		_spi->buffer->lockState = BUFFER_FREE;
+		FIFO_Init(_spi->buffer);
 		_spi->status = PORT_FREE;
-		return 0;//repeat
+		return 1;
+		break;
+	default:
+		return 0;
+		break;
 	}
 }
 
 uint8_t SPI_WriteOnlyBytes(SPI_Conn_ONE_t *_spi, uint8_t *tx, uint8_t txLen) {
-    if ((_spi->status == PORT_FREE) && (_spi->step == 0)) {
+	switch (_spi->status) {
+	case PORT_FREE:
 		_spi->status = PORT_BUSY;
 		FIFO_PutMulti(_spi->buffer, tx, txLen);
 		_spi->len = txLen;
-		_spi->mode = SPI_HALFDUPLEX_WRITE; 
-		_spi->step = 1;
+		_spi->mode = SPI_HALFDUPLEX_WRITE;
 		SPI_Start_IRQ_ONE_HWNSS(_spi);
 		return 0;
-	}
-	else if ((_spi->status == PORT_DONE) && (_spi->step == 1)) {
-		_spi->step = 0;
+		break;
+	case PORT_DONE:
+		_spi->buffer->lockState = BUFFER_FREE;
 		_spi->status = PORT_FREE;
 		return 1;// exit
-	}
-	else {//TODO  ADD error processing HERE
-        FIFO_Init(_spi->buffer);
-		_spi->step = 0;
+		break;
+	case PORT_ERROR://TODO ADD error processing
+		_spi->buffer->lockState = BUFFER_FREE;
+		FIFO_Init(_spi->buffer);
 		_spi->status = PORT_FREE;
-		return 0;//repeat
+		return 1;
+		break;
+	default:
+		return 0;
+		break;
 	}
 }
 
 uint8_t SPI_ReadOnlyOneByte(SPI_Conn_ONE_t *_spi, uint8_t *rx) {
-	if ((_spi->status == PORT_FREE) && (_spi->step == 0)) {
+	switch (_spi->status) {
+	case PORT_FREE:
 		_spi->status = PORT_BUSY;
-        _spi->len = 1;
+		_spi->len = 1;
 		_spi->mode = SPI_HALFDUPLEX_READ;
-		_spi->step = 1;
 		SPI_Start_IRQ_ONE_HWNSS(_spi);
 		return 0;
-	}
-	else if ((_spi->status == PORT_DONE) && (_spi->step == 1)) {
+		break;
+	case PORT_DONE:
+		_spi->buffer->lockState = BUFFER_FREE;
 		FIFO_GetOne(_spi->buffer, rx);
-        _spi->step = 0;
 		_spi->status = PORT_FREE;
 		return 1;// exit
-	}
-	else {//TODO  ADD error processing HERE
+		break;
+	case PORT_ERROR://TODO ADD error processing
+		_spi->buffer->lockState = BUFFER_FREE;
 		FIFO_Init(_spi->buffer);
-		_spi->step = 0;
 		_spi->status = PORT_FREE;
-		return 0;//repeat
+		return 1;
+		break;
+	default:
+		return 0;
+		break;
 	}
 }
 
 uint8_t SPI_ReadOnlyBytes(SPI_Conn_ONE_t *_spi, uint8_t *rx, uint8_t rxLen) {
-	if ((_spi->status == PORT_FREE) && (_spi->step == 0)) {
+	switch (_spi->status) {
+	case PORT_FREE:
 		_spi->status = PORT_BUSY;
-        _spi->len = rxLen;
+		_spi->len = rxLen;
 		_spi->mode = SPI_HALFDUPLEX_READ;
-		_spi->step = 1;
 		SPI_Start_IRQ_ONE_HWNSS(_spi);
 		return 0;
-	}
-	else if ((_spi->status == PORT_DONE) && (_spi->step == 1)) {
+		break;
+	case PORT_DONE:
+		_spi->buffer->lockState = BUFFER_FREE;
 		FIFO_GetMulti(_spi->buffer, rx, rxLen);
-        _spi->step = 0;
 		_spi->status = PORT_FREE;
 		return 1;// exit
-	}
-	else {//TODO  ADD error processing HERE
+		break;
+	case PORT_ERROR://TODO ADD error processing
+		_spi->buffer->lockState = BUFFER_FREE;
 		FIFO_Init(_spi->buffer);
-		_spi->step = 0;
 		_spi->status = PORT_FREE;
-		return 0;//repeat
+		return 1;
+		break;
+	default:
+		return 0;
+		break;
 	}
 }
 

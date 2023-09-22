@@ -25,28 +25,26 @@
 extern "C" {
 #endif
 
-#include <stddef.h>
 #include <stdint.h>
-#include "stdlib.h"
 #include "stm32f1xx.h"
 
 #define DWT_CYCCNT	*(volatile uint32_t*)0xE0001004
 #define DWT_CONTROL *(volatile uint32_t*)0xE0001000
 #define SCB_DEMCR	*(volatile uint32_t*)0xE000EDFC
 
-__STATIC_INLINE void DWT_Init(void) {
+static inline void DWT_Init(void) {
 	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk; //enable debug counter
 	DWT->CYCCNT = 0U;								//reset counter
 	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;   			//start counter
 }
 
-__STATIC_INLINE void delay_us(uint32_t us) {
+static inline void delay_us(uint32_t us) {
 	uint32_t us_count_tic =  us * (SystemCoreClock / 1000000U);
 	DWT->CYCCNT = 0U;
 	while(DWT->CYCCNT < us_count_tic);
 }
 
-__STATIC_INLINE void DWT_Meas(uint32_t *val) {
+static inline void DWT_Meas(uint32_t *val) {
 	*val = DWT->CYCCNT;
 	DWT->CYCCNT = 0;
 }

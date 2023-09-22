@@ -119,17 +119,6 @@ uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev);
   * @retval 1 when end
   */
 uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev);
-//TODO
-//CALCULATING	==========================================================================
-int32_t compensate_temperature_int(BME280_t *dev);
-float compensate_temperature_float(BME280_t *dev);
-uint32_t compensate_pressure_int(BME280_t *dev);
-float compensate_pressure_float(BME280_t *dev);
-uint32_t compensate_humidity_int(BME280_t *dev);
-float compensate_humidity_float(BME280_t *dev);
-
-void bme280_calculate_data_int(BME280_t *dev);
-void bme280_calculate_data_float(BME280_t *dev);
 
 #ifdef __cplusplus
 }

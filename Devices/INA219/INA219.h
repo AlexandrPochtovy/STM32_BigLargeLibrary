@@ -43,15 +43,37 @@ typedef struct INA219_RawData_t {
 	uint16_t power;
 } INA219_RawData;
 
+struct INA219_data {
+	float voltage;
+	float current;
+	float power;
+};
+
+
 typedef struct INA219 {
-		const uint8_t addr;
-		uint8_t step;
+		const enum INA219_ADDRESS addr;
 		DeviceStatus_t status;
+		uint8_t step;
 		INA219_RawData raw;
+		struct INA219_data data;
 } INA219_t;
-//Init & setup	==============================================================================
+
+/*****************************************************************
+  * @brief init power meter: send settings
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to power meter main structure
+  * @retval 1 when end
+  */
 uint8_t INA219_Init(I2C_IRQ_Conn_t *_i2c, INA219_t *dev);
-uint8_t INA219_GetRawData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev);
+
+/*****************************************************************
+  * @brief get all power data from meter and store in main structure 
+  * in RAW format and normalization
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to meter main structure
+  * @retval 1 when end
+  */
+uint8_t INA219_GetData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev);
 //Get & conversion raw data	==================================================================
 uint16_t INA219_GetVoltageInt(INA219_t *dev, uint16_t divider);
 float INA219_GetVoltageFloat(INA219_t *dev, uint16_t divider);

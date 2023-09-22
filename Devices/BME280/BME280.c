@@ -24,11 +24,6 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (uint16_t)(((uint16_t)msb << 8) | (uint16_t)lsb);
 }
 
-//parsing raw data	=================================================================
-/*!
- *  @brief This API is used to parse the pressure, temperature and
- *  humidity data and store it in the bme280_uncomp_data structure instance.
- */
 void bme280_parse_sensor_data(BME280_t *dev, uint8_t *data) {
 	/* Variables to store the sensor data */
 	uint32_t data_xlsb;
@@ -50,10 +45,6 @@ void bme280_parse_sensor_data(BME280_t *dev, uint8_t *data) {
 	dev->uncomp_data.humidity = data_msb | data_lsb;
 }
 
-/*!
- *  @brief This internal API is used to parse the temperature and
- *  pressure calibration data and store it in device structure.
- */
 void parse_temp_press_calib_data(BME280_t *dev, uint8_t *data) {
 	dev->calib_data.dig_t1 = CONCAT_BYTES(data[1], data[0]);
 	dev->calib_data.dig_t2 = (int16_t)CONCAT_BYTES(data[3], data[2]);
@@ -70,7 +61,7 @@ void parse_temp_press_calib_data(BME280_t *dev, uint8_t *data) {
 	dev->calib_data.dig_h1 = data[25];
 }
 
-void parse_humidity_calib_data(BME280_t *dev, uint8_t *data) {  //need check
+void parse_humidity_calib_data(BME280_t *dev, uint8_t *data) {
 	int16_t dig_h4_lsb;
 	int16_t dig_h4_msb;
 	int16_t dig_h5_lsb;
@@ -86,11 +77,6 @@ void parse_humidity_calib_data(BME280_t *dev, uint8_t *data) {  //need check
 	dev->calib_data.dig_h6 = (int8_t)data[6];
 }
 
-//INITIALIZATION	================================================================
-/*!
- *  @brief This API is the entry point.
- *  It reads the chip-id and calibration data from the sensor.
- */
 uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
 	uint8_t data[BME280_T_P_CALIB_DATA_LEN];
 		_i2c->addr = dev->addr;
@@ -132,18 +118,18 @@ uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
 	uint8_t data[BME280_DATA_LEN];
 	if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_DATA, data, BME280_DATA_LEN)) {
 		bme280_parse_sensor_data(dev, data);
-		bme280_calculate_data_int(dev);
-		bme280_calculate_data_float(dev);
+		dev->data_int.temperature = compensate_temperature_int(dev);/* Compensate the temperature data */
+		dev->data_int.pressure = compensate_pressure_int(dev);/* Compensate the pressure data */
+		dev->data_int.humidity = compensate_humidity_int(dev);/* Compensate the humidity data */
+		dev->data_float.temperature = compensate_temperature_float(dev);/* Compensate the temperature data */
+		dev->data_float.pressure = compensate_pressure_float(dev);/* Compensate the pressure data */
+		dev->data_float.humidity = compensate_humidity_float(dev);/* Compensate the humidity data */
 		dev->step = 0;
 		return 1;
 	}
 	return 0;
 }
 
-/*!
- * @brief This internal API is used to compensate the raw temperature data and
- * return the compensated temperature data in integer data type.
- */
 int32_t compensate_temperature_int(BME280_t *dev) {
 	int32_t var1;
 	int32_t var2;
@@ -190,10 +176,6 @@ float compensate_temperature_float(BME280_t *dev) {
 	return temperature;
 }
 
-/*!
- * @brief This internal API is used to compensate the raw pressure data and
- * return the compensated pressure data in integer data type.
- */
 uint32_t compensate_pressure_int(BME280_t *dev) {
 	int32_t var1;
 	int32_t var2;
@@ -274,10 +256,7 @@ float compensate_pressure_float(BME280_t *dev) {
 	}
 	return pressure;
 }
-/*!
- * @brief This internal API is used to compensate the raw humidity data and
- * return the compensated humidity data in integer data type.
- */
+
 uint32_t compensate_humidity_int(BME280_t *dev) {
 	int32_t var1;
 	int32_t var2;
@@ -337,25 +316,3 @@ float compensate_humidity_float(BME280_t *dev) {
 	return humidity;
 }
 
-/*!
- * @brief This API is used to compensate the pressure and/or
- * temperature and/or humidity data according to the component selected
- * by the user.
- */
-void bme280_calculate_data_int(BME280_t *dev) {
-	/* Compensate the temperature data */
-	dev->data_int.temperature = compensate_temperature_int(dev);
-	/* Compensate the pressure data */
-	dev->data_int.pressure = compensate_pressure_int(dev);
-	/* Compensate the humidity data */
-	dev->data_int.humidity = compensate_humidity_int(dev);
-}
-
-void bme280_calculate_data_float(BME280_t *dev) {
-	/* Compensate the temperature data */
-	dev->data_float.temperature = compensate_temperature_float(dev);
-	/* Compensate the pressure data */
-	dev->data_float.pressure = compensate_pressure_float(dev);
-	/* Compensate the humidity data */
-	dev->data_float.humidity = compensate_humidity_float(dev);
-}

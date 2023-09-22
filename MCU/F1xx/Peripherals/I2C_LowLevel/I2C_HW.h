@@ -24,13 +24,13 @@
 extern "C" {
 #endif
 
-#include <stddef.h>
+
 #include <stdint.h>
-#include "stm32f1xx.h"
-#include "stm32f1xx_ll_i2c.h"
-#include "FIFObuffer/FIFObuffer.h"
-#include "DataTypes.h"
-//#include "Peripherals/DMA_Template/DMA_Template.h"
+#include <stm32f1xx.h>
+#include <stm32f1xx_ll_i2c.h>
+#include "F1xx_DataTypes.h"
+#include "Buffers/FIFObuffer/FIFObuffer.h"
+
 
 typedef enum I2C_Mode {
 	I2C_MODE_WRITE,	//for write
@@ -41,7 +41,6 @@ typedef enum I2C_Mode {
 typedef struct I2C_IRQ_Conn {
 	I2C_TypeDef *i2c;	//pointer to HW i2c bus
 	PortStatus_t status;//status I2C bus
-	uint8_t step;		//step processing
 	uint8_t addr;		//device I2C address
 	uint8_t len;		//length data
 	I2C_Mode_t mode;	//device mode
@@ -53,7 +52,6 @@ typedef struct I2C_DMA_Conn {
 	void *DMAx;			//pointer to DMA MCU peripheral
 	uint32_t Channel;	//pointer to dma channel
 	PortStatus_t status;//status I2C bus
-	uint8_t step;		//step processing
 	uint8_t addr;		//device I2C address
 	uint8_t reg;		//register I2C
 	uint8_t len;		//length data
@@ -61,13 +59,58 @@ typedef struct I2C_DMA_Conn {
 	uint8_t *buffer;	//pointer linear buffer
 } I2C_DMA_Conn_t;
 
-/*	control function	******************************************/
+
+/*****************************************************************
+  * @brief start i2c bus: enable IRQ, enable or disable ASK, 
+  * set BUSY flag for databuffer and set START bit for interrupt mode
+  * @param _i2c - pointer to i2c connection struct
+  * @retval none
+  */
 void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c);
+
+/*****************************************************************
+  * @brief start i2c bus: enable IRQ for address send only, 
+  * enable or disable ASK, set BUSY flag for databuffer,
+  * set DMA channel and set START bit for interrupt DMA mode
+  * @param _i2c - pointer to i2c connection struct
+  * @retval none
+  */
 void I2C_Start_DMA(I2C_DMA_Conn_t *_i2c);
+
+/*****************************************************************
+  * @brief clear i2c BUSY hardware bit in SR2 register:
+  * switch scl and sda pin in GPIO mode 
+  * @param _i2c - pointer to i2c connection struct
+  * @note use in i2c BUSY problem only!
+  * @retval none
+  */
 void ClearBusyI2C1(void);
-/*	interrupt processing function	******************************/
+
+/*****************************************************************
+  * @brief interrupt-mode only i2c callback routine: send address, register, 
+  * processing read|write mode data etc.
+  * Use it in interrupt callback function only.
+  * @param _i2c - pointer to i2c connection struct
+  * @retval none
+  */
 void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c);
+
+/*****************************************************************
+  * @brief interrupt and DMA i2c callback routine: send address in interrupt
+  * without DMA, after enable DMA for register and data read|write.
+  * Use it in interrupt callback function only and setup DMA channel correct.
+  * @param _i2c - pointer to i2c connection struct
+  * @retval none
+  */
 void I2C_EV_IRQ_DMA_CallBack(I2C_DMA_Conn_t *_i2c);
+
+/*****************************************************************
+  * @brief interrupt-mode only i2c error callback routine: clear error flags
+  * in SR1 and SR@ register, set PORT_EROR value to bus status.
+  * Use it in interrupt error callback function only for error processing.
+  * @param _i2c - pointer to i2c connection struct
+  * @retval none
+  */
 void I2C_ERR_CallBack(I2C_IRQ_Conn_t *_i2c);
 
 #ifdef __cplusplus

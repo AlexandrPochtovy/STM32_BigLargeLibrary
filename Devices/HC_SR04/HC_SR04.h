@@ -24,7 +24,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* include -------------------------------------------------------------------*/
+
 #include <stdint.h>
 #include "Function/Function.h"
 /**********************************************************************
@@ -36,8 +36,21 @@ typedef struct HC_SR04 {
 	uint16_t distance_mm;
 } HC_SR04_t;
 
-//calculate distance to object from HC-SR04
-void HC_SR04DistanceSimpleCalc(HC_SR04_t *data, uint16_t soundSpeed, uint16_t countLimit);
+/*****************************************************************
+  * @brief calculate distance in mm from ultrasonic sensor in dry air at a temperature of 20C
+  * @param data - pointer to HC_SR04 main structure
+  * @param countLimit - counter up limit for correct calculating
+  * @retval none
+  */
+void HC_SR04DistanceSimpleCalc(HC_SR04_t *data, uint16_t countLimit);
+
+/*****************************************************************
+  * @brief calculating distance in mm from ultrasonic sensor taking into account air temperature
+  * @param data - pointer to HC_SR04 main structure
+  * @param countLimit - counter up limit for correct calculating
+  * 
+  * @retval none
+  */
 void HC_SR04DistanceAdvancedCalc(HC_SR04_t *data, uint16_t countLimit, float temp);
 
 #ifdef __cplusplus

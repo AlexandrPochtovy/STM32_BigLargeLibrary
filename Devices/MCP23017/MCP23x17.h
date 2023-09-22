@@ -36,22 +36,61 @@ enum MCP23017_ADDRESS {
 };
 
 typedef struct MCP23_port {
-		uint8_t portA;
-		uint8_t portB;
+		uint8_t A;
+		uint8_t B;
 } MCP23_port_t;
 
 typedef struct MCP23 {
-		const uint8_t addr;
+		const enum MCP23017_ADDRESS addr;
 		DeviceStatus_t status;
 		MCP23_port_t data;
 } MCP23_t;
-//function	==================================================================
-uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev);
-uint8_t MCP23_17_ReadPort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t *value);
-uint8_t MCP23_17_WritePort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t value);
-uint8_t MCP23_17_ReadAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value);
-uint8_t MCP23_17_WriteAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value);
 
+/*****************************************************************
+  * @brief init MCP IO expander: send settings
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to MCP IO expander main structure
+  * @retval 1 when end
+  */
+uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev);
+
+/*****************************************************************
+  * @brief read IO port value from MCP IO expander
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to MCP IO expander main structure
+  * @param port - select port A or port B
+  * @param value - pointer for store port value
+  * @retval 1 when end
+  */
+uint8_t MCP23_17_ReadPort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t *value);
+
+/*****************************************************************
+  * @brief write IO port value to MCP IO expander
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to MCP IO expander main structure
+  * @param port - select port A or port B
+  * @param value - value for write
+  * @retval 1 when end
+  */
+uint8_t MCP23_17_WritePort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t value);
+
+/*****************************************************************
+  * @brief read both IO ports A and B value from MCP IO expander
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to MCP IO expander main structure
+  * @param value - pointer for store ports value
+  * @retval 1 when end
+  */
+uint8_t MCP23_17_ReadAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value);
+
+/*****************************************************************
+  * @brief write both IO ports A and B value to MCP IO expander
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to MCP IO expander main structure
+  * @param value - pointer to value for write
+  * @retval 1 when end
+  */
+uint8_t MCP23_17_WriteAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value);
 
 #ifdef __cplusplus
 }

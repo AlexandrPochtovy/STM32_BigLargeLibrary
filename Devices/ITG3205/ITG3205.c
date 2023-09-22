@@ -20,9 +20,9 @@
 
 #include "ITG3205.h"
 
-static const float Chip_GYRO_LSB = 14.375;
-static const uint16_t Chip_TEMP_LSB = 280;
-static const uint8_t ITG3205_DATA_LEN = 8;
+#define Chip_GYRO_LSB 14.375F
+#define Chip_TEMP_LSB  280
+#define ITG3205_DATA_LEN  8
 
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (uint16_t)(((uint16_t)msb << 8) | (uint16_t)lsb);

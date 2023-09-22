@@ -20,9 +20,10 @@
 
 #include "QMC5883L.h"
 
-static const uint8_t QMC5883L_DATA_LEN = 6;
+
+#define QMC5883L_DATA_LEN 6
 //static const float QMC5883L_LSB_2G = 12000.0;
-static const float QMC5883L_LSB_8G = 3000.0;
+#define QMC5883L_LSB_8G 3000.0f
 
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (((uint16_t) msb << 8) | (uint16_t) lsb);

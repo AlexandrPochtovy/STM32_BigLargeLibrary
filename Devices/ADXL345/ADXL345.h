@@ -58,17 +58,17 @@ typedef struct ADXL345 {
 } ADXL345_t;
 
 /*****************************************************************
-  * @brief init gyroscope: send settings
+  * @brief init accelerometer: send settings
   * @param _i2c - pointer to I2C bus connection structure
-  * @param dev - pointer to gyroscope main structure
+  * @param dev - pointer to accelerometer main structure
   * @retval 1 when end
   */
 uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev);
 
 /*****************************************************************
-  * @brief get all axis data from gyroscope and store in main gyroscope structure in RAW format
+  * @brief get all axis data from accelerometer and store in main accelerometer structure in RAW format
   * @param _i2c - pointer to I2C bus connection structure
-  * @param dev - pointer to gyroscope main structure
+  * @param dev - pointer to accelerometer main structure
   * @retval 1 when end
   */
 uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev);

@@ -83,6 +83,16 @@ uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 	return 0;
 }
 
+/*****************************************************************
+  * @brief convert gyroscope raw data to normal float data and store in main gyroscope structure
+  * internal use only
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to gyroscope main structure
+  * @retval 1 when end
+  */
+float ADXL345_ConvertData(int16_t raw, enum ratio factor) {
+	return ((2 * raw * factor) * my_gravity) / 1000.0f;
+}
 
 uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 	uint8_t val[ADXL345_DATA_LENGHT];
@@ -99,13 +109,3 @@ uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 	return 0;
 }
 
-/*****************************************************************
-  * @brief convert gyroscope raw data to normal float data and store in main gyroscope structure
-  * internal use only
-  * @param _i2c - pointer to I2C bus connection structure
-  * @param dev - pointer to gyroscope main structure
-  * @retval 1 when end
-  */
-float ADXL345_ConvertData(int16_t raw, enum ratio factor) {
-	return ((2 * raw * factor) * my_gravity) / 1000.0f;
-}

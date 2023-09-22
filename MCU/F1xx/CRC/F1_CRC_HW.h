@@ -20,7 +20,6 @@
 #ifndef _F1_CRC_HW_H_
 #define _F1_CRC_HW_H_
 
-#include <stddef.h>
 #include <stdint.h>
 #include "stm32f1xx.h"
 

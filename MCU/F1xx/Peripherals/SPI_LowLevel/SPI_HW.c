@@ -17,7 +17,15 @@
  * 	MySPI.c
  *  Created on: 30 nov 2020
  */
-#include "MySPI.h"
+#include "SPI_HW.h"
+
+void SPI_Start_IRQ_HWNSS(SPI_Connection_t *_spi) {
+	_spi->status = PORT_BUSY;
+	_spi->SPIbus->CR2 |= (SPI_CR2_TXEIE | SPI_CR2_RXNEIE); //включили прерывание чтобы данные пошли
+	/*попробовать просто отключать интерфейс без постоянного включения/выключения прерываний*/
+	GetOne(&_spi->txbuffer, ((uint8_t*) &_spi->SPIbus->DR)); //записали регистр который читаем пишем
+	LL_SPI_Enable(_spi->SPIbus); //enable SPI
+}
 
 void SPI_Start_IRQ_HWNSS(SPI_Connection_t *_spi) {
 	_spi->status = PORT_BUSY;

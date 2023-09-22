@@ -13,6 +13,9 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
+
+  Base on forum
+  https://we.easyelectronics.ru/STM32/crc32-na-stm32-kak-na-kompe-ili-na-kompe-kak-na-stm32.html
  
  F1_CRC_HW.c
  Created on: Sep 20, 2020
@@ -51,7 +54,9 @@ uint32_t HW_CRC32(const uint8_t* pData, size_t count, uint32_t init) {
 uint32_t crc32_zlib(const uint32_t *data, size_t cnt) {
   uint32_t i;
   CRC->CR = CRC_CR_RESET;
-  for (i = 0; i < (cnt >> 2); i++) CRC->DR = __RBIT(data[i]);
+  for (i = 0; i < (cnt / 4); i++) {
+    CRC->DR = __RBIT(data[i]);
+  }
   uint32_t result = __RBIT(CRC->DR);
   cnt = (cnt % 4) * 8;
   if (cnt) {

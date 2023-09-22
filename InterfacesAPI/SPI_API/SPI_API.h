@@ -28,47 +28,58 @@ extern "C" {
 #include "Peripherals/SPI_LowLevel/SPI_HW.h"
 
 /*****************************************************************
-  * @brief  write 1 byte to spi and read 1 byte from spi in full-duplex mode in interrupt
-  * @param  *_spi - pointer to spi full duplex connection struct
+  * @brief write 1 byte to spi and read 1 byte from spi in full-duplex mode in interrupt
+  * @param _spi - pointer to spi full duplex connection struct
+  * @param tx - data 1 byte for write
+  * @param rx - pointer to data 1 byte to read
   * @retval 0 - processing, 1 - complite
   */
 uint8_t SPI_WriteReadOneByte(SPI_Conn_TWO_t *_spi, uint8_t tx, uint8_t *rx);
 
 /*****************************************************************
   * @brief  write multi bytes to spi and read multi byte from spi in full-duplex mode in interrupt
-  * @param  *_spi - pointer to spi full duplex connection struct
+  * @param _spi - pointer to spi full duplex connection struct
+  * @param tx - pointer to data bytes for write
+  * @param txLen - size data for write
+  * @param rx - pointer to data bytes for read
+  * @param rxLen - size data for read
   * @retval 0 - processing, 1 - complite
   */
 uint8_t SPI_WriteReadBytes(SPI_Conn_TWO_t *_spi, uint8_t *tx, uint8_t txLen, uint8_t *rx, uint8_t rxLen);
 
 /*****************************************************************
-  * @brief  write 1 byte to spi in half-duplex mode in interrupt
-  * @param  *_spi - pointer to spi half-duplex connection struct
+  * @brief write 1 byte to spi in half-duplex mode in interrupt
+  * @param _spi - pointer to spi half-duplex connection struct
+  * @param tx - data 1 byte for write
   * @retval 0 - processing, 1 - complite
   */
 uint8_t SPI_WriteOnlyOneByte(SPI_Conn_ONE_t *_spi, uint8_t tx);
 
 /*****************************************************************
-  * @brief  write multi bytes to spi in half-duplex mode in interrupt
-  * @param  *_spi - pointer to spi half-duplex connection struct
+  * @brief write multi bytes to spi in half-duplex mode in interrupt
+  * @param _spi - pointer to spi half-duplex connection struct
+  * @param tx - pointer to data bytes for write
+  * @param txLen - size data for write
   * @retval 0 - processing, 1 - complite
   */
 uint8_t SPI_WriteOnlyBytes(SPI_Conn_ONE_t *_spi, uint8_t *tx, uint8_t txLen);
 
 /*****************************************************************
-  * @brief  read 1 byte from spi in half-duplex mode in interrupt
-  * @param  *_spi - pointer to spi half-duplex connection struct
+  * @brief read 1 byte from spi in half-duplex mode in interrupt
+  * @param _spi - pointer to spi half-duplex connection struct
+  * @param rx - pointer to data 1 byte to read
   * @retval 0 - processing, 1 - complite
   */
 uint8_t SPI_ReadOnlyOneByte(SPI_Conn_ONE_t *_spi, uint8_t *rx);
 
 /*****************************************************************
-  * @brief  read multi byte from spi in half-duplex mode in interrupt
-  * @param  *_spi - pointer to spi half-duplex connection struct
+  * @brief read multi byte from spi in half-duplex mode in interrupt
+  * @param _spi - pointer to spi half-duplex connection struct
+  * @param rx - pointer to data bytes for read
+  * @param rxLen - size data for read
   * @retval 0 - processing, 1 - complite
   */
 uint8_t SPI_ReadOnlyBytes(SPI_Conn_ONE_t *_spi, uint8_t *rx, uint8_t rxLen);
-
 
 #ifdef __cplusplus
 }

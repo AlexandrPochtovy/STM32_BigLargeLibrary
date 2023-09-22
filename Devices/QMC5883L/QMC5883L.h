@@ -47,15 +47,28 @@ typedef struct QMC5883L_data_t {
 } QMC5883L_data;
 //common data struct for sensor
 typedef struct QMC5883L {
-	const uint8_t addr;
+	const enum QMC5883L_ADDRESS addr;
 	DeviceStatus_t status;
 	uint8_t step;
 	QMC5883L_raw_data raw;
 	QMC5883L_data data;
 } QMC5883L_t;
 
-//INITIALIZATION	================================================================
+/*****************************************************************
+  * @brief init magnetometer: send settings
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to magnetometer main structure
+  * @retval 1 when end
+  */
 uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev);
+
+/*****************************************************************
+  * @brief get all axis data from magnetometer and store in main magnetometer structure in RAW format
+  * and normalisation axis values
+  * @param _i2c - pointer to I2C bus connection structure
+  * @param dev - pointer to magnetometer main structure
+  * @retval 1 when end
+  */
 uint8_t QMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev);
 
 #ifdef __cplusplus

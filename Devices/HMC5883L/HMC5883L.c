@@ -29,7 +29,6 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 
 uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev) {
 	dev->status = DEVICE_NOT_INIT;
-	//setup sensor
 	uint8_t data[3];
 	data[0] = HMC5883L_SAMPLES_1 | HMC5883L_DATARATE_15HZ | HMC5883L_NORMAL;
 	data[1] = HMC5883L_GAIN_1_3GA;

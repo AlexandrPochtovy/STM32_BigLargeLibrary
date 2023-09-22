@@ -66,7 +66,7 @@ uint8_t INA219_Init(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 	return 0;
 }
 
-uint8_t INA219_GetRawData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
+uint8_t INA219_GetData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 		uint8_t dt[INA219_REG_LEN];
 		uint8_t reg;
 		_i2c->addr = dev->addr;

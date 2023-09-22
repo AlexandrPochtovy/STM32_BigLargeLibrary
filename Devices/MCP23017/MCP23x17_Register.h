@@ -21,29 +21,31 @@
 #ifndef MCP23017_MCP23X17_REGISTER_H_
 #define MCP23017_MCP23X17_REGISTER_H_
 
-//	registers map	============================================================================
-#define MCP23017_IODIRA 	(uint8_t)0x00
-#define MCP23017_IODIRB 	(uint8_t)0x01
-#define MCP23017_IPOLA 		(uint8_t)0x02
-#define MCP23017_IPOLB 		(uint8_t)0x03
-#define MCP23017_GPINTENA (uint8_t)0x04
-#define MCP23017_GPINTENB (uint8_t)0x05
-#define MCP23017_DEFVALA 	(uint8_t)0x06
-#define MCP23017_DEFVALB 	(uint8_t)0x07
-#define MCP23017_INTCONA 	(uint8_t)0x08
-#define MCP23017_INTCONB 	(uint8_t)0x09
-#define MCP23017_IOCONA 	(uint8_t)0x0A
-#define MCP23017_IOCONB 	(uint8_t)0x0B
-#define MCP23017_GPPUA 		(uint8_t)0x0C
-#define MCP23017_GPPUB 		(uint8_t)0x0D
-#define MCP23017_INTFA 		(uint8_t)0x0E
-#define MCP23017_INTFB 		(uint8_t)0x0F
-#define MCP23017_INTCAPA 	(uint8_t)0x10
-#define MCP23017_INTCAPB 	(uint8_t)0x11
-#define MCP23017_GPIOA 		(uint8_t)0x12
-#define MCP23017_GPIOB 		(uint8_t)0x13
-#define MCP23017_OLATA		(uint8_t)0x14
-#define MCP23017_OLATB		(uint8_t)0x15
+enum MCP23x17_REGISTER {
+ MCP23017_IODIRA    = (uint8_t)0x00,
+ MCP23017_IODIRB    = (uint8_t)0x01,
+ MCP23017_IPOLA     = (uint8_t)0x02,
+ MCP23017_IPOLB     = (uint8_t)0x03,
+ MCP23017_GPINTENA  = (uint8_t)0x04,
+ MCP23017_GPINTENB  = (uint8_t)0x05,
+ MCP23017_DEFVALA   = (uint8_t)0x06,
+ MCP23017_DEFVALB   = (uint8_t)0x07,
+ MCP23017_INTCONA   = (uint8_t)0x08,
+ MCP23017_INTCONB   = (uint8_t)0x09,
+ MCP23017_IOCONA    = (uint8_t)0x0A,
+ MCP23017_IOCONB    = (uint8_t)0x0B,
+ MCP23017_GPPUA     = (uint8_t)0x0C,
+ MCP23017_GPPUB     = (uint8_t)0x0D,
+ MCP23017_INTFA     = (uint8_t)0x0E,
+ MCP23017_INTFB     = (uint8_t)0x0F,
+ MCP23017_INTCAPA   = (uint8_t)0x10,
+ MCP23017_INTCAPB   = (uint8_t)0x11,
+ MCP23017_GPIOA     = (uint8_t)0x12,
+ MCP23017_GPIOB     = (uint8_t)0x13,
+ MCP23017_OLATA     = (uint8_t)0x14,
+ MCP23017_OLATB     = (uint8_t)0x15
+};
+
 // I/O Direction Default state: MCP23017_IODIR_ALL_INPUT	===============================================
 #define MCP23017_IODIR_ALL_OUTPUT	(uint8_t)0x00
 #define MCP23017_IODIR_ALL_INPUT	(uint8_t)0xFF

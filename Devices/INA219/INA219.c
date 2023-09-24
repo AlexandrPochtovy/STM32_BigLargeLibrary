@@ -20,12 +20,12 @@
 
 #include "INA219.h"
 
-static const uint8_t INA219_REG_LEN = 2;
-static const uint32_t  INA219_MaxCurrentmA = 3200;//maximum curent in mA
-static const uint32_t  INA219_ShuntResistance_mOmh = 100;//shunt resistance in milliOmh
+#define INA219_REG_LEN = 2;
+static const uint32_t  INA219_MaxCurrentmA = 3200U;//maximum curent in mA
+static const uint32_t  INA219_ShuntResistance_mOmh = 100U;//shunt resistance in milliOmh
 
-#define INA219_CalibrationVal		(uint32_t)0x08000000 / ((uint32_t)(INA219_MaxCurrentmA * INA219_ShuntResistance_mOmh) / 10)
-#define INA219_Current_LSB_mkA	(uint32_t)(INA219_MaxCurrentmA * 1000 / 0x8000)
+#define INA219_CalibrationVal	0x08000000U / ((uint32_t)(INA219_MaxCurrentmA * INA219_ShuntResistance_mOmh) / 10)
+#define INA219_Current_LSB_mkA	INA219_MaxCurrentmA * 1000 / 0x8000
 #define INA219_Power_LSB_mkV		(uint32_t)(20 * INA219_Current_LSB_mkA)
 
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
@@ -40,10 +40,10 @@ uint8_t INA219_Init(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 	switch (dev->step) {
 		case 0:
 			cfg = 	INA219_CFG_MODE_SHBV_CONTINUOUS |	// shunt and bus voltage continuous	defaulth
-									INA219_CFG_SADC_12BIT_128S 	|	// 128 x 12-bit shunt samples averaged together
-									INA219_CFG_BADC_12BIT_128S 	|	// 128 x 12-bit bus samples averaged together
-									INA219_CFG_GAIN_8_320MV 		|	// Gain 8, 320mV Range defaulth
-									INA219_CFG_BVRANGE_16V;				// 0-16V Range
+					INA219_CFG_SADC_12BIT_128S 		|	// 128 x 12-bit shunt samples averaged together
+					INA219_CFG_BADC_12BIT_128S 		|	// 128 x 12-bit bus samples averaged together
+					INA219_CFG_GAIN_8_320MV 		|	// Gain 8, 320mV Range defaulth
+					INA219_CFG_BVRANGE_16V;				// 0-16V Range
 			data[0] = (uint8_t)cfg;
 			data[1] = (uint8_t)(cfg >> 8);
 			if (I2C_WriteBytes(_i2c, dev->addr, INA219_REG_CONFIG, data, INA219_REG_LEN)) {
@@ -67,61 +67,39 @@ uint8_t INA219_Init(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 }
 
 uint8_t INA219_GetData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
-	//TODO переделать нахер нормально по шагам
-		uint8_t dt[INA219_REG_LEN];
-		uint8_t reg;
-		switch (dev->step) {
-		case 0://select reg
-		case 1:
-		case 2:
-		case 3:
-			switch (dev->step) {
-					case 0://select reg
-								reg = INA219_REG_BUSVOLTAGE;//read  voltage
-								break;
-					case 1:
-								reg = INA219_REG_POWER;//read power
-								break;
-					case 2:
-								reg = INA219_REG_CURRENT;//read current
-								break;
-					case 3:
-								reg = INA219_REG_SHUNTVOLTAGE;//read shunt voltage
-								break;
-					default:
-						reg = INA219_REG_BUSVOLTAGE;//read voltage
-						break;
-			}
-			if (I2C_ReadBytes(_i2c, dev->addr, reg, dt, INA219_REG_LEN)) {
-				switch (dev->step) {
-					case 0://select reg
-						dev->raw.voltage = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);//read voltage
-						dev->step = 1;
-						break;
-					case 1:
-						dev->raw.power = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);//read power
-						dev->step = 2;
-						break;
-					case 2:
-						dev->raw.current = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);//read current
-						dev->step = 3;
-						break;
-					case 3:
-						dev->raw.shuntV = (int16_t)CONCAT_BYTES(dt[0], dt[1]);//read shunt voltage
-						dev->step = 0;
-						break;
-					default:
-						dev->step = 0;
-						break;
-					}
-				dev->status = DEVICE_DONE;
-				return 1;
-			}
-			break;
-		default:
-			dev->step = 0;
-			break;
+	dev->status = DEVICE_PROCESSING;
+	uint8_t dt[INA219_REG_LEN];
+	switch (dev->step) {
+	case 0://read  voltage
+		if (I2C_ReadBytes(_i2c, dev->addr, INA219_REG_BUSVOLTAGE, dt, INA219_REG_LEN)) {
+			dev->raw.voltage = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);
+			dev->step = 1;
 		}
+		break;
+	case 1://read power
+		if (I2C_ReadBytes(_i2c, dev->addr, INA219_REG_POWER, dt, INA219_REG_LEN)) {
+			dev->raw.power = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);
+			dev->step = 2;
+		}
+		break;
+	case 2://read current
+		if (I2C_ReadBytes(_i2c, dev->addr, INA219_REG_CURRENT, dt, INA219_REG_LEN)) {
+			dev->raw.current = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);
+			dev->step = 3;
+		}
+		break;
+	case 3:
+		if (I2C_ReadBytes(_i2c, dev->addr, INA219_REG_SHUNTVOLTAGE, dt, INA219_REG_LEN)) {
+			dev->raw.shuntV = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);
+			dev->step = 0;
+			dev->status = DEVICE_DONE;
+			return 1;
+		}
+		break;		
+	default:
+		dev->step = 0;
+		break;
+	}
 	return 0;
 }
 //Get & conversion raw data	=================================================================================

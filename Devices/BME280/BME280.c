@@ -301,6 +301,7 @@ uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
 }
 
 uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
+	dev->status = DEVICE_PROCESSING;
 	uint8_t data[BME280_DATA_LEN];
 	if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_DATA, data, BME280_DATA_LEN)) {
 		bme280_parse_sensor_data(dev, data);
@@ -311,6 +312,7 @@ uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
 		dev->data_float.pressure = compensate_pressure_float(dev);/* Compensate the pressure data */
 		dev->data_float.humidity = compensate_humidity_float(dev);/* Compensate the humidity data */
 		dev->step = 0;
+		dev->status = DEVICE_DONE;
 		return 1;
 	}
 	return 0;

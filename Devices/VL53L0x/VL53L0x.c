@@ -122,14 +122,14 @@ void setupVL53L0X(VL53L0x_t *lidar, uint16_t timeout) {
   * @param new_addr - new I2C address
   * @retval 1 when complite
   */
-uint8_t setAddress(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, const uint8_t new_addr)
-{
-	uint8_t st;
-	st = I2C_WriteOneByte(_i2c, lidar->addr, CHIP_I2C_ADDRESS, new_addr & 0x7F);
-	if (st) {
+uint8_t setAddress(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, const uint8_t new_addr) {
+	dev->status = DEVICE_PROCESSING;
+	if (I2C_WriteOneByte(_i2c, lidar->addr, CHIP_I2C_ADDRESS, new_addr & 0x7F)) {
 		lidar->addr = new_addr;
+		dev->status = DEVICE_DONE;
+		return 1;
 	}
-	return st;
+	return 0;
 }
 
 /*****************************************************************
@@ -224,6 +224,7 @@ uint8_t setSignalRateLimit(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint32_t limi
 
 uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar)
 {
+	dev->status = DEVICE_PROCESSING;
 	uint8_t st;
 	switch (lidar->stepL1) {
 	case 0:

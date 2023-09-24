@@ -24,7 +24,7 @@
 
 uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev) {
 	uint8_t data[MCP23017_CFG_LENGHT];
-	dev->status = DEVICE_ON;
+	dev->status = DEVICE_PROCESSING;
 	data[0] = MCP23017_IODIR_ALL_OUTPUT;  //reg 0x00 IODIRA 	RW set all pins portA as output
 	data[1] = MCP23017_IODIR_ALL_OUTPUT;  //reg 0x01 IODIRB 	RW set all pins portB as input
 	data[2] = MCP23017_IPOL_ALL_NORMAL;  //reg 0x02 IPOLA 		RW set all pins portA normal polarity
@@ -40,13 +40,14 @@ uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev) {
 	data[12] = 0x00;  //reg 0x0C GPPUA		RW setup pull-up port A pins disabled for output
 	data[13] = 0x00;  //reg 0x0D GPPUB		RW setup pull-up port B pins enabled for input
 	if (I2C_WriteBytes(_i2c, dev->addr, MCP23017_IODIRA, data, MCP23017_CFG_LENGHT)) {
-		dev->status = DEVICE_INIT;
+		dev->status = DEVICE_READY;
 		return 1;
 	}
 	return 0;
 }
 
 uint8_t MCP23_17_ReadPort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t *value) {
+	dev->status = DEVICE_PROCESSING;
 	if (I2C_ReadOneByte(_i2c, dev->addr, port, value)) {
 		dev->status = DEVICE_DONE;
 		return 1;
@@ -55,6 +56,7 @@ uint8_t MCP23_17_ReadPort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint
 }
 
 uint8_t MCP23_17_WritePort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t value) {
+	dev->status = DEVICE_PROCESSING;
 	if (I2C_WriteOneByte(_i2c, dev->addr, port, value)) {
 		dev->status = DEVICE_DONE;
 		return 1;
@@ -63,6 +65,7 @@ uint8_t MCP23_17_WritePort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uin
 }
 
 uint8_t MCP23_17_ReadAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value) {
+	dev->status = DEVICE_PROCESSING;
 	if (I2C_ReadBytes(_i2c, dev->addr, MCP23017_GPIOA, value, 2)) {
 		dev->status = DEVICE_DONE;
 		return 1;
@@ -71,6 +74,7 @@ uint8_t MCP23_17_ReadAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value) {
 }
 
 uint8_t MCP23_17_WriteAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value) {
+	dev->status = DEVICE_PROCESSING;
 	if (I2C_WriteBytes(_i2c, dev->addr, MCP23017_GPIOA, value, 2)) {
 		dev->status = DEVICE_DONE;
 		return 1;

@@ -22,10 +22,10 @@
 #define ITG3205_REGISTER_H_
 
 enum ITG3205_Register {
-	ITG3205_WHOAMI 		= 0x00,//ID chip
+	ITG3205_WHOAMI 			= 0x00,//ID chip
 	ITG3205_SMPLRT_DIV 	= 0x15,//sample rate, simple value
-	ITG3205_DLPF_FS 	= 0x16,//scale
-	ITG3205_INT_CFG 	= 0x17,//interrupt configuration
+	ITG3205_DLPF_FS 		= 0x16,//scale
+	ITG3205_INT_CFG 		= 0x17,//interrupt configuration
 	ITG3205_INT_STATUS 	= 0x1A,//interrupt status
 	ITG3205_TEMP_OUT_H	= 0x1B,//temperature sensor hi byte
 	ITG3205_TEMP_OUT_L 	= 0x1C,//temperature sensor lo byte
@@ -35,18 +35,18 @@ enum ITG3205_Register {
 	ITG3205_GYRO_YOUT_L	= 0x20,//Y-axis data lo byte
 	ITG3205_GYRO_ZOUT_H = 0x21,//Z-axis data hi byte
 	ITG3205_GYRO_ZOUT_L = 0x22,//Z-axis data lo byte
-	ITG3205_PWR_MGM 	= 0x3E //power setup
+	ITG3205_PWR_MGM 		= 0x3E //power setup
 };
 
 enum ITG3205_DLPF_FS {
-	ITG3205_DLPF_FS_SEL 	= 0x18,
+	ITG3205_DLPF_FS_SEL 		= 0x18,
 	ITG3205_DLPF_CFG_256Hz	= 0x00,
 	ITG3205_DLPF_CFG_188Hz 	= 0x01,
 	ITG3205_DLPF_CFG_98Hz 	= 0x02,
 	ITG3205_DLPF_CFG_42Hz 	= 0x03,
 	ITG3205_DLPF_CFG_20Hz 	= 0x04,
 	ITG3205_DLPF_CFG_10Hz 	= 0x05,
-	ITG3205_DLPF_CFG_5Hz 	= 0x06
+	ITG3205_DLPF_CFG_5Hz 		= 0x06
 };
 
 enum ITG3205_INT_CFG {

@@ -29,30 +29,42 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 }
 
 uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
-	dev->status = DEVICE_ON;
+	dev->status = DEVICE_PROCESSING;
 	switch (dev->step) {
-		case 0: //reset first
-			if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_PWR_MGM, ITG3205_PWR_MGM_RESET)) {
+	case 0: {//read who i am register check connection
+		uint8_t ID = 0;
+		if (I2C_ReadOneByte(_i2c, dev->addr, ITG3205_WHOAMI, &ID)) {
+			if (((ID & 0xFE) << 1) == ITG3205_ADDR) {
 				dev->step = 1;
+			} else {
+				dev->step = 0;
+				dev->status = DEVICE_FAULTH;
+				return 1;
 			}
-			break;
+		}
+		break;}
 		case 1: //setup clock
 			if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_PWR_MGM, ITG3205_PWR_CLOCK_INTERNAL)) {
 				dev->step = 2;
 			}
 			break;
-		case 2:{ //setup sample rate, interrupt
-			uint8_t dt[3];
-			dt[0] = 0xFF; //ITG3205_SMPLRT_DIV
-			dt[1] = ITG3205_DLPF_FS_SEL | ITG3205_DLPF_CFG_256Hz;
-			dt[2] = ITG3205_INT_CFG_INT_ANYRD_2CLEAR;
-			FIFO_PutMulti(_i2c->buffer, dt, 3);
-			if (I2C_WriteBytes(_i2c, dev->addr, ITG3205_SMPLRT_DIV, dt, 3)) {
-				dev->status = DEVICE_INIT;
+		case 2: //setup sample rate
+			if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_SMPLRT_DIV, 0x07)) {
+				dev->step = 3;
+			}
+			break;
+		case 3: //setup low-pass filter
+			if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_DLPF_FS, ITG3205_DLPF_FS_SEL | ITG3205_DLPF_CFG_5Hz)) {
+				dev->step = 4;
+			}
+			break;
+		case 4:
+			if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_INT_CFG, 0x00)) {
+				dev->status = DEVICE_READY;
 				dev->step = 0;
 				return 1;
 			}
-			break;}
+			break;
 		default:
 			dev->step = 0;
 			break;
@@ -61,6 +73,7 @@ uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 }
 
 uint8_t ITG3205_GetData(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
+	dev->status = DEVICE_PROCESSING;
 	uint8_t dt[ITG3205_DATA_LEN];
 	if (I2C_ReadBytes(_i2c, dev->addr, ITG3205_TEMP_OUT_H, dt, ITG3205_DATA_LEN)) {
 		dev->raw.temp = (int16_t)CONCAT_BYTES(dt[0], dt[1]);

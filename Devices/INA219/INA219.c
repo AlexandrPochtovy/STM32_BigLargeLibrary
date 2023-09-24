@@ -55,7 +55,7 @@ uint8_t INA219_Init(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 			data[1] = (uint8_t)(INA219_CalibrationVal >> 8);
 			if (I2C_WriteBytes(_i2c, dev->addr, INA219_REG_CALIBRATION, data, INA219_REG_LEN)) {
 				dev->step = 0;
-				dev->status = DEVICE_INIT;
+				dev->status = DEVICE_READY;
 				return 1;
 			}
 			break;

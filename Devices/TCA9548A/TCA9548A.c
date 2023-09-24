@@ -23,9 +23,9 @@
 #define TCA9548A_PORT 0x00
 
 uint8_t TCA9548A_Init(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev) {
-	dev->status = DEVICE_ON;
+	dev->status = DEVICE_PROCESSING;
 	if (I2C_WriteOneByte(_i2c, dev->addr, TCA9548A_PORT, 0x00)) {
-		dev->status = DEVICE_INIT;
+		dev->status = DEVICE_READY;
 		dev->step = 0;
 		return 1;
 	}
@@ -33,6 +33,7 @@ uint8_t TCA9548A_Init(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev) {
 }
 
 uint8_t TCA9548A_OnChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t channelMask) {
+	dev->status = DEVICE_PROCESSING;
 	switch (dev->step) {
 		case 0://read port actual
 			if (I2C_ReadOneByte(_i2c, dev->addr, TCA9548A_PORT, &dev->port)) {
@@ -55,6 +56,7 @@ uint8_t TCA9548A_OnChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t chann
 }
 
 uint8_t TCA9548A_OffChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t channelMask) {
+	dev->status = DEVICE_PROCESSING;
 	switch (dev->step) {
 		case 0://read port actual
 			if (I2C_ReadOneByte(_i2c, dev->addr, TCA9548A_PORT, &dev->port)) {

@@ -30,7 +30,7 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 }
 
 uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
-		dev->status = DEVICE_ON;
+	dev->status = DEVICE_PROCESSING;
 	switch (dev->step) {
 			case 0: //set reset period don't give a fuck
 							//recommended magic number RTFM
@@ -45,7 +45,7 @@ uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
 				data[1] = 0x00;
 				if (I2C_WriteBytes(_i2c, dev->addr, QMC5883L_REG_CFG_A, data, 2)) {
 					dev->step = 0;
-					dev->status = DEVICE_INIT;
+					dev->status = DEVICE_READY;
 					return 1;
 				}
 				break;}
@@ -57,6 +57,7 @@ uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
 }
 
 uint8_t QMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
+	dev->status = DEVICE_PROCESSING;
 		uint8_t dt[QMC5883L_DATA_LEN];
 		if (I2C_ReadBytes(_i2c, dev->addr, QMC5883L_REG_OUT_X_L, dt, QMC5883L_DATA_LEN)) {
 				FIFO_GetMulti(_i2c->buffer, dt, QMC5883L_DATA_LEN);

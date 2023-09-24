@@ -29,7 +29,7 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 }
 
 uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
-	dev->status = DEVICE_NOT_INIT;
+	dev->status = DEVICE_ON;
 	switch (dev->step) {
 		case 0: //reset first
 			if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_PWR_MGM, ITG3205_PWR_MGM_RESET)) {

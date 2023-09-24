@@ -39,7 +39,7 @@ uint8_t I2C_WriteOneByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_
   * @param  *_i2c - pointer to i2c connection struct
   * @retval 0 - processing, 1 - complite
   */
-uint8_t I2C_WriteBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, void *data, uint8_t size);
+uint8_t I2C_WriteBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t *data, uint8_t size);
 
 /*****************************************************************
   * @brief  read one byte frow i2c bus, but send 2 before: addr and reg
@@ -53,7 +53,7 @@ uint8_t I2C_ReadOneByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t
   * @param  *_i2c - pointer to i2c connection struct
   * @retval 0 - processing, 1 - complite
   */
-uint8_t I2C_ReadBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, void *data, uint8_t size);
+uint8_t I2C_ReadBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t *data, uint8_t size);
 
 #ifdef __cplusplus
 }

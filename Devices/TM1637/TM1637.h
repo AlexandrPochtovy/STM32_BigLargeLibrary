@@ -27,6 +27,7 @@ extern "C" {
 
 #include "stdint.h"
 #include "math.h"
+#include "main.h"
 
 /**********************************************************************
 *                       TYPEDEF & ENUM                                * 

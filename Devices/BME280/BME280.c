@@ -77,59 +77,6 @@ void parse_humidity_calib_data(BME280_t *dev, uint8_t *data) {
 	dev->calib_data.dig_h6 = (int8_t)data[6];
 }
 
-uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
-	uint8_t data[BME280_T_P_CALIB_DATA_LEN];
-		_i2c->addr = dev->addr;
-		switch (dev->step) {
-		case 0://setup humidity
-			dev->status = DEVICE_NOT_INIT;
-			if (I2C_WriteOneByte(_i2c, dev->addr, BME280_REG_CTRL_HUM, BME280_HUM_OVERSAMPLING_16X)) {
-				dev->step = 1;
-			}
-			break;
-		case 1://setup mode temp pressure
-			data[0] = BME280_NORMAL_MODE | BME280_PRESS_OVERSAMPLING_16X | BME280_TEMP_OVERSAMPLING_16X;
-			data[1] = BME280_SPI_3WIRE_MODE_OFF | BME280_FILTER_COEFF_16 | BME280_STANDBY_TIME_20_MS;
-			if (I2C_WriteBytes(_i2c, dev->addr, BME280_REG_CTRL_MEAS_PWR, data, 2)) {
-				dev->step = 2;
-			}
-			break;
-		case 2://read calib temp data
-			if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_T_P_CALIB_DATA, data, BME280_T_P_CALIB_DATA_LEN)) {
-				parse_temp_press_calib_data(dev, data);
-				dev->step = 3;
-			}
-			break;
-		case 3:  //read calib pressure data
-			if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_HUM_CALIB_DATA, data, BME280_HUM_CALIB_DATA_LEN)) {
-				parse_humidity_calib_data(dev, data);
-				dev->status = DEVICE_INIT;
-				dev->step = 0;
-			}
-			return 1;
-		default:
-			dev->step = 0;
-			break;
-		}
-	return 0;
-}
-
-uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
-	uint8_t data[BME280_DATA_LEN];
-	if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_DATA, data, BME280_DATA_LEN)) {
-		bme280_parse_sensor_data(dev, data);
-		dev->data_int.temperature = compensate_temperature_int(dev);/* Compensate the temperature data */
-		dev->data_int.pressure = compensate_pressure_int(dev);/* Compensate the pressure data */
-		dev->data_int.humidity = compensate_humidity_int(dev);/* Compensate the humidity data */
-		dev->data_float.temperature = compensate_temperature_float(dev);/* Compensate the temperature data */
-		dev->data_float.pressure = compensate_pressure_float(dev);/* Compensate the pressure data */
-		dev->data_float.humidity = compensate_humidity_float(dev);/* Compensate the humidity data */
-		dev->step = 0;
-		return 1;
-	}
-	return 0;
-}
-
 int32_t compensate_temperature_int(BME280_t *dev) {
 	int32_t var1;
 	int32_t var2;
@@ -316,3 +263,55 @@ float compensate_humidity_float(BME280_t *dev) {
 	return humidity;
 }
 
+
+uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
+	uint8_t data[BME280_T_P_CALIB_DATA_LEN];
+	switch (dev->step) {
+		case 0://setup humidity
+			dev->status = DEVICE_PROCESSING;
+			if (I2C_WriteOneByte(_i2c, dev->addr, BME280_REG_CTRL_HUM, BME280_HUM_OVERSAMPLING_16X)) {
+				dev->step = 1;
+			}
+			break;
+		case 1://setup mode temp pressure
+			data[0] = BME280_NORMAL_MODE | BME280_PRESS_OVERSAMPLING_16X | BME280_TEMP_OVERSAMPLING_16X;
+			data[1] = BME280_SPI_3WIRE_MODE_OFF | BME280_FILTER_COEFF_16 | BME280_STANDBY_TIME_20_MS;
+			if (I2C_WriteBytes(_i2c, dev->addr, BME280_REG_CTRL_MEAS_PWR, data, 2)) {
+				dev->step = 2;
+			}
+			break;
+		case 2://read calib temp data
+			if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_T_P_CALIB_DATA, data, BME280_T_P_CALIB_DATA_LEN)) {
+				parse_temp_press_calib_data(dev, data);
+				dev->step = 3;
+			}
+			break;
+		case 3:  //read calib pressure data
+			if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_HUM_CALIB_DATA, data, BME280_HUM_CALIB_DATA_LEN)) {
+				parse_humidity_calib_data(dev, data);
+				dev->status = DEVICE_READY;
+				dev->step = 0;
+				return 1;
+			}
+		default:
+			dev->step = 0;
+			break;
+		}
+	return 0;
+}
+
+uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
+	uint8_t data[BME280_DATA_LEN];
+	if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_DATA, data, BME280_DATA_LEN)) {
+		bme280_parse_sensor_data(dev, data);
+		dev->data_int.temperature = compensate_temperature_int(dev);/* Compensate the temperature data */
+		dev->data_int.pressure = compensate_pressure_int(dev);/* Compensate the pressure data */
+		dev->data_int.humidity = compensate_humidity_int(dev);/* Compensate the humidity data */
+		dev->data_float.temperature = compensate_temperature_float(dev);/* Compensate the temperature data */
+		dev->data_float.pressure = compensate_pressure_float(dev);/* Compensate the pressure data */
+		dev->data_float.humidity = compensate_humidity_float(dev);/* Compensate the humidity data */
+		dev->step = 0;
+		return 1;
+	}
+	return 0;
+}

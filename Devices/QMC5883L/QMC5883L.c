@@ -30,7 +30,7 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 }
 
 uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
-		dev->status = DEVICE_NOT_INIT;
+		dev->status = DEVICE_ON;
 	switch (dev->step) {
 			case 0: //set reset period don't give a fuck
 							//recommended magic number RTFM

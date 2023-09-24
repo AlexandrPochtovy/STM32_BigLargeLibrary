@@ -34,7 +34,7 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 
 //Init & setup	=============================================================================================
 uint8_t INA219_Init(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
-	dev->status = DEVICE_NOT_INIT;
+	dev->status = DEVICE_PROCESSING;
 	uint16_t cfg;
 	uint8_t data[INA219_REG_LEN];
 	switch (dev->step) {
@@ -67,11 +67,9 @@ uint8_t INA219_Init(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 }
 
 uint8_t INA219_GetData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
+	//TODO переделать нахер нормально по шагам
 		uint8_t dt[INA219_REG_LEN];
 		uint8_t reg;
-		_i2c->addr = dev->addr;
-		_i2c->len = INA219_REG_LEN;
-		_i2c->mode = I2C_MODE_READ;
 		switch (dev->step) {
 		case 0://select reg
 		case 1:

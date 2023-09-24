@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #include <stm32f4xx_ll_usart.h>
-#include "Peripherals/DataTypes.h"
+#include "F4xx_DataTypes.h"
 #include "Buffers/FIFObuffer/FIFObuffer.h"
 //#include "DMA_Template/DMA_Template.h"
 #ifdef DMA_H

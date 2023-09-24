@@ -24,11 +24,11 @@
 extern "C" {
 #endif
 
-#include "sdtint.h" 
+#include "stdint.h"
 #include "math.h"
 #include "ITG3205_Register.h"
 #include "I2C_API.h"
-
+//TODO DEVICE DO NOt ANSHWER IF RECONFIG OR RECONNECT
 /**********************************************************************
 *                       TYPEDEF & ENUM                                * 
 ***********************************************************************/
@@ -37,7 +37,8 @@ extern "C" {
 #endif
 
 enum ITG3205_ADDRESS {
-	ITG3205_ADDR = 0xD0
+	ITG3205_ADDR = 0xD0,
+	ITG3205_ADDR2 = 0xD2
 };
 
 typedef struct ITG3205_RAW_t {

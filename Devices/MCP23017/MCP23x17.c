@@ -24,7 +24,7 @@
 
 uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev) {
 	uint8_t data[MCP23017_CFG_LENGHT];
-	dev->status = DEVICE_NOT_INIT;
+	dev->status = DEVICE_ON;
 	data[0] = MCP23017_IODIR_ALL_OUTPUT;  //reg 0x00 IODIRA 	RW set all pins portA as output
 	data[1] = MCP23017_IODIR_ALL_OUTPUT;  //reg 0x01 IODIRB 	RW set all pins portB as input
 	data[2] = MCP23017_IPOL_ALL_NORMAL;  //reg 0x02 IPOLA 		RW set all pins portA normal polarity

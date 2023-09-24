@@ -24,6 +24,7 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
 #include "BME280_Registers.h"
 #include "I2C_API.h"
 

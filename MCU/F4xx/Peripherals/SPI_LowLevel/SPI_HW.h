@@ -26,16 +26,14 @@ extern "C" {
 #endif
 
 #include <stm32f4xx_ll_spi.h>
-#include "Peripherals/DataTypes.h"
+#include "F4xx_DataTypes.h"
 #include "Buffers/FIFObuffer/FIFObuffer.h"
 //#include "DMA_Template/DMA_Template.h"
 
 typedef enum SPI_Mode {
-	SPI_MODE_WRITE,		//half-duplex write only
-	SPI_MODE_READ,		//half-duplex read only
-	SPI_MODE_DUPLEX,	//full-duplex write and read both
-	SPI_HALFDUPLEX_READ,			//receive-only mode (3 wire)
-	SPI_HALFDUPLEX_WRITE				//transmit-only mode (3 wire)
+	SPI_FULLDUPLEX_RW,		//full-duplex write and read both
+	SPI_HALFDUPLEX_READ,	//receive-only mode (3 wire)
+	SPI_HALFDUPLEX_WRITE	//transmit-only mode (3 wire)
 } SPI_Mode_t;
 
 typedef struct SPI_Conn_TWO {

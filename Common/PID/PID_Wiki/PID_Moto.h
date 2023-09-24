@@ -69,10 +69,11 @@ void PID_MotoInit(float kp, float ki, float kd, float fc, uint32_t dT, PID_M_t *
     @param act - actual value, i.e. feedback
     @param min - minimum output value
     @param max - maximum output value
+    @param dT - time between pid calculation
     @param *pid - pointer for pidS_t pid structure
   * @retval control value from pid
   */
-int32_t PID_MotoCalc(float sp, float act, int32_t min, int32_t max, PID_M_t *pid);
+int32_t PID_MotoCalc(float sp, float act, int32_t min, int32_t max, uint32_t dT, PID_M_t *pid);
 
 /*****************************************************************
   * @brief init the PID controller: calculate coefficients and constants

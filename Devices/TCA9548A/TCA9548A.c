@@ -23,7 +23,7 @@
 #define TCA9548A_PORT 0x00
 
 uint8_t TCA9548A_Init(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev) {
-	dev->status = DEVICE_NOT_INIT;
+	dev->status = DEVICE_ON;
 	if (I2C_WriteOneByte(_i2c, dev->addr, TCA9548A_PORT, 0x00)) {
 		dev->status = DEVICE_INIT;
 		dev->step = 0;

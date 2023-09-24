@@ -26,8 +26,8 @@ extern "C" {
 
 #include <stdint.h>
 #include "stm32f1xx_ll_spi.h"
-#include "FIFObuffer/FIFObuffer.h"
-#include "DataTypes.h"
+#include "F1xx_DataTypes.h"
+#include "Buffers/FIFObuffer/FIFObuffer.h"
 
 typedef enum SPI_Mode {
 	SPI_FULLDUPLEX_RW,		//full-duplex write and read both

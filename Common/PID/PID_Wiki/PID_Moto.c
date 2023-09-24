@@ -18,11 +18,11 @@ void PID_MotoInit(float kp, float ki, float kd, float fc, uint32_t dT, PID_M_t *
 	pid->oldErrFilter = 0;
 }
 
-int32_t PID_MotoCalc(float sp, float act, int32_t min, int32_t max, PID_M_t *pid) {
+int32_t PID_MotoCalc(float sp, float act, int32_t min, int32_t max, uint32_t dT, PID_M_t *pid) {
 	float error = sp - act;// e[k] = r[k] - y[k], error between setpoint and true position
 	float errFilter = pid->alpha * error + (1 - pid->alpha) * pid->oldErrFilter;// e_f[k] = α e[k] + (1-α) e_f[k-1], filtered error
-	float derivative = (errFilter - pid->oldErrFilter) * 1000.0f / pid->dT;// e_d[k] = (e_f[k] - e_f[k-1]) / Tₛ, filtered derivative
-	float actInt = pid->intgErr + error * pid->dT / 1000.0f;// e_i[k+1] = e_i[k] + Tₛ e[k], integral
+	float derivative = (errFilter - pid->oldErrFilter) * 1000.0f / dT;// e_d[k] = (e_f[k] - e_f[k-1]) / Tₛ, filtered derivative
+	float actInt = pid->intgErr + error * dT / 1000.0f;// e_i[k+1] = e_i[k] + Tₛ e[k], integral
 	pid->out = pid->kp * error + pid->ki * pid->intgErr + pid->kd * derivative;// PID formula: u[k] = Kp e[k] + Ki e_i[k] + Kd e_d[k], control signal
     if (pid->out <= min) { 
 		pid->out = min; 

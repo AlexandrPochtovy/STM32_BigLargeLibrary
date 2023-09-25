@@ -20,7 +20,7 @@
 
 #include "INA219.h"
 
-#define INA219_REG_LEN = 2;
+#define INA219_REG_LEN 2
 static const uint32_t  INA219_MaxCurrentmA = 3200U;//maximum curent in mA
 static const uint32_t  INA219_ShuntResistance_mOmh = 100U;//shunt resistance in milliOmh
 

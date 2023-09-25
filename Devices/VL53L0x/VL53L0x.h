@@ -97,7 +97,7 @@ typedef struct __VL53L0X {
   * @param dev - pointer to sensor's main structure
   * @retval none
   */
-void setupVL53L0X(VL53L0x_t *lidar, uint16_t lim);
+void setupVL53L0X(VL53L0x_t *dev, uint16_t lim);
 
 /*****************************************************************
   * @brief write to sensor new I2C address and store it in main sensor's structure
@@ -108,14 +108,14 @@ void setupVL53L0X(VL53L0x_t *lidar, uint16_t lim);
   * @param new_addr - new I2C address
   * @retval 1 when complite
   */
-uint8_t setAddress(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, const uint8_t new_addr);
+uint8_t setAddress(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, const uint8_t new_addr);
 
 /*****************************************************************
   * @brief read sensor's I2C address from structure
   * @param dev - pointer to sensor's main structure
   * @retval actual i2c address
   */
-uint8_t getAddress( VL53L0x_t *lidar);
+uint8_t getAddress( VL53L0x_t *dev);
 
 /*****************************************************************
   * @brief read sensor's model ID and store it in main sensor's structure
@@ -124,7 +124,7 @@ uint8_t getAddress( VL53L0x_t *lidar);
   * @param dev - pointer to sensor's main structure
   * @retval 1 when complite
   */
-uint8_t getModelId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
+uint8_t getModelId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
 
 /*****************************************************************
   * @brief read sensor's revision ID and store it in main sensor's structure
@@ -133,7 +133,7 @@ uint8_t getModelId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
   * @param dev - pointer to sensor's main structure
   * @retval 1 when complite
   */
-uint8_t getRevisionId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
+uint8_t getRevisionId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
 
 /*****************************************************************
   * @brief set new timeout value to main sensor's structure
@@ -141,7 +141,7 @@ uint8_t getRevisionId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
   * @param timeout - new timeout value
   * @retval none
   */
-void setTimeout(VL53L0x_t *lidar, const uint16_t timeout);
+void setTimeout(VL53L0x_t *dev, const uint16_t timeout);
 
 /*****************************************************************
   * @brief get actual timeout value from main sensor's structure
@@ -149,21 +149,21 @@ void setTimeout(VL53L0x_t *lidar, const uint16_t timeout);
   * @param dev - pointer to sensor's main structure
   * @retval timeout value
   */
-uint16_t getTimeout(VL53L0x_t *lidar);
+uint16_t getTimeout(VL53L0x_t *dev);
 
 /*****************************************************************
   * @brief clear timeout's count and flags in main sensor's structure
   * @param dev - pointer to sensor's main structure
   * @retval timeout value
   */
-void startTimeout(VL53L0x_t *lidar);
+void startTimeout(VL53L0x_t *dev);
 
 /*****************************************************************
   * @brief Check if timeout is enabled (set to nonzero value) and has expired
   * @param dev - pointer to sensor's main structure
   * @retval timeout flag
   */
-uint8_t checkTimeoutExpired(VL53L0x_t *lidar);
+uint8_t checkTimeoutExpired(VL53L0x_t *dev);
 
 /**********************************************************************
 *                       INERNAL FUNCTION                              * 
@@ -190,7 +190,7 @@ uint8_t checkTimeoutExpired(VL53L0x_t *lidar);
   * @param limit_Mcps - time limit in Million capture per sesonds
   * @retval 1 when done
   */
-uint8_t setSignalRateLimit(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint32_t limit_Mcps);
+uint8_t setSignalRateLimit(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, uint32_t limit_Mcps);
 
 /*****************************************************************
  * @brief Get the return signal rate limit check value in MCPS
@@ -203,7 +203,7 @@ uint8_t setSignalRateLimit(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint32_t limi
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar);
+uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *dev);
 
 /*****************************************************************
  * @brief Get sequence step enables based on VL53L0X_GetSequenceStepEnables()
@@ -211,7 +211,7 @@ uint8_t getSpadInfo(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar);
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t getSequenceStepEnables(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar);
+uint8_t getSequenceStepEnables(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *dev);
 
 /*****************************************************************
  * @brief Get the VCSEL pulse period in PCLKs for the given period type based on VL53L0X_get_vcsel_pulse_period()
@@ -219,7 +219,7 @@ uint8_t getSequenceStepEnables(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar);
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t getVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar,vcselPeriodType type);
+uint8_t getVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *dev,vcselPeriodType type);
 
 /*****************************************************************
  * @brief Get sequence step timeouts based on get_sequence_step_timeout(),
@@ -228,7 +228,7 @@ uint8_t getVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar,vcselPeriodTyp
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t getSequenceStepTimeouts(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar);
+uint8_t getSequenceStepTimeouts(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *dev);
 
 /*****************************************************************
  * @brief Get the measurement timing budget in microseconds 
@@ -237,7 +237,7 @@ uint8_t getSequenceStepTimeouts(I2C_IRQ_Conn_t *_i2c,VL53L0x_t *lidar);
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t getMeasurementTimingBudget(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
+uint8_t getMeasurementTimingBudget(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
 
 /*****************************************************************
  * @brief Set the measurement timing budget in microseconds, which is the time allowed for one measurement;
@@ -249,7 +249,7 @@ uint8_t getMeasurementTimingBudget(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t setMeasurementTimingBudget(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint32_t budget_us);
+uint8_t setMeasurementTimingBudget(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, uint32_t budget_us);
 
 /*****************************************************************
  * @brief based on VL53L0X_perform_single_ref_calibration() interrupt enable need
@@ -257,7 +257,7 @@ uint8_t setMeasurementTimingBudget(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint3
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t performSingleRefCalibration(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint8_t vhv_init_byte);
+uint8_t performSingleRefCalibration(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, uint8_t vhv_init_byte);
 
 /*****************************************************************
  * @brief Set the VCSEL (vertical cavity surface emitting laser)
@@ -272,7 +272,7 @@ uint8_t performSingleRefCalibration(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint
  * @param period_pclks - period vcsel type
  * @retval 1 when done
  */
-uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, vcselPeriodType type, uint8_t period_pclks);
+uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, vcselPeriodType type, uint8_t period_pclks);
 
 /**********************************************************************
 *                       MEASURE FUNCTION                              * 
@@ -288,7 +288,7 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, vcselPeriodT
  * @param period_ms - measuring period in msec
  * @retval 1 when done
  */
-uint8_t startContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint32_t period_ms);
+uint8_t startContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, uint32_t period_ms);
 
 /*****************************************************************
  * @brief Stop continuous measurements based on VL53L0X_StopMeasurement()
@@ -296,7 +296,7 @@ uint8_t startContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar, uint32_t period_
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t stopContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
+uint8_t stopContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
 
 /*****************************************************************
  * @brief Returns a range reading in millimeters when continuous mode is active 
@@ -305,7 +305,7 @@ uint8_t stopContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t readRangeContinuousMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
+uint8_t readRangeContinuousMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
 
 /*****************************************************************
  * @brief Performs a single-shot range measurement and returns the reading in
@@ -314,7 +314,7 @@ uint8_t readRangeContinuousMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
+uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
 
 /*****************************************************************
  * @brief Initialize sensor using sequence based on VL53L0X_DataInit(), 
@@ -335,14 +335,14 @@ uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *lidar);
+uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
 
 /*****************************************************************
  * @brief calculate smooth value of range
  * @param dev - pointer to sensor's main structure
  * @retval range in mm
  */
-uint16_t getSmoothRange(VL53L0x_t *lidar);
+uint16_t getSmoothRange(VL53L0x_t *dev);
 
 #ifdef __cplusplus
 }

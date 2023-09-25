@@ -42,6 +42,7 @@ typedef struct MCP23_port {
 
 typedef struct MCP23 {
 		const enum MCP23017_ADDRESS addr;
+    uint8_t errCount;
 		DeviceStatus_t status;
 		MCP23_port_t data;
 } MCP23_t;

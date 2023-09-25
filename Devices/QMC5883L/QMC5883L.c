@@ -30,37 +30,78 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 }
 
 uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
-	dev->status = DEVICE_PROCESSING;
-	switch (dev->step) {
-			case 0: //set reset period don't give a fuck
-							//recommended magic number RTFM
-				if (I2C_WriteOneByte(_i2c, dev->addr, QMC5883L_REG_PERIOD, 0x01)) {
+	PortStatus_t st;
+	switch (dev->status) {
+		case DEVICE_FAULTH:
+			return 1;
+			break;
+		case DEVICE_READY:
+			if (_i2c->status == PORT_FREE) {
+				_i2c->status = PORT_BUSY;
+				dev->status = DEVICE_PROCESSING;
+				dev->step = 0;
+			}
+			break;
+		case DEVICE_PROCESSING:{
+			switch (dev->step) {
+
+			case 0: //set reset period don't give a fuck recommended magic number RTFM
+				st = I2C_WriteOneByte(_i2c, dev->addr, QMC5883L_REG_PERIOD, 0x01);
+				if (st == PORT_DONE) {
+					_i2c->status = PORT_BUSY;
 					dev->step = 1;
+				} else if (st == PORT_ERROR) {
+					dev->status = DEVICE_ERROR;
 				}
 				break;
 			case 1:{ //setup sensor gain and sample rate interrupt
 				uint8_t data[2];
-				data[0] = QMC5883L_MODE_CONTINUOUS | QMC5883L_ODR_50HZ |
-									QMC5883L_RNG_8G | QMC5883L_SAMPLES_512;
+				data[0] = QMC5883L_MODE_CONTINUOUS | QMC5883L_ODR_50HZ | QMC5883L_RNG_8G | QMC5883L_SAMPLES_512;
 				data[1] = 0x00;
-				if (I2C_WriteBytes(_i2c, dev->addr, QMC5883L_REG_CFG_A, data, 2)) {
-					dev->step = 0;
-					dev->status = DEVICE_READY;
-					return 1;
+				st = I2C_WriteBytes(_i2c, dev->addr, QMC5883L_REG_CFG_A, data, 2);
+				if (st == PORT_DONE) {
+					dev->status = DEVICE_DONE;
+				} else if (st == PORT_ERROR) {
+					dev->status = DEVICE_ERROR;
 				}
 				break;}
 			default:
-				dev->step = 0;
 				break;
-		}
+			}
+			break;}
+		case DEVICE_DONE:
+			_i2c->status = PORT_FREE;
+			dev->status = DEVICE_READY;
+			return 1;
+		case DEVICE_ERROR:
+			if (++dev->errCount < 10) {
+				dev->status = DEVICE_READY;
+			} else {
+				dev->status = DEVICE_FAULTH;
+			}
+			break;
+		default:
+			break;
+	}
 	return 0;
 }
 
 uint8_t QMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
-	dev->status = DEVICE_PROCESSING;
+	PortStatus_t st;
+	switch (dev->status) {
+	case DEVICE_FAULTH:
+		return 1;
+		break;
+	case DEVICE_READY:
+		if (_i2c->status == PORT_FREE) {
+			_i2c->status = PORT_BUSY;
+			dev->status = DEVICE_PROCESSING;
+			dev->step = 0;
+		}break;
+	case DEVICE_PROCESSING:{
 		uint8_t dt[QMC5883L_DATA_LEN];
-		if (I2C_ReadBytes(_i2c, dev->addr, QMC5883L_REG_OUT_X_L, dt, QMC5883L_DATA_LEN)) {
-				FIFO_GetMulti(_i2c->buffer, dt, QMC5883L_DATA_LEN);
+		st = I2C_ReadBytes(_i2c, dev->addr, QMC5883L_REG_OUT_X_L, dt, QMC5883L_DATA_LEN);
+		if (st == PORT_DONE) {
 				dev->raw.X = (int16_t)CONCAT_BYTES(dt[1], dt[0]);
 				dev->raw.Y = (int16_t)CONCAT_BYTES(dt[3], dt[2]);
 				dev->raw.Z = (int16_t)CONCAT_BYTES(dt[5], dt[4]);
@@ -68,7 +109,23 @@ uint8_t QMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
 				dev->data.Y = (float) dev->raw.Y / QMC5883L_LSB_8G;
 				dev->data.Z = (float) dev->raw.Z / QMC5883L_LSB_8G;
 				dev->status = DEVICE_DONE;
-				return 1;
+		} else if (st == PORT_ERROR) {
+			dev->status = DEVICE_ERROR;
 		}
-	return 0;
+		break;}
+	case DEVICE_DONE:
+		_i2c->status = PORT_FREE;
+		dev->status = DEVICE_READY;
+		return 1;
+	case DEVICE_ERROR:
+		if (++dev->errCount < 10) {
+			dev->status = DEVICE_READY;
+		} else {
+			dev->status = DEVICE_FAULTH;
+		}
+		break;
+	default:
+		break;
+}
+return 0;
 }

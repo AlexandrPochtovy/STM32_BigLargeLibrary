@@ -52,6 +52,7 @@ typedef struct ADXL345_data {
 typedef struct ADXL345 {
 	const enum ADXL345_ADDRESS addr;
 	DeviceStatus_t status;
+	uint8_t errCount;
 	uint8_t step;
 	ADXL345_RAW_t raw;
 	ADXL345_data_t data;

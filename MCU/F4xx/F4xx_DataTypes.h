@@ -39,8 +39,7 @@ typedef enum PortStatus {
  * used to display the status of the process of working with the device for the main code
  */
 typedef enum DeviceStatus {
-	DEVICE_ON,		      //device is power on, default setting
-  DEVICE_READY,       //the device initialization was successful
+  DEVICE_READY,       //the device power on or initialization was successful
   DEVICE_PROCESSING,  //data exchange in progress
 	DEVICE_DONE,	      //data exchange completed successfully
 	DEVICE_ERROR,	      //communication error: bad data, port/bus problem, etc, increment error count

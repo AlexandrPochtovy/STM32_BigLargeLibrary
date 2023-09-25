@@ -24,8 +24,6 @@
  * после того как передали в кольцевой буфер все необходимые данные
  */
 void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c) {
-	_i2c->status = PORT_BUSY;
-	_i2c->buffer->lockState = BUFFER_BLOCKED;
 	_i2c->i2c->CR2 |= I2C_CR2_ITBUFEN;//Enable TXE RxNE iterrupt for >1 byte
 	if (_i2c->len > 1) {
 		LL_I2C_AcknowledgeNextData(_i2c->i2c, LL_I2C_ACK); 	// Ack enable if more one bytes read
@@ -37,7 +35,6 @@ void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c) {
 }
 /*запускает обмен по I2C с использованием DMA, не дописано*/
 void I2C_Start_DMA(I2C_DMA_Conn_t *_i2c) {
-	_i2c->status = PORT_BUSY;
 	LL_I2C_DisableDMAReq_TX(_i2c->i2c);
 	LL_I2C_DisableIT_BUF(_i2c->i2c);//отключаем прерывания чтобы работало DMA
 	if (_i2c->len > 1) {
@@ -52,7 +49,6 @@ void I2C_Start_DMA(I2C_DMA_Conn_t *_i2c) {
  * после окончания обработки присваивает соединению статус "свободно"
  * при ошибках будет выполняться обработчик ошибок*/
 void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
-	//_i2c->status = PORT_BUSY;
 	volatile uint16_t I2C_SR1 = _i2c->i2c->SR1;//LL_I2C_ReadReg(_i2c->i2c, SR1);//Read SR1 first
 	//EV5 Start condition generated. Clear: read SR1 and write slave addr to DR final
 	if (I2C_SR1 & I2C_SR1_SB) {//start signal send device address
@@ -209,6 +205,5 @@ void I2C_ERR_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 		LL_I2C_Enable(I2C1);
 		}
 	LL_I2C_GenerateStopCondition(_i2c->i2c);
-	_i2c->status = PORT_FREE;
 }
 //=============================================================================

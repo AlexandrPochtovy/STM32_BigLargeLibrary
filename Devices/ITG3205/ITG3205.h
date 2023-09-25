@@ -58,6 +58,7 @@ typedef struct ITG3205_data_t {
 typedef struct ITG3205 {
 	const enum ITG3205_ADDRESS addr;
 	DeviceStatus_t status;
+  uint8_t errCount;
 	uint8_t step;
 	ITG3205_RAW raw;
 	ITG3205_data data;

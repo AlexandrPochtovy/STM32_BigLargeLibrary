@@ -38,7 +38,7 @@ typedef enum I2C_Mode {
 
 typedef struct I2C_IRQ_Conn {
 	I2C_TypeDef *i2c;	//pointer to HW i2c bus
-	PortStatus_t status;//status I2C bus
+	volatile PortStatus_t status;//status I2C bus
 	uint8_t addr;		//device I2C address
 	uint8_t len;		//length data
 	I2C_Mode_t mode;	//device mode

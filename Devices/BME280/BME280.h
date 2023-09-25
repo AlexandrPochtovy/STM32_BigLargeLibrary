@@ -98,6 +98,7 @@ typedef struct bme280_dataFloat {
 typedef struct bme280_dev {
 		const enum BME280_ADDRESS addr;
 		DeviceStatus_t status;
+		uint8_t errCount;
 		uint8_t step;
 		bme280_calib_data_t calib_data;
 		bme280_uncomp_data_t uncomp_data;

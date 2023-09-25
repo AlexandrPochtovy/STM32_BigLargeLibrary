@@ -29,63 +29,132 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 }
 
 uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
-	dev->status = DEVICE_PROCESSING;
-	switch (dev->step) {
-	case 0: {//read who i am register check connection
-		uint8_t ID = 0;
-		if (I2C_ReadOneByte(_i2c, dev->addr, ITG3205_WHOAMI, &ID)) {
-			if (((ID & 0xFE) << 1) == ITG3205_ADDR) {
-				dev->step = 1;
-			} else {
+	PortStatus_t st;
+		switch (dev->status) {
+		case DEVICE_FAULTH:
+			return 1;
+			break;
+		case DEVICE_READY:
+			if (_i2c->status == PORT_FREE) {
+				_i2c->status = PORT_BUSY;
+				dev->status = DEVICE_PROCESSING;
 				dev->step = 0;
-				dev->status = DEVICE_FAULTH;
-				return 1;
-			}
-		}
-		break;}
-		case 1: //setup clock
-			if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_PWR_MGM, ITG3205_PWR_CLOCK_INTERNAL)) {
-				dev->step = 2;
 			}
 			break;
-		case 2: //setup sample rate
-			if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_SMPLRT_DIV, 0x07)) {
-				dev->step = 3;
+		case DEVICE_PROCESSING:{
+			switch (dev->step) {
+			case 0: {//read who i am register check connection
+				uint8_t ID = 0;
+				st = I2C_ReadOneByte(_i2c, dev->addr, ITG3205_WHOAMI, &ID);
+				if (st == PORT_DONE) {
+					if (((ID & 0xFE) << 1) == ITG3205_ADDR) {
+						_i2c->status = PORT_BUSY;
+						dev->step = 1;
+					} else {
+						dev->status = DEVICE_ERROR;
+					}
+				} else if (st == PORT_ERROR) {
+					dev->status = DEVICE_ERROR;
+				}
+				break;}
+			case 1: //setup clock
+				st = I2C_WriteOneByte(_i2c, dev->addr, ITG3205_PWR_MGM, ITG3205_PWR_CLOCK_INTERNAL);
+				if (st == PORT_DONE) {
+					_i2c->status = PORT_BUSY;
+					dev->step = 2;
+				} else if (st == PORT_ERROR) {
+					dev->status = DEVICE_ERROR;
+				}
+				break;
+			case 2: //setup sample rate
+				st = I2C_WriteOneByte(_i2c, dev->addr, ITG3205_SMPLRT_DIV, 0x07);
+				if (st == PORT_DONE) {
+					_i2c->status = PORT_BUSY;
+					dev->step = 3;
+				} else if (st == PORT_ERROR) {
+					dev->status = DEVICE_ERROR;
+				}
+				break;
+			case 3: //setup low-pass filter
+				st = I2C_WriteOneByte(_i2c, dev->addr, ITG3205_DLPF_FS, ITG3205_DLPF_FS_SEL | ITG3205_DLPF_CFG_5Hz);
+				if (st == PORT_DONE) {
+					_i2c->status = PORT_BUSY;
+					dev->step = 4;
+				} else if (st == PORT_ERROR) {
+					dev->status = DEVICE_ERROR;
+				}
+				break;
+			case 4:
+				st = I2C_WriteOneByte(_i2c, dev->addr, ITG3205_INT_CFG, 0x00);
+				if (st == PORT_DONE) {
+					dev->status = DEVICE_DONE;
+				} else if (st == PORT_ERROR) {
+					dev->status = DEVICE_ERROR;
+				}
+				break;
+			default:
+				break;
 			}
-			break;
-		case 3: //setup low-pass filter
-			if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_DLPF_FS, ITG3205_DLPF_FS_SEL | ITG3205_DLPF_CFG_5Hz)) {
-				dev->step = 4;
-			}
-			break;
-		case 4:
-			if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_INT_CFG, 0x00)) {
+			break;}
+		case DEVICE_DONE:
+			_i2c->status = PORT_FREE;
+			dev->status = DEVICE_READY;
+			return 1;
+		case DEVICE_ERROR:
+			if (++dev->errCount < 10) {
 				dev->status = DEVICE_READY;
-				dev->step = 0;
-				return 1;
+			} else {
+				dev->status = DEVICE_FAULTH;
 			}
 			break;
 		default:
-			dev->step = 0;
 			break;
-		}
+	}
 	return 0;
 }
 
 uint8_t ITG3205_GetData(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
-	dev->status = DEVICE_PROCESSING;
-	uint8_t dt[ITG3205_DATA_LEN];
-	if (I2C_ReadBytes(_i2c, dev->addr, ITG3205_TEMP_OUT_H, dt, ITG3205_DATA_LEN)) {
-		dev->raw.temp = (int16_t)CONCAT_BYTES(dt[0], dt[1]);
-		dev->raw.X = (int16_t)CONCAT_BYTES(dt[2], dt[3]);
-		dev->raw.Y = (int16_t)CONCAT_BYTES(dt[4], dt[5]);
-		dev->raw.Z = (int16_t)CONCAT_BYTES(dt[6], dt[7]);
-		dev->data.temp = 35 + ((float) (dev->raw.temp + 13200)) / Chip_TEMP_LSB;
-		dev->data.X = (float) dev->raw.X / Chip_GYRO_LSB * M_PI / 180;
-		dev->data.Y = (float) dev->raw.Y / Chip_GYRO_LSB * M_PI / 180;
-		dev->data.Z = (float) dev->raw.Z / Chip_GYRO_LSB * M_PI / 180;
-		dev->status = DEVICE_DONE;
-		return 1;
+	PortStatus_t st;
+		switch (dev->status) {
+		case DEVICE_FAULTH:
+			return 1;
+			break;
+		case DEVICE_READY:
+			if (_i2c->status == PORT_FREE) {
+				_i2c->status = PORT_BUSY;
+				dev->status = DEVICE_PROCESSING;
+				dev->step = 0;
+			}break;
+		case DEVICE_PROCESSING:{
+			uint8_t dt[ITG3205_DATA_LEN];
+			st = I2C_ReadBytes(_i2c, dev->addr, ITG3205_TEMP_OUT_H, dt, ITG3205_DATA_LEN);
+			if (st == PORT_DONE) {
+				dev->raw.temp = (int16_t)CONCAT_BYTES(dt[0], dt[1]);
+				dev->raw.X = (int16_t)CONCAT_BYTES(dt[2], dt[3]);
+				dev->raw.Y = (int16_t)CONCAT_BYTES(dt[4], dt[5]);
+				dev->raw.Z = (int16_t)CONCAT_BYTES(dt[6], dt[7]);
+				dev->data.temp = 35 + ((float) (dev->raw.temp + 13200)) / Chip_TEMP_LSB;
+				dev->data.X = (float) dev->raw.X / Chip_GYRO_LSB * M_PI / 180;
+				dev->data.Y = (float) dev->raw.Y / Chip_GYRO_LSB * M_PI / 180;
+				dev->data.Z = (float) dev->raw.Z / Chip_GYRO_LSB * M_PI / 180;
+				dev->status = DEVICE_DONE;
+			} else if (st == PORT_ERROR) {
+				dev->status = DEVICE_ERROR;
+			}
+			break;}
+		case DEVICE_DONE:
+			_i2c->status = PORT_FREE;
+			dev->status = DEVICE_READY;
+			return 1;
+		case DEVICE_ERROR:
+			if (++dev->errCount < 10) {
+				dev->status = DEVICE_READY;
+			} else {
+				dev->status = DEVICE_FAULTH;
+			}
+			break;
+		default:
+			break;
 	}
 	return 0;
 }

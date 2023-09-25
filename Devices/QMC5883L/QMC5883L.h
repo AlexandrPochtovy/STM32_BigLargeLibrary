@@ -49,6 +49,7 @@ typedef struct QMC5883L_data_t {
 typedef struct QMC5883L {
 	const enum QMC5883L_ADDRESS addr;
 	DeviceStatus_t status;
+  uint8_t errCount;
 	uint8_t step;
 	QMC5883L_raw_data raw;
 	QMC5883L_data data;

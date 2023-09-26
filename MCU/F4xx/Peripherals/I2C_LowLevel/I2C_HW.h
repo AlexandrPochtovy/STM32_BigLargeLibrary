@@ -91,6 +91,7 @@ void ClearBusyI2C1(void);
   * @retval none
   */
 void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c);
+void I2C_Alt_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c);
 
 /*****************************************************************
   * @brief interrupt and DMA i2c callback routine: send address in interrupt

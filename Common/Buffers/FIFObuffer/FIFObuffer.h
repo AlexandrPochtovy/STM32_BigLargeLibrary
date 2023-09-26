@@ -41,7 +41,7 @@ typedef struct fifo
   size_t head;
   size_t tail;
   size_t bytes_avail;
-  volatile BufferStatus_t lockState;
+  BufferStatus_t lockState;
 } fifo_t;
 
 /*****************************************************************

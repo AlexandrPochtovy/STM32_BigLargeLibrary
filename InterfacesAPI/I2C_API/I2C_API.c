@@ -21,8 +21,8 @@
 #include "I2C_API.h"
 
 PortStatus_t I2C_WriteOneByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t value) {
-	if ((_i2c->status == PORT_BUSY) && (_i2c->buffer->lockState == BUFFER_FREE)) {
-		_i2c->buffer->lockState = BUFFER_BLOCKED;
+	if ((_i2c->status == PORT_FREE) && (_i2c->buffer->lockState == BUFFER_FREE)) {
+		_i2c->status = PORT_BUSY;
 		_i2c->addr = addr;
 		FIFO_PutOne(_i2c->buffer, reg);
 		FIFO_PutOne(_i2c->buffer, value);
@@ -30,8 +30,8 @@ PortStatus_t I2C_WriteOneByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, u
 		_i2c->mode = I2C_MODE_WRITE;
 		I2C_Start_IRQ(_i2c);
 	}
-	else if ((_i2c->status == PORT_DONE) && (_i2c->buffer->lockState == BUFFER_BLOCKED)) {
-		_i2c->buffer->lockState = BUFFER_FREE;
+	else if ((_i2c->status == PORT_BUSY) && (_i2c->buffer->lockState == BUFFER_FREE)) {
+		_i2c->status = PORT_DONE;
 	}
 	else if (_i2c->status == PORT_ERROR) {
 		FIFO_Init(_i2c->buffer);
@@ -40,8 +40,8 @@ PortStatus_t I2C_WriteOneByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, u
 }
 
 PortStatus_t I2C_WriteBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t *data, uint8_t size) {
-	if ((_i2c->status == PORT_BUSY) && (_i2c->buffer->lockState == BUFFER_FREE)) {
-		_i2c->buffer->lockState = BUFFER_BLOCKED;
+	if ((_i2c->status == PORT_FREE) && (_i2c->buffer->lockState == BUFFER_FREE)) {
+		_i2c->status = PORT_BUSY;
 		_i2c->addr = addr;
 		FIFO_PutOne(_i2c->buffer, reg);
 		FIFO_PutMulti(_i2c->buffer, data, size);
@@ -49,8 +49,8 @@ PortStatus_t I2C_WriteBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uin
 		_i2c->mode = I2C_MODE_WRITE;
 		I2C_Start_IRQ(_i2c);
 	}
-	else if ((_i2c->status == PORT_DONE) && (_i2c->buffer->lockState == BUFFER_BLOCKED)) {
-		_i2c->buffer->lockState = BUFFER_FREE;
+	else if ((_i2c->status == PORT_BUSY) && (_i2c->buffer->lockState == BUFFER_FREE)) {
+		_i2c->status = PORT_DONE;
 	}
 	else if (_i2c->status == PORT_ERROR) {
 		FIFO_Init(_i2c->buffer);
@@ -59,17 +59,17 @@ PortStatus_t I2C_WriteBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uin
 }
 
 PortStatus_t I2C_ReadOneByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t *value) {
-	if ((_i2c->status == PORT_BUSY) && (_i2c->buffer->lockState == BUFFER_FREE)) {
-		_i2c->buffer->lockState = BUFFER_BLOCKED;
+	if ((_i2c->status == PORT_FREE) && (_i2c->buffer->lockState == BUFFER_FREE)) {
+		_i2c->status = PORT_BUSY;
 		_i2c->addr = addr;
 		FIFO_PutOne(_i2c->buffer, reg);
 		_i2c->len = 1;
 		_i2c->mode = I2C_MODE_READ;
 		I2C_Start_IRQ(_i2c);
 	}
-	else if ((_i2c->status == PORT_DONE) && (_i2c->buffer->lockState == BUFFER_BLOCKED)) {
+	else if ((_i2c->status == PORT_BUSY) && (_i2c->buffer->lockState == BUFFER_FREE)) {
 		FIFO_GetOne(_i2c->buffer, value);
-		_i2c->buffer->lockState = BUFFER_FREE;
+		_i2c->status = PORT_DONE;
 	}
 	else if (_i2c->status == PORT_ERROR) {
 		FIFO_Init(_i2c->buffer);
@@ -78,17 +78,17 @@ PortStatus_t I2C_ReadOneByte(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, ui
 }
 
 PortStatus_t I2C_ReadBytes(I2C_IRQ_Conn_t *_i2c, uint8_t addr, uint8_t reg, uint8_t *data, uint8_t size) {
-	if ((_i2c->status == PORT_BUSY) && (_i2c->buffer->lockState == BUFFER_FREE)) {
-		_i2c->buffer->lockState = BUFFER_BLOCKED;
+	if ((_i2c->status == PORT_FREE) && (_i2c->buffer->lockState == BUFFER_FREE)) {
+		_i2c->status = PORT_BUSY;
 		_i2c->addr = addr;
 		FIFO_PutOne(_i2c->buffer, reg);
 		_i2c->len = size;
 		_i2c->mode = I2C_MODE_READ;
 		I2C_Start_IRQ(_i2c);
 	}
-	else if ((_i2c->status == PORT_DONE) && (_i2c->buffer->lockState == BUFFER_BLOCKED)) {
+	else if ((_i2c->status == PORT_BUSY) && (_i2c->buffer->lockState == BUFFER_FREE)) {
 		FIFO_GetMulti(_i2c->buffer, data, size);
-		_i2c->buffer->lockState = BUFFER_FREE;
+		_i2c->status = PORT_DONE;
 	}
 	else if (_i2c->status == PORT_ERROR) {
 		FIFO_Init(_i2c->buffer);

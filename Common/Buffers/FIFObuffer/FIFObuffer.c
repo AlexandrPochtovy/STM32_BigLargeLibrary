@@ -43,7 +43,7 @@ void FIFO_Init(fifo_t *q)
     q->head = 0;
     q->tail = 0;
     q->bytes_avail = 0;
-    q->lockState = BUFFER_FREE;
+    q->status = BUFFER_FREE;
 }
 
 uint8_t FIFO_PutOne(fifo_t *q, uint8_t data)

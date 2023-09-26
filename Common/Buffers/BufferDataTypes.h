@@ -26,8 +26,7 @@
 ************************************************************************************/
 typedef enum BufferStatus {
 	BUFFER_FREE,
-	BUFFER_BUSY,
-	BUFFER_DONE
+	BUFFER_BUSY
 } BufferStatus_t;
 
 #endif /* _BUFFER_DATATYPES_H_ */

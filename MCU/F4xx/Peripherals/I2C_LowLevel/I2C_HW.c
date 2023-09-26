@@ -22,7 +22,6 @@
 #include "I2C_HW.h"
 
 void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c) {
-	_i2c->buffer->lockState = BUFFER_BUSY;
 	if (_i2c->len) {
 		_i2c->i2c->CR2 |= I2C_CR2_ITBUFEN;//Enable TXE RxNE iterrupt for >=1 byte
 		if ((_i2c->len > 1) && (_i2c->mode == I2C_MODE_READ)) {
@@ -50,6 +49,7 @@ void I2C_Start_DMA(I2C_DMA_Conn_t *_i2c) {
 }
 
 void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
+	_i2c->buffer->status = BUFFER_BUSY;
 	volatile uint16_t I2C_SR1 = _i2c->i2c->SR1;		//Read SR1 first
 //EV5 Start condition generated. Clear: read SR1 and write slave addr to DR
 	if (I2C_SR1 & I2C_SR1_SB) {
@@ -121,6 +121,7 @@ void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 
 
 void I2C_Alt_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
+	_i2c->buffer->status = BUFFER_BUSY;
 	volatile uint16_t I2C_SR1 = _i2c->i2c->SR1;		//Read SR1 first
 //EV5 Start condition generated. Clear: read SR1 and write slave addr to DR
 	if (I2C_SR1 & I2C_SR1_SB) {
@@ -141,7 +142,7 @@ void I2C_Alt_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 				LL_I2C_GenerateStopCondition(_i2c->i2c);//stop before last byte read
 				FIFO_PutOne(_i2c->buffer, ((uint8_t)_i2c->i2c->DR));//read last byte from data reg
 				--_i2c->len;
-				_i2c->buffer->lockState = BUFFER_FREE;//set bus free status
+				_i2c->status = PORT_DONE;//set bus free status
 			}
 			else if (_i2c->len == 2) {
 				LL_I2C_AcknowledgeNextData(_i2c->i2c, LL_I2C_NACK);//Ack disable if only one byte read
@@ -157,9 +158,9 @@ void I2C_Alt_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 	if ((I2C_SR1 & I2C_SR1_BTF) && (_i2c->len == 0)) {
 		if (_i2c->mode == I2C_MODE_WRITE) {
 			LL_I2C_GenerateStopCondition(_i2c->i2c);			//use errata & AN2824
-				_i2c->buffer->lockState = BUFFER_FREE;//set bus free status
+			_i2c->status = PORT_DONE;//set bus free status
 		} else if (_i2c->mode == I2C_MODE_RW) {
-			_i2c->buffer->lockState = BUFFER_FREE;//set bus free status
+			_i2c->status = PORT_DONE;//set bus free status
 		}
 	}
 
@@ -170,7 +171,7 @@ void I2C_Alt_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 			if (_i2c->len == 0) {
 				if (I2C_SR1 & I2C_SR1_BTF) {
 					LL_I2C_GenerateStopCondition(_i2c->i2c);			//use errata & AN2824
-					_i2c->buffer->lockState = BUFFER_FREE;//set bus free status
+					_i2c->status = PORT_DONE;//set bus free status
 				}
 			} else {
 				--_i2c->len;

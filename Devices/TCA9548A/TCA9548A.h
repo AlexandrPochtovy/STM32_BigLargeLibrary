@@ -44,6 +44,8 @@ enum TCA9548A_channel {
 typedef struct TCA9548A {
 	enum TCA9548A_ADDRESS addr;
 	DeviceStatus_t status;
+	const uint8_t errLimit;
+	uint8_t errCount;
 	uint8_t step;
 	uint8_t port;
 } TCA9548A_t;

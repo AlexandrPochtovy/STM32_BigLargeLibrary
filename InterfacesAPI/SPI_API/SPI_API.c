@@ -28,7 +28,7 @@ uint8_t SPI_WriteReadOneByte(SPI_Conn_TWO_t *_spi, uint8_t tx, uint8_t *rx) {
 		_spi->txlen = 1;
         _spi->rxlen = 1;
 		_spi->mode = SPI_FULLDUPLEX_RW;
-		SPI_Start_IRQ_HWNSS(_spi);
+		SPI_Start_IRQ_TWO_HWNSS(_spi);
 		return 0;
 		break;
 	case PORT_DONE:
@@ -60,7 +60,7 @@ uint8_t SPI_WriteReadBytes(SPI_Conn_TWO_t *_spi, uint8_t *tx, uint8_t txLen, uin
 		_spi->txlen = txLen;
         _spi->rxlen = rxLen;
 		_spi->mode = SPI_FULLDUPLEX_RW;
-		SPI_Start_IRQ_HWNSS(_spi);
+		SPI_Start_IRQ_TWO_HWNSS(_spi);
 		return 0;
 		break;
 	case PORT_DONE:

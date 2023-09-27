@@ -1,18 +1,18 @@
 /*********************************************************************************
-  Original author:  Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
-                    https://github.com/AlexandrPochtovy
+	Original author:  Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+										https://github.com/AlexandrPochtovy
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+			http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
 
  * 	MCP23_17.c
  *  Created on: 12 jan 2021
@@ -22,19 +22,18 @@
 
 #define MCP23017_CFG_LENGHT 14
 
-uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev) {
+uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *bus, MCP23_t *dev) {
 	PortStatus_t st;
 	switch (dev->status) {
 		case DEVICE_FAULTH:
 			return 1;
-			break;
 		case DEVICE_READY:
-			if (_i2c->status == PORT_FREE) {
-				_i2c->status = PORT_BUSY;
+			if (bus->status == PORT_FREE) {
+				bus->status = PORT_BUSY;
 				dev->status = DEVICE_PROCESSING;
-			}
+				}
 			break;
-		case DEVICE_PROCESSING:{
+		case DEVICE_PROCESSING: {
 			uint8_t data[MCP23017_CFG_LENGHT];
 			data[0] = MCP23017_IODIR_ALL_OUTPUT;  //reg 0x00 IODIRA 	RW set all pins portA as output
 			data[1] = MCP23017_IODIR_ALL_OUTPUT;  //reg 0x01 IODIRB 	RW set all pins portB as input
@@ -50,174 +49,156 @@ uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev) {
 			data[11] = 0x00;  //reg 0x0B IOCONB		RW setup byte
 			data[12] = 0x00;  //reg 0x0C GPPUA		RW setup pull-up port A pins disabled for output
 			data[13] = 0x00;  //reg 0x0D GPPUB		RW setup pull-up port B pins enabled for input
-			st = I2C_WriteBytes(_i2c, dev->addr, MCP23017_IODIRA, data, MCP23017_CFG_LENGHT);
+			st = I2C_WriteBytes(bus, dev->addr, MCP23017_IODIRA, data, MCP23017_CFG_LENGHT);
 			if (st == PORT_DONE) {
 				dev->status = DEVICE_DONE;
-			} else if (st == PORT_ERROR) {
+				}
+			else if (st == PORT_ERROR) {
 				dev->status = DEVICE_ERROR;
+				}
+			break;
 			}
-			break;}
 		case DEVICE_DONE:
-			_i2c->status = PORT_FREE;
+			bus->status = PORT_FREE;
 			dev->status = DEVICE_READY;
 			return 1;
 		case DEVICE_ERROR:
-			if (++dev->errCount < 10) {
-				dev->status = DEVICE_READY;
-			} else {
-				dev->status = DEVICE_FAULTH;
-			}
+			dev->status = ++dev->errCount < dev->errLimit ? DEVICE_READY : DEVICE_FAULTH;
 			break;
 		default:
 			break;
-	}
+		}
 	return 0;
-}
+	}
 
-uint8_t MCP23_17_ReadPort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t *value) {
+uint8_t MCP23_17_ReadPort(I2C_IRQ_Conn_t *bus, MCP23_t *dev, uint8_t port, uint8_t *value) {
 	PortStatus_t st;
 	switch (dev->status) {
 		case DEVICE_FAULTH:
 			return 1;
-			break;
 		case DEVICE_READY:
-			if (_i2c->status == PORT_FREE) {
-				_i2c->status = PORT_BUSY;
+			if (bus->status == PORT_FREE) {
+				bus->status = PORT_BUSY;
 				dev->status = DEVICE_PROCESSING;
-			}
+				}
 			break;
 		case DEVICE_PROCESSING:
-			st = I2C_ReadOneByte(_i2c, dev->addr, port, value);
+			st = I2C_ReadOneByte(bus, dev->addr, port, value);
 			if (st == PORT_DONE) {
 				dev->status = DEVICE_DONE;
-			} else if (st == PORT_ERROR) {
+				}
+			else if (st == PORT_ERROR) {
 				dev->status = DEVICE_ERROR;
-			}
+				}
 			break;
 		case DEVICE_DONE:
-			_i2c->status = PORT_FREE;
+			bus->status = PORT_FREE;
 			dev->status = DEVICE_READY;
 			return 1;
 		case DEVICE_ERROR:
-			if (++dev->errCount < 10) {
-				dev->status = DEVICE_READY;
-			} else {
-				dev->status = DEVICE_FAULTH;
-			}
+			dev->status = ++dev->errCount < dev->errLimit ? DEVICE_READY : DEVICE_FAULTH;
 			break;
 		default:
 			break;
-	}
+		}
 	return 0;
-}
+	}
 
-uint8_t MCP23_17_WritePort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint8_t value) {
+uint8_t MCP23_17_WritePort(I2C_IRQ_Conn_t *bus, MCP23_t *dev, uint8_t port, uint8_t value) {
 	PortStatus_t st;
 	switch (dev->status) {
 		case DEVICE_FAULTH:
 			return 1;
-			break;
 		case DEVICE_READY:
-			if (_i2c->status == PORT_FREE) {
-				_i2c->status = PORT_BUSY;
+			if (bus->status == PORT_FREE) {
+				bus->status = PORT_BUSY;
 				dev->status = DEVICE_PROCESSING;
-			}
+				}
 			break;
 		case DEVICE_PROCESSING:
-			st = I2C_WriteOneByte(_i2c, dev->addr, port, value);
+			st = I2C_WriteOneByte(bus, dev->addr, port, value);
 			if (st == PORT_DONE) {
 				dev->status = DEVICE_DONE;
-			} else if (st == PORT_ERROR) {
+				}
+			else if (st == PORT_ERROR) {
 				dev->status = DEVICE_ERROR;
-			}
+				}
 			break;
 		case DEVICE_DONE:
-			_i2c->status = PORT_FREE;
+			bus->status = PORT_FREE;
 			dev->status = DEVICE_READY;
 			return 1;
 		case DEVICE_ERROR:
-			if (++dev->errCount < 10) {
-				dev->status = DEVICE_READY;
-			} else {
-				dev->status = DEVICE_FAULTH;
-			}
+			dev->status = ++dev->errCount < dev->errLimit ? DEVICE_READY : DEVICE_FAULTH;
 			break;
 		default:
 			break;
-	}
+		}
 	return 0;
-}
+	}
 
-uint8_t MCP23_17_ReadAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value) {
+uint8_t MCP23_17_ReadAB(I2C_IRQ_Conn_t *bus, MCP23_t *dev, uint8_t *value) {
 	PortStatus_t st;
 	switch (dev->status) {
 		case DEVICE_FAULTH:
 			return 1;
-			break;
 		case DEVICE_READY:
-			if (_i2c->status == PORT_FREE) {
-				_i2c->status = PORT_BUSY;
+			if (bus->status == PORT_FREE) {
+				bus->status = PORT_BUSY;
 				dev->status = DEVICE_PROCESSING;
-			}
+				}
 			break;
 		case DEVICE_PROCESSING:
-			st = I2C_ReadBytes(_i2c, dev->addr, MCP23017_GPIOA, value, 2);
+			st = I2C_ReadBytes(bus, dev->addr, MCP23017_GPIOA, value, 2);
 			if (st == PORT_DONE) {
 				dev->status = DEVICE_DONE;
-			} else if (st == PORT_ERROR) {
+				}
+			else if (st == PORT_ERROR) {
 				dev->status = DEVICE_ERROR;
-			}
+				}
 			break;
 		case DEVICE_DONE:
-			_i2c->status = PORT_FREE;
+			bus->status = PORT_FREE;
 			dev->status = DEVICE_READY;
 			return 1;
 		case DEVICE_ERROR:
-			if (++dev->errCount < 10) {
-				dev->status = DEVICE_READY;
-			} else {
-				dev->status = DEVICE_FAULTH;
-			}
+			dev->status = ++dev->errCount < dev->errLimit ? DEVICE_READY : DEVICE_FAULTH;
 			break;
 		default:
 			break;
-	}
+		}
 	return 0;
-}
+	}
 
-uint8_t MCP23_17_WriteAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value) {
+uint8_t MCP23_17_WriteAB(I2C_IRQ_Conn_t *bus, MCP23_t *dev, uint8_t *value) {
 	PortStatus_t st;
 	switch (dev->status) {
 		case DEVICE_FAULTH:
 			return 1;
-			break;
 		case DEVICE_READY:
-			if (_i2c->status == PORT_FREE) {
-				_i2c->status = PORT_BUSY;
+			if (bus->status == PORT_FREE) {
+				bus->status = PORT_BUSY;
 				dev->status = DEVICE_PROCESSING;
-			}
+				}
 			break;
 		case DEVICE_PROCESSING:
-			st = I2C_WriteBytes(_i2c, dev->addr, MCP23017_GPIOA, value, 2);
+			st = I2C_WriteBytes(bus, dev->addr, MCP23017_GPIOA, value, 2);
 			if (st == PORT_DONE) {
 				dev->status = DEVICE_DONE;
-			} else if (st == PORT_ERROR) {
+				}
+			else if (st == PORT_ERROR) {
 				dev->status = DEVICE_ERROR;
-			}
+				}
 			break;
 		case DEVICE_DONE:
-			_i2c->status = PORT_FREE;
+			bus->status = PORT_FREE;
 			dev->status = DEVICE_READY;
 			return 1;
 		case DEVICE_ERROR:
-			if (++dev->errCount < 10) {
-				dev->status = DEVICE_READY;
-			} else {
-				dev->status = DEVICE_FAULTH;
-			}
+			dev->status = ++dev->errCount < dev->errLimit ? DEVICE_READY : DEVICE_FAULTH;
 			break;
 		default:
 			break;
-	}
+		}
 	return 0;
-}
+	}

@@ -13,7 +13,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-   
+
  * 	ITG3205.h
  *  Created on: Jan 30, 2022
  ********************************************************************************/
@@ -28,60 +28,61 @@ extern "C" {
 #include "math.h"
 #include "ITG3205_Register.h"
 #include "I2C_API.h"
-//TODO DEVICE DO NOt ANSHWER IF RECONFIG OR RECONNECT
-/**********************************************************************
-*                       TYPEDEF & ENUM                                * 
-***********************************************************************/
+  //TODO DEVICE DO NOt ANSHWER IF RECONFIG OR RECONNECT
+  /**********************************************************************
+  *                       TYPEDEF & ENUM                                *
+  ***********************************************************************/
 #ifndef M_PI
 #define M_PI		3.14159265358979323846
 #endif
 
-enum ITG3205_ADDRESS {
-	ITG3205_ADDR = 0xD0,
-	ITG3205_ADDR2 = 0xD2
-};
+  enum ITG3205_ADDRESS {
+    ITG3205_ADDR = 0xD0,
+    ITG3205_ADDR2 = 0xD2
+    };
 
-typedef struct ITG3205_RAW_t {
-	int16_t temp;
-	int16_t X;
-	int16_t Y;
-	int16_t Z;
-} ITG3205_RAW;
+  typedef struct ITG3205_RAW_t {
+    int16_t temp;
+    int16_t X;
+    int16_t Y;
+    int16_t Z;
+    } ITG3205_RAW;
 
-typedef struct ITG3205_data_t {
-	float temp;
-	float X;
-	float Y;
-	float Z;
-} ITG3205_data;
-//common data struct for sensor
-typedef struct ITG3205 {
-	const enum ITG3205_ADDRESS addr;
-	DeviceStatus_t status;
-  uint8_t errCount;
-	uint8_t step;
-	ITG3205_RAW raw;
-	ITG3205_data data;
-} ITG3205_t;
+  typedef struct ITG3205_data_t {
+    float temp;
+    float X;
+    float Y;
+    float Z;
+    } ITG3205_data;
+  //common data struct for sensor
+  typedef struct ITG3205 {
+    const enum ITG3205_ADDRESS addr;
+    DeviceStatus_t status;
+    const uint8_t errLimit;
+    uint8_t errCount;
+    uint8_t step;
+    ITG3205_RAW raw;
+    ITG3205_data data;
+    } ITG3205_t;
 
-/*****************************************************************
-  * @brief init gyroscope: send settings
-  * @param _i2c - pointer to I2C bus connection structure
-  * @param dev - pointer to gyroscope main structure
-  * @retval 1 when end
-  */
-uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev);
+  /*****************************************************************
+    * @brief init gyroscope: send settings
+    * @param port - pointer to I2C bus connection structure
+    * @param dev - pointer to gyroscope main structure
+    * @retval 1 when end
+    */
+  uint8_t ITG3205_Init(I2C_IRQ_Conn_t *port, ITG3205_t *dev);
 
-/*****************************************************************
-  * @brief get all axis data from gyroscope and store in main gyroscope structure in RAW format
-  * and normalization values
-  * @param _i2c - pointer to I2C bus connection structure
-  * @param dev - pointer to gyroscope main structure
-  * @retval 1 when end
-  */
-uint8_t ITG3205_GetData(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev);
+  /*****************************************************************
+    * @brief get all axis data from gyroscope and store in main gyroscope structure in RAW format
+    * and normalization values
+    * @param port - pointer to I2C bus connection structure
+    * @param dev - pointer to gyroscope main structure
+    * @retval 1 when end
+    */
+  uint8_t ITG3205_GetData(I2C_IRQ_Conn_t *port, ITG3205_t *dev);
 
 #ifdef __cplusplus
-}
+  }
 #endif
 #endif /* ITG3205_H_ */

@@ -22,29 +22,33 @@
 #define _F1xx_DATATYPES_H_
 
 /************************************************************************************
-*									COMMON											*
-************************************************************************************/
+ *									COMMON											*
+ ************************************************************************************/
 /* MCU peripheral state
-* specifies that it is possible to work with peripherals at a low level
-* with multiple errors or timeouts, the peripheral is considered faulty
-*/
-typedef enum PortStatus {
-	PORT_FREE,
-	PORT_BUSY,
-	PORT_DONE,
-	PORT_ERROR
+ * specifies that it is possible to work with peripherals at a low level
+ * with multiple errors or timeouts, the peripheral is considered faulty
+ */
+typedef enum PortStatus
+{
+  PORT_FREE,        // port free, ready for connect
+  PORT_BUSY,        // port busy, data exchange is being prepared
+  PORT_IN_PROGRESS, // data exchange is being processing
+  PORT_COMPLITE,    // data exchange is being complite
+  PORT_DONE,        // data exchange complite without error
+  PORT_ERROR        // data exchange complite without error
 } PortStatus_t;
 
 /* state of data exchange with the device as with a bus element
  * used to display the status of the process of working with the device for the main code
  */
-typedef enum DeviceStatus {
-	DEVICE_ON,		      //device is power on, default setting
-  DEVICE_READY,       //the device initialization was successful
-  DEVICE_PROCESSING,  //data exchange in progress
-	DEVICE_DONE,	      //data exchange completed successfully
-	DEVICE_ERROR,	      //communication error: bad data, port/bus problem, etc, increment error count
-	DEVICE_FAULTH	      //device mark as "lost", process read-write data is off
+typedef enum DeviceStatus
+{
+  DEVICE_ON,         // device is power on, default setting
+  DEVICE_READY,      // the device ready for data exchange
+  DEVICE_PROCESSING, // data exchange in progress
+  DEVICE_DONE,       // data exchange completed successfully
+  DEVICE_ERROR,      // communication error: bad data, port/bus problem, etc, increment error count
+  DEVICE_FAULTH      // device mark as "lost", process read-write data is off
 } DeviceStatus_t;
 
 #endif /* _F1xx_DATATYPES_H_ */

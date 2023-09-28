@@ -27,14 +27,14 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (uint16_t)(((uint16_t)msb << 8) | (uint16_t)lsb);
 	}
 
-uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *port, HMC5883L_dev *dev) {
+uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev) {
 	PortStatus_t st;
 	switch (dev->status) {
 		case DEVICE_FAULTH:
 			return 1;
 		case DEVICE_READY:
-			if (port->status == PORT_FREE) {
-				port->status = PORT_BUSY;
+			if (_i2c->status == PORT_FREE) {
+				_i2c->status = PORT_BUSY;
 				dev->status = DEVICE_PROCESSING;
 				dev->step = 0;
 				}
@@ -44,7 +44,7 @@ uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *port, HMC5883L_dev *dev) {
 			data[0] = HMC5883L_SAMPLES_1 | HMC5883L_DATARATE_15HZ | HMC5883L_NORMAL;
 			data[1] = HMC5883L_GAIN_1_3GA;
 			data[2] = HMC5883L_CONTINOUS;
-			st = I2C_WriteBytes(port, dev->addr, HMC5883L_REG_CONFIG_A, data, 3);
+			st = I2C_WriteBytes(_i2c, dev->addr, HMC5883L_REG_CONFIG_A, data, 3);
 			if (st == PORT_DONE) {
 				dev->status = DEVICE_DONE;
 				}
@@ -53,7 +53,7 @@ uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *port, HMC5883L_dev *dev) {
 				}
 			break;}
 		case DEVICE_DONE:
-			port->status = PORT_FREE;
+			_i2c->status = PORT_FREE;
 			dev->status = DEVICE_READY;
 			return 1;
 		case DEVICE_ERROR:
@@ -65,21 +65,21 @@ uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *port, HMC5883L_dev *dev) {
 	return 0;
 	}
 
-uint8_t HMC5883L_GetData(I2C_IRQ_Conn_t *port, HMC5883L_dev *dev) {
+uint8_t HMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev) {
 	PortStatus_t st;
 	switch (dev->status) {
 		case DEVICE_FAULTH:
 			return 1;
 		case DEVICE_READY:
-			if (port->status == PORT_FREE) {
-				port->status = PORT_BUSY;
+			if (_i2c->status == PORT_FREE) {
+				_i2c->status = PORT_BUSY;
 				dev->status = DEVICE_PROCESSING;
 				}
 			break;
 		case DEVICE_PROCESSING: {
 			dev->status = DEVICE_PROCESSING;
 			uint8_t data[HMC5883L_DATA_LEN];
-			st = I2C_ReadBytes(port, dev->addr, HMC5883L_REG_OUT_X_M, data, HMC5883L_DATA_LEN);
+			st = I2C_ReadBytes(_i2c, dev->addr, HMC5883L_REG_OUT_X_M, data, HMC5883L_DATA_LEN);
 			if (st == PORT_DONE) {
 				dev->raw.X = CONCAT_BYTES(data[0], data[1]);
 				dev->raw.Z = CONCAT_BYTES(data[2], data[3]);
@@ -92,7 +92,7 @@ uint8_t HMC5883L_GetData(I2C_IRQ_Conn_t *port, HMC5883L_dev *dev) {
 				}
 			break;}
 		case DEVICE_DONE:
-			port->status = PORT_FREE;
+			_i2c->status = PORT_FREE;
 			dev->status = DEVICE_READY;
 			return 1;
 		case DEVICE_ERROR:

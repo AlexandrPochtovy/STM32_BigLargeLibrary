@@ -34,6 +34,11 @@ extern "C" {
     QMC5883L_ADDR = 0x1A
     };
 
+  enum QMC5883L_RANGE {
+    QMC5883L_LSB_2G = 2,
+    QMC5883L_LSB_8G = 8
+    }
+
   typedef struct QMC5883L_raw_data_t {
     int16_t X;
     int16_t Y;
@@ -58,20 +63,20 @@ extern "C" {
 
   /*****************************************************************
     * @brief init magnetometer: send settings
-    * @param port - pointer to I2C bus connection structure
+    * @param _i2c - pointer to I2C bus connection structure
     * @param dev - pointer to magnetometer main structure
     * @retval 1 when end
     */
-  uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *port, QMC5883L_t *dev);
+  uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev);
 
   /*****************************************************************
     * @brief get all axis data from magnetometer and store in main magnetometer structure in RAW format
     * and normalisation axis values
-    * @param port - pointer to I2C bus connection structure
+    * @param _i2c - pointer to I2C bus connection structure
     * @param dev - pointer to magnetometer main structure
     * @retval 1 when end
     */
-  uint8_t QMC5883L_GetData(I2C_IRQ_Conn_t *port, QMC5883L_t *dev);
+  uint8_t QMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev);
 
 #ifdef __cplusplus
   }

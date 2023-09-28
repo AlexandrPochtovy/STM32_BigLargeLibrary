@@ -28,6 +28,7 @@ enum ratio {
 	RATIO_16G = 16
 	};
 
+
 /*************************** REGISTER MAP ***************************/
 enum ADXL345_Register {
 	ADXL345_DEVID_REG = 0x00,					 // R		Device ID

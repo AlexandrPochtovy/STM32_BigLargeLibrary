@@ -31,7 +31,8 @@ enum BME280_Len {
 //BME280 registers address---------------------------------------------------------------------
 enum BME280_REG {
 	BME280_REG_T_P_CALIB_DATA = 0x88,	//calibration data 26 bytes
-	BME280_REG_CHIP_ID = 0xD0,				//BME280 ID REGISTER
+	BME280_REG_CHIP_ID = 0xD0,				//BME280 CHIP ID REGISTER
+	BME280_CHIP_ID = 0x60,						//BME280 CHIP ID VALUE 
 	BME280_REG_RESET = 0xE0,					//SOFTWARE RESET WRITE 0xB6 for reset chip
 	BME280_REG_HUM_CALIB_DATA = 0xE1,	//16 bytes
 	BME280_REG_CTRL_HUM = 0xF2,				//bits for setup osrs hum
@@ -39,7 +40,7 @@ enum BME280_REG {
 	BME280_REG_CTRL_MEAS_PWR = 0xF4,	//measure setup register
 	BME280_REG_CFG = 0xF5,						//common setup register
 	BME280_REG_DATA = 0xF7,						//8 bytes data register
-	BME280_CHIP_ID = 0x60,						//BME280 I2C ID
+
 	BME280_RESET_COMMAND = 0xB6				//BME280 software reset
 	};
 //-------------------------------------------------------------------------------------

@@ -60,20 +60,20 @@ extern "C" {
 
   /*****************************************************************
     * @brief init magnetometer: send settings
-    * @param port - pointer to I2C bus connection structure
+    * @param _i2c - pointer to I2C bus connection structure
     * @param dev - pointer to magnetometer main structure
     * @retval 1 when end
     */
-  uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *port, HMC5883L_dev *dev);
+  uint8_t HMC5883L_Init(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev);
 
   /*****************************************************************
     * @brief get all axis data from magnetometer and store in main magnetometer structure in RAW format
     * and normalisation axis values
-    * @param port - pointer to I2C bus connection structure
+    * @param _i2c - pointer to I2C bus connection structure
     * @param dev - pointer to magnetometer main structure
     * @retval 1 when end
     */
-  uint8_t HMC5883L_GetData(I2C_IRQ_Conn_t *port, HMC5883L_dev *dev);
+  uint8_t HMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, HMC5883L_dev *dev);
 
 #ifdef __cplusplus
   }

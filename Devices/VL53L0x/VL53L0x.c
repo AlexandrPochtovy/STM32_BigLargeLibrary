@@ -1248,7 +1248,7 @@ uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev)
 	return 0;
 }
 //--------------------------------------------------------------
-uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev) {
+uint8_t VL53L0x_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev) {
 	uint8_t st;
 	// VL53L0X_DataInit() begin
 	switch (dev->stepL3) {

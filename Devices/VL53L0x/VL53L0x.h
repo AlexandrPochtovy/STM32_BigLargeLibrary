@@ -335,7 +335,7 @@ uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t VL_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
+uint8_t VL53L0x_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
 
 /*****************************************************************
  * @brief calculate smooth value of range

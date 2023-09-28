@@ -25,7 +25,7 @@
 extern "C"
 {
 #endif
-
+//TODO add simple write function for reg write only, see TCA9548A
 #include "Peripherals/I2C_LowLevel/I2C_HW.h"
 
   /*****************************************************************

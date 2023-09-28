@@ -30,14 +30,14 @@ enum TCA9548A_ADDRESS {
   };
 
 enum TCA9548A_channel {
-  channel_0 = 0x01,
-  channel_1 = 0x02,
-  channel_2 = 0x04,
-  channel_3 = 0x08,
-  channel_4 = 0x10,
-  channel_5 = 0x20,
-  channel_6 = 0x40,
-  channel_7 = 0x80
+	TCA9548A_CH0 = 0x01,
+	TCA9548A_CH1 = 0x02,
+	TCA9548A_CH2 = 0x04,
+	TCA9548A_CH3 = 0x08,
+	TCA9548A_CH4 = 0x10,
+	TCA9548A_CH5 = 0x20,
+	TCA9548A_CH6 = 0x40,
+	TCA9548A_CH7 = 0x80
   };
 
 //common data struct for sensor

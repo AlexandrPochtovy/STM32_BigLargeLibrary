@@ -109,19 +109,19 @@ extern "C" {
 
 	/*****************************************************************
 		* @brief init bme280: send settings, read calibration data
-		* @param port - pointer to I2C bus connection structure
+		* @param _i2c - pointer to I2C bus connection structure
 		* @param dev - pointer to bme280 main structure
 		* @retval 1 when end
 		*/
-	uint8_t BME280_Init(I2C_IRQ_Conn_t *port, BME280_t *dev);
+	uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev);
 
 	/*****************************************************************
 		* @brief get data from bme280 receives data in raw format, converts it to normal values
-		* @param port - pointer to I2C bus connection structure
+		* @param _i2c - pointer to I2C bus connection structure
 		* @param dev - pointer to bme280 main structure
 		* @retval 1 when end
 		*/
-	uint8_t BME280_GetData(I2C_IRQ_Conn_t *port, BME280_t *dev);
+	uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev);
 
 #ifdef __cplusplus
 	}

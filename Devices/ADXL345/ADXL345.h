@@ -61,19 +61,19 @@ extern "C"
 
   /*****************************************************************
    * @brief init accelerometer: send settings
-   * @param port - pointer to I2C bus connection structure
+   * @param _i2c - pointer to I2C bus connection structure
    * @param dev - pointer to accelerometer main structure
    * @retval 1 when end
    */
-  uint8_t ADXL345_Init(I2C_IRQ_Conn_t *port, ADXL345_t *dev);
+  uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev);
 
   /*****************************************************************
    * @brief get all axis data from accelerometer and store in main accelerometer structure in RAW format
-   * @param port - pointer to I2C bus connection structure
+   * @param _i2c - pointer to I2C bus connection structure
    * @param dev - pointer to accelerometer main structure
    * @retval 1 when end
    */
-  uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *port, ADXL345_t *dev);
+  uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev);
 
 #ifdef __cplusplus
   }

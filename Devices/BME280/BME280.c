@@ -167,9 +167,7 @@ uint32_t compensate_pressure_int(BME280_t *dev) {
 	}
 
 float compensate_pressure_float(BME280_t *dev) {
-	float var1;
-	float var2;
-	float var3;
+	float var1, var2, var3;
 	float pressure;
 	float pressure_min = 30000.0;
 	float pressure_max = 110000.0;
@@ -196,19 +194,14 @@ float compensate_pressure_float(BME280_t *dev) {
 			pressure = pressure_max;
 			}
 		}
-	else /* Invalid case */
-		{
+	else { /* Invalid case */
 		pressure = pressure_min;
 		}
 	return pressure;
 	}
 
 uint32_t compensate_humidity_int(BME280_t *dev) {
-	int32_t var1;
-	int32_t var2;
-	int32_t var3;
-	int32_t var4;
-	int32_t var5;
+	int32_t var1, var2, var3, var4, var5;
 	uint32_t humidity;
 	uint32_t humidity_max = 102400;
 
@@ -237,12 +230,7 @@ float compensate_humidity_float(BME280_t *dev) {
 	float humidity;
 	float humidity_min = 0.0;
 	float humidity_max = 100.0;
-	float var1;
-	float var2;
-	float var3;
-	float var4;
-	float var5;
-	float var6;
+	float var1, var2, var3, var4, var5, var6;
 
 	var1 = ((float)dev->calib_data.t_fine) - 76800.0;
 	var2 = (((float)dev->calib_data.dig_h4) * 64.0 + (((float)dev->calib_data.dig_h5) / 16384.0) * var1);
@@ -261,111 +249,124 @@ float compensate_humidity_float(BME280_t *dev) {
 	return humidity;
 	}
 
-uint8_t BME280_Init(I2C_IRQ_Conn_t *port, BME280_t *dev) {
+uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
 	PortStatus_t st;
-	switch (dev->status) {
-		case DEVICE_FAULTH:
-			return 1;
-		case DEVICE_READY:
-			if (port->status == PORT_FREE) {
-				port->status = PORT_BUSY;
-				dev->status = DEVICE_PROCESSING;
-				dev->step = 0;
-				}
-			break;
-		case DEVICE_PROCESSING: {
-			uint8_t data[BME280_T_P_CALIB_DATA_LEN];
-			switch (dev->step) {
-				case 0: // setup humidity
-					st = I2C_WriteOneByte(port, dev->addr, BME280_REG_CTRL_HUM, BME280_HUM_OVERSAMPLING_16X);
-					if (st == PORT_DONE) {
-						port->status = PORT_BUSY;
+	if (dev->status == DEVICE_FAULTH) {
+		return 1;
+		}
+	else if ((dev->status == DEVICE_READY) && (_i2c->status == PORT_FREE)) {
+		_i2c->status = PORT_BUSY;
+		dev->status = DEVICE_PROCESSING;
+		dev->step = 0;
+		}
+	switch (dev->step) {
+		case 0: // //check connection read chip's ID
+			if (dev->status == DEVICE_PROCESSING) {
+				uint8_t ID = 0;
+				st = I2C_ReadOneByte(_i2c, dev->addr, BME280_REG_CHIP_ID, &ID);
+				if (st == PORT_DONE) {
+					if (ID == BME280_CHIP_ID) {
+						_i2c->status = PORT_BUSY;
 						dev->step = 1;
 						}
-					break;
-				case 1: // setup mode temp pressure
-					data[0] = BME280_NORMAL_MODE | BME280_PRESS_OVERSAMPLING_16X | BME280_TEMP_OVERSAMPLING_16X;
-					data[1] = BME280_SPI_3WIRE_MODE_OFF | BME280_FILTER_COEFF_16 | BME280_STANDBY_TIME_20_MS;
-					st = I2C_WriteBytes(port, dev->addr, BME280_REG_CTRL_MEAS_PWR, data, 2);
-					if (st == PORT_DONE) {
-						port->status = PORT_BUSY;
-						dev->step = 2;
+					else {
+						dev->status = DEVICE_FAULTH;
+						_i2c->status = PORT_FREE;
+						return 1;
 						}
-					break;
-				case 2: // read calib temp data
-					st = I2C_ReadBytes(port, dev->addr, BME280_REG_T_P_CALIB_DATA, data, BME280_T_P_CALIB_DATA_LEN);
-					if (st == PORT_DONE) {
-						parse_temp_press_calib_data(dev, data);
-						port->status = PORT_BUSY;
-						dev->step = 3;
-						}
-					break;
-				case 3: // read calib pressure data
-					st = I2C_ReadBytes(port, dev->addr, BME280_REG_HUM_CALIB_DATA, data, BME280_HUM_CALIB_DATA_LEN);
-					if (st == PORT_DONE) {
-						parse_humidity_calib_data(dev, data);
-						dev->status = DEVICE_DONE;
-						dev->step = 0;
-						}
-				default:
-					break;
-				}
-			if (st == PORT_ERROR) {
-				dev->status = DEVICE_ERROR;
+					}
 				}
 			break;
-			}
-		case DEVICE_DONE:
-			port->status = PORT_FREE;
-			dev->status = DEVICE_READY;
-			return 1;
-		case DEVICE_ERROR:
-			dev->status = ++dev->errCount < dev->errLimit ? DEVICE_READY : DEVICE_FAULTH;
+		case 1: // setup humidity
+			if (dev->status == DEVICE_PROCESSING) {
+				st = I2C_WriteOneByte(_i2c, dev->addr, BME280_REG_CTRL_HUM, BME280_HUM_OVERSAMPLING_16X);
+				if (st == PORT_DONE) {
+					_i2c->status = PORT_BUSY;
+					dev->step = 2;
+					}
+				}
+			break;
+		case 2: // setup mode temp pressure
+			if (dev->status == DEVICE_PROCESSING) {
+				uint8_t data[2];
+				data[0] = BME280_NORMAL_MODE | BME280_PRESS_OVERSAMPLING_16X | BME280_TEMP_OVERSAMPLING_16X;
+				data[1] = BME280_SPI_3WIRE_MODE_OFF | BME280_FILTER_COEFF_16 | BME280_STANDBY_TIME_20_MS;
+				st = I2C_WriteBytes(_i2c, dev->addr, BME280_REG_CTRL_MEAS_PWR, data, 2);
+				if (st == PORT_DONE) {
+					_i2c->status = PORT_BUSY;
+					dev->step = 3;
+					}
+				}
+			break;
+		case 3: // read calib temp data
+			if (dev->status == DEVICE_PROCESSING) {
+				uint8_t data[BME280_T_P_CALIB_DATA_LEN];
+				st = I2C_ReadBytes(_i2c, dev->addr, BME280_REG_T_P_CALIB_DATA, data, BME280_T_P_CALIB_DATA_LEN);
+				if (st == PORT_DONE) {
+					parse_temp_press_calib_data(dev, data);
+					_i2c->status = PORT_BUSY;
+					dev->step = 4;
+					}
+				}
+			break;
+		case 4: // read calib pressure data
+			if (dev->status == DEVICE_PROCESSING) {
+				uint8_t data[BME280_HUM_CALIB_DATA_LEN];
+				st = I2C_ReadBytes(_i2c, dev->addr, BME280_REG_HUM_CALIB_DATA, data, BME280_HUM_CALIB_DATA_LEN);
+				if (st == PORT_DONE) {
+					parse_humidity_calib_data(dev, data);
+					dev->status = DEVICE_DONE;
+					}
+				}
 			break;
 		default:
 			break;
 		}
+	if (dev->status == DEVICE_DONE) {
+		_i2c->status = PORT_FREE;
+		dev->status = DEVICE_READY;
+		return 1;
+		}
+	else if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
+		dev->status = DEVICE_FAULTH;
+		_i2c->status = PORT_FREE;
+		return 1;
+		}
 	return 0;
 	}
 
-uint8_t BME280_GetData(I2C_IRQ_Conn_t *port, BME280_t *dev) {
+uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
 	PortStatus_t st;
-	switch (dev->status) {
-		case DEVICE_FAULTH:
-			return 1;
-		case DEVICE_READY:
-			if (port->status == PORT_FREE) {
-				port->status = PORT_BUSY;
-				dev->status = DEVICE_PROCESSING;
-				}
-			break;
-		case DEVICE_PROCESSING: {
-			uint8_t data[BME280_DATA_LEN];
-			st = I2C_ReadBytes(port, dev->addr, BME280_REG_DATA, data, BME280_DATA_LEN);
-			if (st == PORT_DONE) {
-				bme280_parse_sensor_data(dev, data);
-				dev->data_int.temperature = compensate_temperature_int(dev);		 /* Compensate the temperature data */
-				dev->data_int.pressure = compensate_pressure_int(dev);					 /* Compensate the pressure data */
-				dev->data_int.humidity = compensate_humidity_int(dev);					 /* Compensate the humidity data */
-				dev->data_float.temperature = compensate_temperature_float(dev); /* Compensate the temperature data */
-				dev->data_float.pressure = compensate_pressure_float(dev);			 /* Compensate the pressure data */
-				dev->data_float.humidity = compensate_humidity_float(dev);			 /* Compensate the humidity data */
-				dev->status = DEVICE_DONE;
-				}
-			else if (st == PORT_ERROR) {
-				dev->status = DEVICE_ERROR;
-				}
-			break;
+	if (dev->status == DEVICE_FAULTH) {
+		return 1;
+		}
+	else if ((dev->status == DEVICE_READY) && (_i2c->status == PORT_FREE)) {
+		_i2c->status = PORT_BUSY;
+		dev->status = DEVICE_PROCESSING;
+		}
+	if (dev->status == DEVICE_PROCESSING) {
+		uint8_t data[BME280_DATA_LEN];
+		st = I2C_ReadBytes(_i2c, dev->addr, BME280_REG_DATA, data, BME280_DATA_LEN);
+		if (st == PORT_DONE) {
+			bme280_parse_sensor_data(dev, data);
+			dev->data_int.temperature = compensate_temperature_int(dev);		 /* Compensate the temperature data */
+			dev->data_int.pressure = compensate_pressure_int(dev);					 /* Compensate the pressure data */
+			dev->data_int.humidity = compensate_humidity_int(dev);					 /* Compensate the humidity data */
+			dev->data_float.temperature = compensate_temperature_float(dev); /* Compensate the temperature data */
+			dev->data_float.pressure = compensate_pressure_float(dev);			 /* Compensate the pressure data */
+			dev->data_float.humidity = compensate_humidity_float(dev);			 /* Compensate the humidity data */
+			dev->status = DEVICE_DONE;
 			}
-		case DEVICE_DONE:
-			port->status = PORT_FREE;
-			dev->status = DEVICE_READY;
-			return 1;
-		case DEVICE_ERROR:
-			dev->status = ++dev->errCount < dev->errLimit ? DEVICE_READY : DEVICE_FAULTH;
-			break;
-		default:
-			break;
+		}
+	if (dev->status == DEVICE_DONE) {
+		_i2c->status = PORT_FREE;
+		dev->status = DEVICE_READY;
+		return 1;
+		}
+	else if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
+		dev->status = DEVICE_FAULTH;
+		_i2c->status = PORT_FREE;
+		return 1;
 		}
 	return 0;
 	}

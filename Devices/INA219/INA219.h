@@ -36,6 +36,13 @@ extern "C" {
     INA219_ADDR = 0x88
     };
 
+  enum INA219_DIVIDERS {
+    div1 = 1,
+    div10 = 10,
+    div100 = 100,
+    div1000 = 1000
+    };
+
   typedef struct INA219_RawData_t {
     int16_t shuntV;
     uint16_t voltage;

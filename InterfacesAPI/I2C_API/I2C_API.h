@@ -23,9 +23,9 @@
 
 #ifdef __cplusplus
 extern "C"
-{
+  {
 #endif
-//TODO add simple write function for reg write only, see TCA9548A
+  //TODO add simple write function for reg write only, see TCA9548A
 #include "Peripherals/I2C_LowLevel/I2C_HW.h"
 
   /*****************************************************************
@@ -33,31 +33,38 @@ extern "C"
    * @param  *_i2c - pointer to i2c connection struct
    * @retval 0 - processing, 1 - complite
    */
-  uint8_t I2C_WriteOneByte(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint8_t value);
+  PortStatus_t I2C_WriteOneByte(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint8_t value);
 
   /*****************************************************************
    * @brief  write multiple bytes in i2c bus: addr, reg, value's array in interrupt mode.
    * @param  *_i2c - pointer to i2c connection struct
    * @retval 0 - processing, 1 - complite
    */
-  uint8_t I2C_WriteBytes(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint8_t *data, uint8_t size);
+  PortStatus_t I2C_WriteBytes(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint8_t *data, uint8_t size);
 
   /*****************************************************************
    * @brief  read one byte frow i2c bus, but send 2 before: addr and reg
    * @param  *_i2c - pointer to i2c connection struct
    * @retval 0 - processing, 1 - complite
    */
-  uint8_t I2C_ReadOneByte(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint8_t *value);
+  PortStatus_t I2C_ReadOneByte(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint8_t *value);
 
   /*****************************************************************
    * @brief  read multiple bytes frow i2c bus, but send 2 before: addr and reg
    * @param  *_i2c - pointer to i2c connection struct
    * @retval 0 - processing, 1 - complite
    */
-  uint8_t I2C_ReadBytes(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint8_t *data, uint8_t size);
+  PortStatus_t I2C_ReadBytes(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint8_t *data, uint8_t size);
+
+  /*****************************************************************
+ * @brief  write 2 bytes in i2c bus: addr and reg(value) in interrupt mode.
+ * @param  *_i2c - pointer to i2c connection struct
+ * @retval 0 - processing, 1 - complite
+ */
+  PortStatus_t I2C_WriteOne(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg);
 
 #ifdef __cplusplus
-}
+  }
 #endif
 
 #endif /* _I2C_MIDDLELEVEL_I2C_API_H_ */

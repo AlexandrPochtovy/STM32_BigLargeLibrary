@@ -22,6 +22,7 @@
 #include "I2C_HW.h"
 
 void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c) {
+	_i2c->status = PORT_IN_PROGRESS;
 	if (_i2c->len) {
 		_i2c->i2c->CR2 |= I2C_CR2_ITBUFEN;//Enable TXE RxNE iterrupt for >=1 byte
 		if ((_i2c->len > 1) && (_i2c->mode == I2C_MODE_READ)) {

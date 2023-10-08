@@ -22,7 +22,7 @@
 
 PortStatus_t I2C_WriteOneByte(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint8_t value) {
 	if (port->status == PORT_BUSY) {
-		port->status = PORT_IN_PROGRESS;
+		//port->status = PORT_IN_PROGRESS;
 		port->addr = addr;
 		FIFO_PutOne(port->buffer, reg);
 		FIFO_PutOne(port->buffer, value);

@@ -62,7 +62,9 @@ typedef struct __SequenceStepTimeouts {
 
 typedef struct __VL53L0X {
   uint8_t addr;
-  DeviceStatus_t status;
+  volatile DeviceStatus_t status;
+  const uint8_t errLimit;
+  uint8_t errCount;
   uint8_t stepL1;
   uint8_t stepL2;
   uint8_t stepL3;
@@ -124,7 +126,7 @@ uint8_t getAddress( VL53L0x_t *dev);
   * @param dev - pointer to sensor's main structure
   * @retval 1 when complite
   */
-uint8_t getModelId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
+uint8_t VL53_getModelId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
 
 /*****************************************************************
   * @brief read sensor's revision ID and store it in main sensor's structure
@@ -288,7 +290,7 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, vcselPeriodTyp
  * @param period_ms - measuring period in msec
  * @retval 1 when done
  */
-uint8_t startContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, uint32_t period_ms);
+uint8_t VL53_StartContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, uint32_t period_ms);
 
 /*****************************************************************
  * @brief Stop continuous measurements based on VL53L0X_StopMeasurement()
@@ -296,7 +298,7 @@ uint8_t startContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, uint32_t period_ms
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t stopContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
+uint8_t VL53_StopContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
 
 /*****************************************************************
  * @brief Returns a range reading in millimeters when continuous mode is active 
@@ -305,7 +307,7 @@ uint8_t stopContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
  * @param dev - pointer to sensor's main structure
  * @retval 1 when done
  */
-uint8_t readRangeContinuousMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
+uint8_t VL53_readRangeContinuousMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev);
 
 /*****************************************************************
  * @brief Performs a single-shot range measurement and returns the reading in

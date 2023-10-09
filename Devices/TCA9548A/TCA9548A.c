@@ -31,18 +31,14 @@ uint8_t TCA9548A_Init(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev) {
 		dev->port = 0x00;
 		}
 	if (dev->status == DEVICE_PROCESSING) {
-		st = I2C_WriteBytes(_i2c, dev->addr, dev->port, NULL, 0);
+		st = I2C_WriteOne(_i2c, dev->addr, dev->port);
 		if (st == PORT_DONE) {
+			_i2c->status = PORT_FREE;
 			dev->status = DEVICE_READY;
 			return 1;
 			}
 		}
-	if (dev->status == DEVICE_DONE) {
-		_i2c->status = PORT_FREE;
-		dev->status = DEVICE_READY;
-		return 1;
-		}
-	else if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
+	if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
 		dev->status = DEVICE_FAULTH;
 		_i2c->status = PORT_FREE;
 		return 1;
@@ -58,21 +54,17 @@ uint8_t TCA9548A_OnChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t chann
 	else if ((dev->status == DEVICE_READY) && (_i2c->status == PORT_FREE)) {
 		_i2c->status = PORT_BUSY;
 		dev->status = DEVICE_PROCESSING;
-		dev->port |= channelMask;
+		dev->port = channelMask;
 		}
 	if (dev->status == DEVICE_PROCESSING) {
-		st = I2C_WriteBytes(_i2c, dev->addr, dev->port, NULL, 0);
+		st = I2C_WriteOne(_i2c, dev->addr, dev->port);
 		if (st == PORT_DONE) {
+			_i2c->status = PORT_FREE;
 			dev->status = DEVICE_READY;
 			return 1;
 			}
 		}
-	if (dev->status == DEVICE_DONE) {
-		_i2c->status = PORT_FREE;
-		dev->status = DEVICE_READY;
-		return 1;
-		}
-	else if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
+	if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
 		dev->status = DEVICE_FAULTH;
 		_i2c->status = PORT_FREE;
 		return 1;
@@ -91,18 +83,14 @@ uint8_t TCA9548A_OffChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t chan
 		dev->port &= ~channelMask;
 		}
 	if (dev->status == DEVICE_PROCESSING) {
-		st = I2C_WriteBytes(_i2c, dev->addr, dev->port, NULL, 0);
+		st = I2C_WriteOne(_i2c, dev->addr, dev->port);
 		if (st == PORT_DONE) {
+			_i2c->status = PORT_FREE;
 			dev->status = DEVICE_READY;
 			return 1;
 			}
 		}
-	if (dev->status == DEVICE_DONE) {
-		_i2c->status = PORT_FREE;
-		dev->status = DEVICE_READY;
-		return 1;
-		}
-	else if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
+	if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
 		dev->status = DEVICE_FAULTH;
 		_i2c->status = PORT_FREE;
 		return 1;

@@ -26,24 +26,24 @@
  *                       TYPEDEF & ENUM                                *
  ***********************************************************************/
 enum TCA9548A_ADDRESS {
-  TCA9548A_ADDR = 0x70//Assumes ALT address pin low
+  TCA9548A_ADDR = 0xE0//Assumes ALT address pin low
   };
 
 enum TCA9548A_channel {
-  channel_0 = 0x01,
-  channel_1 = 0x02,
-  channel_2 = 0x04,
-  channel_3 = 0x08,
-  channel_4 = 0x10,
-  channel_5 = 0x20,
-  channel_6 = 0x40,
-  channel_7 = 0x80
+	TCA9548A_CH0 = 0x01,
+	TCA9548A_CH1 = 0x02,
+	TCA9548A_CH2 = 0x04,
+	TCA9548A_CH3 = 0x08,
+	TCA9548A_CH4 = 0x10,
+	TCA9548A_CH5 = 0x20,
+	TCA9548A_CH6 = 0x40,
+	TCA9548A_CH7 = 0x80
   };
 
 //common data struct for sensor
 typedef struct TCA9548A {
   enum TCA9548A_ADDRESS addr;
-  DeviceStatus_t status;
+  volatile DeviceStatus_t status;
   const uint8_t errLimit;
   uint8_t errCount;
   uint8_t port;

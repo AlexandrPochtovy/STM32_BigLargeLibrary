@@ -35,6 +35,8 @@ void I2C_Start_IRQ(I2C_IRQ_Conn_t *_i2c) {
 	else {
 		_i2c->i2c->CR2 &= ~I2C_CR2_ITBUFEN;//disable TXE RxNE iterrupt for send reg byte only
 		}
+	_i2c->enterCount = 0;
+	_i2c->errCount = 0;
 	_i2c->i2c->CR1 |= I2C_CR1_START;//generate START condition
 	}
 
@@ -52,6 +54,7 @@ void I2C_Start_DMA(I2C_DMA_Conn_t *_i2c) {
 	}
 
 void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
+	_i2c->enterCount += 1;
 	_i2c->buffer->status = BUFFER_BUSY;
 	volatile uint16_t I2C_SR1 = _i2c->i2c->SR1;		//Read SR1 first
 	//EV5 Start condition generated. Clear: read SR1 and write slave addr to DR
@@ -125,6 +128,7 @@ void I2C_Raw_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 
 
 void I2C_Alt_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
+	_i2c->enterCount += 1;
 	_i2c->buffer->status = BUFFER_BUSY;
 	volatile uint16_t I2C_SR1 = _i2c->i2c->SR1;		//Read SR1 first
 	//EV5 Start condition generated. Clear: read SR1 and write slave addr to DR
@@ -161,8 +165,8 @@ void I2C_Alt_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 	// Data register empty (transmitters). Clear: write byte to DR or after START/STOP
 	if ((I2C_SR1 & I2C_SR1_BTF) && (_i2c->len == 0)) {
 		if (_i2c->mode == I2C_MODE_WRITE) {
-			LL_I2C_GenerateStopCondition(_i2c->i2c);			//use errata & AN2824
 			_i2c->status = PORT_COMPLITE;//set bus free status
+			LL_I2C_GenerateStopCondition(_i2c->i2c);			//use errata & AN2824
 			}
 		else if (_i2c->mode == I2C_MODE_RW) {
 			_i2c->status = PORT_COMPLITE;//set bus free status
@@ -222,6 +226,7 @@ void I2C_EV_IRQ_DMA_CallBack(I2C_DMA_Conn_t *_i2c) {
 	}
 //=============================================================================
 void I2C_ERR_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
+	_i2c->errCount += 1;
 	volatile uint32_t I2C_SR1 = 0;
 	volatile uint32_t I2C_SR2 = 0;
 	_i2c->status = PORT_ERROR;

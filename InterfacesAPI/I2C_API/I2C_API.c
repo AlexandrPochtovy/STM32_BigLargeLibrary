@@ -42,7 +42,7 @@ PortStatus_t I2C_WriteOneByte(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, u
 PortStatus_t I2C_WriteBytes(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint8_t *data,
 	uint8_t size) {
 	if (port->status == PORT_BUSY) {
-		port->status = PORT_IN_PROGRESS;
+		//port->status = PORT_IN_PROGRESS;
 		port->addr = addr;
 		FIFO_PutOne(port->buffer, reg);
 		FIFO_PutMulti(port->buffer, data, size);
@@ -61,7 +61,7 @@ PortStatus_t I2C_WriteBytes(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uin
 
 PortStatus_t I2C_ReadOneByte(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint8_t *value) {
 	if (port->status == PORT_BUSY) {
-		port->status = PORT_IN_PROGRESS;
+		//port->status = PORT_IN_PROGRESS;
 		port->addr = addr;
 		FIFO_PutOne(port->buffer, reg);
 		port->len = 1;
@@ -81,7 +81,7 @@ PortStatus_t I2C_ReadOneByte(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, ui
 PortStatus_t I2C_ReadBytes(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint8_t *data,
 	uint8_t size) {
 	if (port->status == PORT_BUSY) {
-		port->status = PORT_IN_PROGRESS;
+		//port->status = PORT_IN_PROGRESS;
 		port->addr = addr;
 		FIFO_PutOne(port->buffer, reg);
 		port->len = size;
@@ -100,7 +100,7 @@ PortStatus_t I2C_ReadBytes(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg, uint
 
 PortStatus_t I2C_WriteOne(I2C_IRQ_Conn_t *port, uint8_t addr, uint8_t reg) {
 	if (port->status == PORT_BUSY) {
-		port->status = PORT_IN_PROGRESS;
+		//port->status = PORT_IN_PROGRESS;
 		port->addr = addr;
 		FIFO_PutOne(port->buffer, reg);
 		port->len = 0;

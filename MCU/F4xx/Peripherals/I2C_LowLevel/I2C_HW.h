@@ -43,6 +43,8 @@ extern "C" {
     uint8_t len;		//length data
     I2C_Mode_t mode;	//device mode
     fifo_t *buffer;		//pointer circular buffer
+    volatile uint16_t enterCount;
+    volatile uint16_t errCount;
     } I2C_IRQ_Conn_t;
 
   typedef struct I2C_DMA_Conn {

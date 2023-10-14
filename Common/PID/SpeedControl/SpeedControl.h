@@ -65,9 +65,9 @@ typedef struct Drive {
 	moveMode_t mode;	//main move mode
 	uint8_t step;			//machine-state's step for processing move mode
 	point_t position;	//actual coordinates of robot
-	Wheel_t left;			//left wheel actual data
-	Wheel_t right;		//right wheel actual data
-	float speedRobot;	//main speed
+	Wheel_t WL;				//left wheel actual data
+	Wheel_t WR;				//right wheel actual data
+	float speed;	//main speed
 	float distance;		//distance to target
 	float fullPath;		//full patch, integral
 	float intLength;	//integral length for move to target

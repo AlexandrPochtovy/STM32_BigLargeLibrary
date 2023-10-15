@@ -21,7 +21,7 @@
 #include "TCA9548A.h"
 
 uint8_t TCA9548A_Init(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev) {
-	PortStatus_t st;
+	PortStatus_t st  = 0;
 	if (dev->status == DEVICE_FAULTH) {
 		return 1;
 		}
@@ -67,7 +67,7 @@ uint8_t TCA9548A_OnChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t chann
 	if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
 		dev->status = DEVICE_FAULTH;
 		_i2c->status = PORT_FREE;
-		return 1;
+//		return 1;
 		}
 	return 0;
 	}

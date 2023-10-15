@@ -42,7 +42,7 @@ extern "C" {
 
   typedef struct MCP23 {
     const enum MCP23017_ADDRESS addr;
-    DeviceStatus_t status;
+    volatile DeviceStatus_t status;
     const uint8_t errLimit;
     uint8_t errCount;
     MCP23_port_t data;
@@ -93,6 +93,8 @@ extern "C" {
     * @retval 1 when end
     */
   uint8_t MCP23_17_WriteAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value);
+
+  uint8_t MCP23_17_Check(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t reg);
 
 #ifdef __cplusplus
   }

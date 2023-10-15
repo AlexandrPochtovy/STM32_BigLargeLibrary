@@ -37,7 +37,7 @@ extern "C" {
   enum QMC5883L_RANGE {
     QMC5883L_LSB_2G = 2,
     QMC5883L_LSB_8G = 8
-    }
+    };
 
   typedef struct QMC5883L_raw_data_t {
     int16_t X;

@@ -24,7 +24,7 @@ int32_t WheelSpeedZeroLimiter(int32_t act, int32_t sp, int32_t low, int32_t hi) 
             }
         }
     else if (sp < 0) {
-
+    	return act;
         }
     else {
         return 0;

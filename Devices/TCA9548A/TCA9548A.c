@@ -26,6 +26,7 @@ uint8_t TCA9548A_SetChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t chan
 			if (_i2c->status == PORT_FREE) {
 				_i2c->status = PORT_BUSY;
 				dev->status = DEVICE_PROCESSING;
+				dev->port = channelMask;
 				}
 			break;
 		case DEVICE_PROCESSING:

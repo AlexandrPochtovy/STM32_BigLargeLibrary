@@ -1,18 +1,18 @@
 /*********************************************************************************
-  Original author:  Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+	Original author:  Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
 					https://github.com/AlexandrPochtovy
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
 
-	  http://www.apache.org/licenses/LICENSE-2.0
+		http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
 
  * 	VL53L0x.cpp
  *	Created on: Jul 25, 2022
@@ -26,32 +26,32 @@
  *          		STATIC INLINE FUNCTIONS                               *
  ***********************************************************************/
  /*****************************************************************
-   * @brief  Encode VCSEL pulse period register value from period in PCLKs
-   * based on VL53L0X_encode_vcsel_period()
-   * @param  uint8_t period_pclks in clks
-   * @retval uint8_t period in microsec
-   */
+	 * @brief  Encode VCSEL pulse period register value from period in PCLKs
+	 * based on VL53L0X_encode_vcsel_period()
+	 * @param  uint8_t period_pclks in clks
+	 * @retval uint8_t period in microsec
+	 */
 static inline uint8_t __encodeVcselPeriod(uint8_t period_pclks) {
 	return (((period_pclks) >> 1) - 1);
 	}
 
 /*****************************************************************
-  * @brief Decode VCSEL (vertical cavity surface emitting laser) pulse period in PCLKs from register value
-  * based on VL53L0X_decode_vcsel_period()
-  * @param
-  * @retval
-  */
+	* @brief Decode VCSEL (vertical cavity surface emitting laser) pulse period in PCLKs from register value
+	* based on VL53L0X_decode_vcsel_period()
+	* @param
+	* @retval
+	*/
 static inline uint8_t __decodeVcselPeriod(uint8_t reg_val) {
 	return ((( reg_val )+1) << 1);
 	}
 
 /*****************************************************************
-  * @brief Calculate macro period in nanoseconds from VCSEL period in PCLKs
-  * based on VL53L0X_calc_macro_period_ps()
-  * PLL_period_ps = 1655; macro_period_vclks = 2304
-  * @param
-  * @retval
-  */
+	* @brief Calculate macro period in nanoseconds from VCSEL period in PCLKs
+	* based on VL53L0X_calc_macro_period_ps()
+	* PLL_period_ps = 1655; macro_period_vclks = 2304
+	* @param
+	* @retval
+	*/
 static inline uint32_t __calcMacroPeriod(uint8_t vcsel_period_pclks) {
 	return (((( uint32_t )2304 * (vcsel_period_pclks) * 1655) + 500) / 1000);
 	}
@@ -60,8 +60,8 @@ static inline uint32_t __calcMacroPeriod(uint8_t vcsel_period_pclks) {
  * 			VALUE CONVERTERS									*
  ****************************************************************/
  /* Convert sequence step timeout from MCLKs to microseconds with given VCSEL period in PCLKs
-  * based on VL53L0X_calc_timeout_us()
-  */
+	* based on VL53L0X_calc_timeout_us()
+	*/
 uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks) {
 	uint32_t macro_period_ns = __calcMacroPeriod(vcsel_period_pclks);
 	return ((timeout_period_mclks * macro_period_ns) + 500) / 1000;
@@ -117,14 +117,14 @@ void setupVL53L0X(VL53L0x_t* dev, uint16_t timeout) {
  * 			BUS PROCESSING										*
  ****************************************************************/
  /*****************************************************************
-   * @brief write to sensor new I2C address and store it in main sensor's structure
-   * @note there is a problem, the new address is recorded but the sensor does not respond to the new address
-   * do not use!
-   * @param _i2c - pointer to I2C bus connection structure
-   * @param dev - pointer to sensor's main structure
-   * @param new_addr - new I2C address
-   * @retval 1 when complite
-   */
+	 * @brief write to sensor new I2C address and store it in main sensor's structure
+	 * @note there is a problem, the new address is recorded but the sensor does not respond to the new address
+	 * do not use!
+	 * @param _i2c - pointer to I2C bus connection structure
+	 * @param dev - pointer to sensor's main structure
+	 * @param new_addr - new I2C address
+	 * @retval 1 when complite
+	 */
 uint8_t setAddress(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, const uint8_t new_addr) {
 	PortStatus_t st;
 	if (dev->status == DEVICE_FAULTH) {
@@ -151,21 +151,21 @@ uint8_t setAddress(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, const uint8_t new_addr)
 	}
 
 /*****************************************************************
-  * @brief read sensor's I2C address from structure
-  * @param dev - pointer to sensor's main structure
-  * @retval actual i2c address
-  */
+	* @brief read sensor's I2C address from structure
+	* @param dev - pointer to sensor's main structure
+	* @retval actual i2c address
+	*/
 uint8_t getAddress(VL53L0x_t* dev) {
 	return dev->addr;
 	}
 
 /*****************************************************************
-  * @brief read sensor's model ID and store it in main sensor's structure
-  * @note use it for connection check
-  * @param _i2c - pointer to I2C bus connection structure
-  * @param dev - pointer to sensor's main structure
-  * @retval 1 when complite
-  */
+	* @brief read sensor's model ID and store it in main sensor's structure
+	* @note use it for connection check
+	* @param _i2c - pointer to I2C bus connection structure
+	* @param dev - pointer to sensor's main structure
+	* @retval 1 when complite
+	*/
 uint8_t VL53_getModelId(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	PortStatus_t st;
 	if (dev->status == DEVICE_FAULTH) {
@@ -193,12 +193,12 @@ uint8_t VL53_getModelId(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	}
 
 /*****************************************************************
-  * @brief read sensor's revision ID and store it in main sensor's structure
-  * @note use it for connection check
-  * @param _i2c - pointer to I2C bus connection structure
-  * @param dev - pointer to sensor's main structure
-  * @retval 1 when complite
-  */
+	* @brief read sensor's revision ID and store it in main sensor's structure
+	* @note use it for connection check
+	* @param _i2c - pointer to I2C bus connection structure
+	* @param dev - pointer to sensor's main structure
+	* @retval 1 when complite
+	*/
 uint8_t getRevisionId(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	PortStatus_t st;
 	if (dev->status == DEVICE_FAULTH) {
@@ -226,39 +226,39 @@ uint8_t getRevisionId(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	}
 
 /*****************************************************************
-  * @brief set new timeout value to main sensor's structure
-  * @param dev - pointer to sensor's main structure
-  * @param timeout - new timeout value
-  * @retval none
-  */
+	* @brief set new timeout value to main sensor's structure
+	* @param dev - pointer to sensor's main structure
+	* @param timeout - new timeout value
+	* @retval none
+	*/
 void setTimeout(VL53L0x_t* dev, const uint16_t timeout) {
 	dev->limit_timeout = timeout;
 	}
 
 /*****************************************************************
-  * @brief get actual timeout value from main sensor's structure
-  * @note useless feature, made to be
-  * @param dev - pointer to sensor's main structure
-  * @retval timeout value
-  */
+	* @brief get actual timeout value from main sensor's structure
+	* @note useless feature, made to be
+	* @param dev - pointer to sensor's main structure
+	* @retval timeout value
+	*/
 uint16_t getTimeout(VL53L0x_t* dev) {
 	return dev->count_timeout;
 	}
 
 /*****************************************************************
-  * @brief clear timeout's count and flags in main sensor's structure
-  * @param dev - pointer to sensor's main structure
-  * @retval timeout value
-  */
+	* @brief clear timeout's count and flags in main sensor's structure
+	* @param dev - pointer to sensor's main structure
+	* @retval timeout value
+	*/
 void startTimeout(VL53L0x_t* dev) {
 	dev->count_timeout = 0;
 	}
 
 /*****************************************************************
-  * @brief Check if timeout is enabled (set to nonzero value) and has expired
-  * @param dev - pointer to sensor's main structure
-  * @retval timeout flag
-  */
+	* @brief Check if timeout is enabled (set to nonzero value) and has expired
+	* @param dev - pointer to sensor's main structure
+	* @retval timeout flag
+	*/
 uint8_t checkTimeoutExpired(VL53L0x_t* dev)  //+
 	{
 	dev->timeoutFlag = ++dev->count_timeout > ++dev->limit_timeout;
@@ -1170,10 +1170,10 @@ uint8_t VL53_StartContinuous(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, uint32_t peri
 	return 0;
 	}
 /*****************************************************************
-  * @brief	OK
-  * @param
-  * @retval
-  */
+	* @brief	OK
+	* @param
+	* @retval
+	*/
 uint8_t VL53_StopContinuous(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	PortStatus_t st;
 	if (dev->status == DEVICE_FAULTH) {
@@ -1247,10 +1247,10 @@ uint8_t VL53_StopContinuous(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	return 0;
 	}
 /*****************************************************************
-  * @brief	OK
-  * @param
-  * @retval
-  */
+	* @brief	OK
+	* @param
+	* @retval
+	*/
 uint8_t VL53_readRangeContinuousMillimeters(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	PortStatus_t st;
 	if (dev->status == DEVICE_FAULTH) {
@@ -1310,10 +1310,10 @@ uint8_t VL53_readRangeContinuousMillimeters(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev
 	return 0;
 	}
 /*****************************************************************
-  * @brief	OK
-  * @param
-  * @retval
-  */
+	* @brief	OK
+	* @param
+	* @retval
+	*/
 uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	uint8_t st;
 	switch (dev->stepL2) {
@@ -1395,1026 +1395,1082 @@ uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 
 //--------------------------------------------------------------
 uint8_t VL53L0x_Init(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
-	PortStatus_t st;
-	if (dev->status == DEVICE_FAULTH) {
-		return 1;
-		}
-	else if ((dev->status == DEVICE_READY) && (_i2c->status == PORT_FREE)) {
-		_i2c->status = PORT_BUSY;
-		dev->status = DEVICE_PROCESSING;
-		dev->stepL3 = 0;
-		}
-	if (dev->status == DEVICE_PROCESSING) {
-		switch (dev->stepL3) {
-			case 0:// VL53L0X_DataInit() begin
-				st = I2C_ReadOneByte(_i2c, dev->addr, VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, &dev->tmp8);
-				if (st == PORT_DONE) {
-					dev->stepL3 = 1;
-					}
-				break;
-			case 1:// always 2.8v enable
-				st = I2C_WriteOneByte(_i2c, dev->addr, VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, dev->tmp8 | 0x01);  // set bit 0
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 2;
-					}
-				break;
-			case 2:  //Set I2C standard mode
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x88, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 3;
-					}
-				break;
-			case 3:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x80, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 4;
-					}
-				break;
-			case 4:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 5;
-					}
-				break;
-			case 5:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x00, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 6;
-					}
-				break;
-			case 6://stop variable 0x11
-				st = I2C_ReadOneByte(_i2c, dev->addr, 0x91, &dev->stop_variable);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 7;
-					}
-				break;
-			case 7:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x00, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 8;
-					}
-				break;
-			case 8:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 9;
-					}
-				break;
-			case 9:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x80, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 10;
-					}
-				break;
-			case 10:// disable SIGNAL_RATE_MSRC (bit 1) and SIGNAL_RATE_PRE_RANGE (bit 4) limit checks//+
-				st = I2C_ReadOneByte(_i2c, dev->addr, MSRC_CONFIG_CONTROL, &dev->tmp8);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 11;
-					}
-				break;//tmp must be 0x32
-			case 11:
-				st = I2C_WriteOneByte(_i2c, dev->addr, MSRC_CONFIG_CONTROL, dev->tmp8 | 0x12);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 12;
-					}
-				break;
-			case 12:
-				//st = setSignalRateLimit(_i2c, dev, 32);
-				uint16_t data = 32;//Min(Max(( uint16_t )limit_Mcps, 65535), 32);
-				st = I2C_WriteBytes(_i2c, dev->addr, FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, ( uint8_t* )&data, 2);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 13;
-					}
-				break;
-			case 13:
-				st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_SEQUENCE_CONFIG, 0xFF);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 14;
-					}
-				break;// VL53L0X_DataInit() end
-				/* VL53L0X_StaticInit() begin
-				The SPAD map (RefGoodSpadMap) is read by VL53L0X_get_info_from_device() in
-				the API, but the same data seems to be more easily readable from
-				GLOBAL_CONFIG_SPAD_ENABLES_REF_0 through _6, so read it from there*/
-			case 14://uint8_t getSpadInfo() start, I insert it directly
-				st = I2C_WriteOneByte(_i2c, dev->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 15;
-					}
-				break;
-			case 15:
-				st = I2C_WriteOneByte(_i2c, dev->addr, INTERNAL_TUNING_2, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 16;
-					}
-				break;
-			case 16:
-				st = I2C_WriteOneByte(_i2c, dev->addr, SYSRANGE_START, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 17;
-					}
-				break;
-			case 17:
-				st = I2C_WriteOneByte(_i2c, dev->addr, INTERNAL_TUNING_2, 0x06);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 18;
-					}
-				break;
-			case 18:
-				st = I2C_ReadOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, &dev->tmp8);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->tmp8 |= 0x04;
-					dev->stepL3 = 19;
-					}
-				break;
-			case 19:
-				st = I2C_WriteOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, dev->tmp8);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 20;
-					}
-				break;
-			case 20:
-				st = I2C_WriteOneByte(_i2c, dev->addr, INTERNAL_TUNING_2, 0x07);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 21;
-					}
-				break;
-			case 21:
-				st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_HISTOGRAM_BIN, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 22;
-					}
-				break;
-			case 22:
-				st = I2C_WriteOneByte(_i2c, dev->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 23;
-					}
-				;
-				break;
-			case 23:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x94, 0x6b);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 24;
-					}
-				break;
-			case 24:
-				st = I2C_WriteOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					setTimeout(dev, 100);
-					startTimeout(dev);
-					dev->stepL3 = 25;
-					}
-				break;
-			case 25:
-				st = I2C_ReadOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, &dev->tmp8);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					if (dev->tmp8 != 0x00) {
-						dev->stepL3 = 26;
-						}
-					else if (checkTimeoutExpired(dev)) {
-						dev->stepL3 = 0;
-						dev->status = DEVICE_FAULTH;
-						_i2c->status = PORT_FREE;
-						return 1;
-						}
-					}
-				break;
-			case 26:
-				st = I2C_WriteOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 27;
-					}
-				break;
-			case 27:
-				st = I2C_ReadOneByte(_i2c, dev->addr, 0x92, &dev->tmp8);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->spad_count = dev->tmp8 & 0x7f;
-					dev->spad_type_is_aperture = (dev->tmp8 >> 7) & 0x01;
-					dev->stepL3 = 28;
-					}
-				break;
-			case 28:
-				st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_HISTOGRAM_BIN, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 29;
-					}
-				break;
-			case 29:
-				st = I2C_WriteOneByte(_i2c, dev->addr, INTERNAL_TUNING_2, 0x06);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 30;
-					}
-				break;
-			case 30:
-				st = I2C_ReadOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, &dev->tmp8);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->tmp8 &= ~0x04;
-					dev->stepL3 = 31;
-					}
-				break;
-			case 31:
-				st = I2C_WriteOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, dev->tmp8);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 32;
-					}
-				break;
-			case 32:
-				st = I2C_WriteOneByte(_i2c, dev->addr, INTERNAL_TUNING_2, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 33;
-					}
-				break;
-			case 33:
-				st = I2C_WriteOneByte(_i2c, dev->addr, SYSRANGE_START, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 34;
-					}
-				break;
-			case 34:
-				st = I2C_WriteOneByte(_i2c, dev->addr, INTERNAL_TUNING_2, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 35;
-					}
-				break;
-			case 35:
-				st = I2C_WriteOneByte(_i2c, dev->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 36;
-					}
-				break;//get SPAD info end
-			case 36:
-				st = I2C_ReadBytes(_i2c, dev->addr, GLOBAL_CONFIG_SPAD_ENABLES_REF_0, ( uint8_t* )&dev->ref_spad_map, 6);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 37;
-					}
-				break;
-				// -- VL53L0X_set_reference_spads() begin (assume NVM values are valid)
-			case 37:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 38;
-					}
-				break;
-			case 38:
-				st = I2C_WriteOneByte(_i2c, dev->addr, DYNAMIC_SPAD_REF_EN_START_OFFSET, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 39;
-					}
-				break;
-			case 39:
-				st = I2C_WriteOneByte(_i2c, dev->addr, DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD, 0x2C);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 40;
-					}
-				break;
-			case 40:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 41;
-					}
-				break;
-			case 41:
-				st = I2C_WriteOneByte(_i2c, dev->addr, GLOBAL_CONFIG_REF_EN_START_SELECT, 0xB4);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					uint8_t first_spad_to_enable = dev->spad_type_is_aperture ? 12 : 0;  // 12 is the first aperture spad
-					uint8_t spads_enabled = 0;
-					for (uint8_t i = 0; i < 48; i++) {
-						if (i < first_spad_to_enable || spads_enabled == dev->spad_count) {
-							// This bit is lower than the first one that should be enabled, or
-							// (reference_spad_count) bits have already been enabled, so zero this bit
-							dev->ref_spad_map[i / 8] &= ~(1 << (i % 7));
-							}
-						else if ((dev->ref_spad_map[i / 8] >> (i % 7)) & 0x1) {
-							spads_enabled++;
-							}
-						}
-					dev->stepL3 = 42;
-					}
-				break;
-			case 42:
-				st = I2C_WriteBytes(_i2c, dev->addr, GLOBAL_CONFIG_SPAD_ENABLES_REF_0, dev->ref_spad_map, 6);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 43;
-					}
-				break;
-				// -- VL53L0X_set_reference_spads() end
-
-				// -- VL53L0X_load_tuning_settings() begin
-				// DefaultTuningSettings from vl53l0x_tuning.h
-			case 43:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 44;
-					}
-				break;
-			case 44:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x00, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 45;
-					}
-				break;
-			case 45:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 46;
-					}
-				break;
-			case 46:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x09, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 47;
-					}
-				break;
-			case 47:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x10, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 48;
-					}
-				break;
-			case 48:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x11, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 49;
-					}
-				break;//+
-			case 49:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x24, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 50;
-					}
-				break;
-			case 50:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x25, 0xFF);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 51;
-					}
-				break;
-			case 51:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x75, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 52;
-					}
-				break;
-			case 52:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 53;
-					}
-				break;
-			case 53:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x4E, 0x2C);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 54;
-					}
-				break;
-			case 54:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x48, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 55;
-					}
-				break;
-			case 55:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x30, 0x20);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 56;
-					}
-				break;
-			case 56:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 57;
-					}
-				break;
-			case 57:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x30, 0x09);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 58;
-					}
-				break;
-			case 58:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x54, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 59;
-					}
-				break;
-			case 59:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x31, 0x04);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 60;
-					}
-				break;
-			case 60:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x32, 0x03);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 61;
-					}
-				break;
-			case 61:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x40, 0x83);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 62;
-					}
-				break;
-			case 62:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x46, 0x25);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 63;
-					}
-				break;
-			case 63:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x60, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 64;
-					}
-				break;
-			case 64:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x27, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 65;
-					}
-				break;
-			case 65:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x50, 0x06);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 66;
-					}
-				break;
-			case 66:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x51, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 67;
-					}
-				break;
-			case 67:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x52, 0x96);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 68;
-					}
-				break;
-			case 68:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x56, 0x08);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 69;
-					}
-				break;
-			case 69:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x57, 0x30);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 70;
-					}
-				break;
-			case 70:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x61, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 71;
-					}
-				break;
-			case 71:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x62, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 72;
-					}
-				break;
-			case 72:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x64, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 73;
-					}
-				break;
-			case 73:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x65, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 74;
-					}
-				break;
-			case 74:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x66, 0xA0);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 75;
-					}
-				break;
-			case 75:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 76;
-					}
-				break;
-			case 76:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x22, 0x32);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 77;
-					}
-				break;
-			case 77:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x47, 0x14);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 78;
-					}
-				break;
-			case 78:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x49, 0xFF);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 79;
-					}
-				break;
-			case 79:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x4A, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 80;
-					}
-				break;
-			case 80:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 81;
-					}
-				break;
-			case 81:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x7A, 0x0A);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 82;
-					}
-				break;
-			case 82:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x7B, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 83;
-					}
-				break;
-			case 83:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x78, 0x21);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 84;
-					}
-				break;
-			case 84:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 85;
-					}
-				break;
-			case 85:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x23, 0x34);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 86;
-					}
-				break;
-			case 86:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x42, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 87;
-					}
-				break;
-			case 87:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x44, 0xFF);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 88;
-					}
-				break;
-			case 88:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x45, 0x26);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 89;
-					}
-				break;
-			case 89:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x46, 0x05);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 90;
-					}
-				break;
-			case 90:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x40, 0x40);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 91;
-					}
-				break;
-			case 91:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x0E, 0x06);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 92;
-					}
-				break;
-			case 92:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x20, 0x1A);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 93;
-					}
-				break;
-			case 93:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x43, 0x40);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 94;
-					}
-				break;
-			case 94:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 95;
-					}
-				break;
-			case 95:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x34, 0x03);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 96;
-					}
-				break;
-			case 96:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x35, 0x44);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 97;
-					}
-				break;
-			case 97:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 98;
-					}
-				break;
-			case 98:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x31, 0x04);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 99;
-					}
-				break;
-			case 99:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x4B, 0x09);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 100;
-					}
-				break;
-			case 100:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x4C, 0x05);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 101;
-					}
-				break;
-			case 101:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x4D, 0x04);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 102;
-					}
-				break;
-			case 102:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 103;
-					}
-				break;
-			case 103:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x44, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 104;
-					}
-				break;
-			case 104:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x45, 0x20);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 105;
-					}
-				break;
-			case 105:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x47, 0x08);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 106;
-					}
-				break;
-			case 106:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x48, 0x28);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 107;
-					}
-				break;
-			case 107:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x67, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 108;
-					}
-				break;
-			case 108:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x70, 0x04);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 109;
-					}
-				break;
-			case 109:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x71, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 110;
-					}
-				break;
-			case 110:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x72, 0xFE);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 111;
-					}
-				break;
-			case 111:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x76, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 112;
-					}
-				break;
-			case 112:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x77, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 113;
-					}
-				break;
-			case 113:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 114;
-					}
-				break;
-			case 114:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x0D, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 115;
-					}
-				break;
-			case 115:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 116;
-					}
-				break;
-			case 116:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x80, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 117;
-					}
-				break;
-			case 117:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x01, 0xF8);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 118;
-					}
-				break;
-			case 118:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 119;
-					}
-				break;
-			case 119:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x8E, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 120;
-					}
-				break;
-			case 120:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x00, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 121;
-					}
-				break;
-			case 121:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 122;
-					}
-				break;
-			case 122:
-				st = I2C_WriteOneByte(_i2c, dev->addr, 0x80, 0x00);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 123;
-					}
-				break;
-			case 123:
-				st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 124;
-					}
-				break;
-			case 124:
-				st = I2C_ReadOneByte(_i2c, dev->addr, GPIO_HV_MUX_ACTIVE_HIGH, &dev->tmp8);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 125;
-					}
-				break;
-			case 125:
-				st = I2C_WriteOneByte(_i2c, dev->addr, GPIO_HV_MUX_ACTIVE_HIGH, dev->tmp8 & ~0x10);  // active low
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 126;
-					}
-				break;
-			case 126:
-				st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_INTERRUPT_CLEAR, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 127;
-					}
-				break;
-				// -- VL53L0X_SetGpioConfig() end
-
-			case 127:
-				if (getMeasurementTimingBudget(_i2c, dev)) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 128;
-					}
-				break;
-				// "Disable MSRC and TCC by default"
-				// MSRC = Minimum Signal Rate Check
-				// TCC = Target CentreCheck
-				// -- VL53L0X_SetSequenceStepEnable() begin
-			case 128:
-				st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_SEQUENCE_CONFIG, 0xE8);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 129;
-					}
-				break;
-				// -- VL53L0X_SetSequenceStepEnable() end
-
-			case 129:  // "Recalculate timing budget"
-				if (setMeasurementTimingBudget(_i2c, dev, dev->measurement_timing_budget_us)) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 130;
-					}
-				break;
-				// VL53L0X_StaticInit() end
-				// VL53L0X_PerformRefCalibration() begin (VL53L0X_perform_ref_calibration())
-			case 130:  // -- VL53L0X_perform_vhv_calibration() begin
-				st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_SEQUENCE_CONFIG, 0x01);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 131;
-					}
-				break;
-			case 131:  //  performSingleRefCalibration(_i2c,dev,0x40);
-				if (performSingleRefCalibration(_i2c, dev, 0x40)) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 132;
-					}
-				break;
-				// -- VL53L0X_perform_vhv_calibration() end
-			case 132:  // -- VL53L0X_perform_phase_calibration() begin
-				st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_SEQUENCE_CONFIG, 0x02);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 133;
-					}
-				break;
-			case 133:  //  performSingleRefCalibration(_i2c,dev,0x00);
-				if (performSingleRefCalibration(_i2c, dev, 0x00)) {
-					_i2c->status = PORT_BUSY;
-					dev->stepL3 = 134;
-					}
-				break;
-				// -- VL53L0X_perform_phase_calibration() end
-			case 134:  // "restore the previous Sequence Config"
-				st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_SEQUENCE_CONFIG, 0xE8);
-				if (st == PORT_DONE) {
-					dev->status = DEVICE_DONE;
-					dev->stepL3 = 0;
-					dev->count_timeout = 0;
-					}
-				break;
-				// VL53L0X_PerformRefCalibration() end
-			default:
+	switch (dev->status) {
+		case DEVICE_READY:
+			if (_i2c->status == PORT_FREE) {
+				_i2c->status = PORT_BUSY;
+				dev->status = DEVICE_PROCESSING;
+				dev->stepL1 = 0;
+				dev->stepL2 = 0;
 				dev->stepL3 = 0;
-				break;
-			}
+				}
+			break;
+		case DEVICE_PROCESSING:
+			switch (dev->stepL3) {
+				case 0:// VL53L0X_DataInit() begin
+					if (I2C_ReadOneByte(_i2c, dev->addr, VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, &dev->tmp8)) {
+						if (_i2c->status == PORT_DONE) {
+							_i2c->status = PORT_BUSY;
+							dev->stepL3 = 1;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 1:// always 2.8v enable
+					if (I2C_WriteOneByte(_i2c, dev->addr, VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, dev->tmp8 | 0x01)) {  // set bit 0
+						if (_i2c->status == PORT_DONE) {
+							_i2c->status = PORT_BUSY;
+							dev->stepL3 = 2;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 2:  //Set I2C standard mode
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0x88, 0x00)) {
+						if (_i2c->status == PORT_DONE) {
+							_i2c->status = PORT_BUSY;
+							dev->stepL3 = 3;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 3:
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0x80, 0x01)) {
+						if (_i2c->status == PORT_DONE) {
+							_i2c->status = PORT_BUSY;
+							dev->stepL3 = 4;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 4:
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01)) {
+						if (_i2c->status == PORT_DONE) {
+							_i2c->status = PORT_BUSY;
+							dev->stepL3 = 5;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 5:
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0x00, 0x00)) {
+						if (_i2c->status == PORT_DONE) {
+							_i2c->status = PORT_BUSY;
+							dev->stepL3 = 6;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 6://stop variable 0x11
+					if (I2C_ReadOneByte(_i2c, dev->addr, 0x91, &dev->stop_variable)) {
+						if (_i2c->status == PORT_DONE) {
+							_i2c->status = PORT_BUSY;
+							dev->stepL3 = 7;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 7:
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0x00, 0x01)) {
+						if (_i2c->status == PORT_DONE) {
+							_i2c->status = PORT_BUSY;
+							dev->stepL3 = 8;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 8:
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00)) {
+						if (_i2c->status == PORT_DONE) {
+							_i2c->status = PORT_BUSY;
+							dev->stepL3 = 9;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 9:
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0x80, 0x00)) {
+						if (_i2c->status == PORT_DONE) {
+							_i2c->status = PORT_BUSY;
+							dev->stepL3 = 10;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 10:// disable SIGNAL_RATE_MSRC (bit 1) and SIGNAL_RATE_PRE_RANGE (bit 4) limit checks//+
+					st = I2C_ReadOneByte(_i2c, dev->addr, MSRC_CONFIG_CONTROL, &dev->tmp8);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 11;
+						}
+					break;//tmp must be 0x32
+				case 11:
+					st = I2C_WriteOneByte(_i2c, dev->addr, MSRC_CONFIG_CONTROL, dev->tmp8 | 0x12);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 12;
+						}
+					break;
+				case 12:
+					//st = setSignalRateLimit(_i2c, dev, 32);
+					uint16_t data = 32;//Min(Max(( uint16_t )limit_Mcps, 65535), 32);
+					st = I2C_WriteBytes(_i2c, dev->addr, FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, ( uint8_t* )&data, 2);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 13;
+						}
+					break;
+				case 13:
+					st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_SEQUENCE_CONFIG, 0xFF);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 14;
+						}
+					break;// VL53L0X_DataInit() end
+					/* VL53L0X_StaticInit() begin
+					The SPAD map (RefGoodSpadMap) is read by VL53L0X_get_info_from_device() in
+					the API, but the same data seems to be more easily readable from
+					GLOBAL_CONFIG_SPAD_ENABLES_REF_0 through _6, so read it from there*/
+				case 14://uint8_t getSpadInfo() start, I insert it directly
+					st = I2C_WriteOneByte(_i2c, dev->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 15;
+						}
+					break;
+				case 15:
+					st = I2C_WriteOneByte(_i2c, dev->addr, INTERNAL_TUNING_2, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 16;
+						}
+					break;
+				case 16:
+					st = I2C_WriteOneByte(_i2c, dev->addr, SYSRANGE_START, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 17;
+						}
+					break;
+				case 17:
+					st = I2C_WriteOneByte(_i2c, dev->addr, INTERNAL_TUNING_2, 0x06);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 18;
+						}
+					break;
+				case 18:
+					st = I2C_ReadOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, &dev->tmp8);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->tmp8 |= 0x04;
+						dev->stepL3 = 19;
+						}
+					break;
+				case 19:
+					st = I2C_WriteOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, dev->tmp8);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 20;
+						}
+					break;
+				case 20:
+					st = I2C_WriteOneByte(_i2c, dev->addr, INTERNAL_TUNING_2, 0x07);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 21;
+						}
+					break;
+				case 21:
+					st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_HISTOGRAM_BIN, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 22;
+						}
+					break;
+				case 22:
+					st = I2C_WriteOneByte(_i2c, dev->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 23;
+						}
+					;
+					break;
+				case 23:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x94, 0x6b);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 24;
+						}
+					break;
+				case 24:
+					st = I2C_WriteOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						setTimeout(dev, 100);
+						startTimeout(dev);
+						dev->stepL3 = 25;
+						}
+					break;
+				case 25:
+					st = I2C_ReadOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, &dev->tmp8);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						if (dev->tmp8 != 0x00) {
+							dev->stepL3 = 26;
+							}
+						else if (checkTimeoutExpired(dev)) {
+							dev->stepL3 = 0;
+							dev->status = DEVICE_FAULTH;
+							_i2c->status = PORT_FREE;
+							return 1;
+							}
+						}
+					break;
+				case 26:
+					st = I2C_WriteOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 27;
+						}
+					break;
+				case 27:
+					st = I2C_ReadOneByte(_i2c, dev->addr, 0x92, &dev->tmp8);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->spad_count = dev->tmp8 & 0x7f;
+						dev->spad_type_is_aperture = (dev->tmp8 >> 7) & 0x01;
+						dev->stepL3 = 28;
+						}
+					break;
+				case 28:
+					st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_HISTOGRAM_BIN, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 29;
+						}
+					break;
+				case 29:
+					st = I2C_WriteOneByte(_i2c, dev->addr, INTERNAL_TUNING_2, 0x06);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 30;
+						}
+					break;
+				case 30:
+					st = I2C_ReadOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, &dev->tmp8);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->tmp8 &= ~0x04;
+						dev->stepL3 = 31;
+						}
+					break;
+				case 31:
+					st = I2C_WriteOneByte(_i2c, dev->addr, SOMETHING_MAGIC_REG, dev->tmp8);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 32;
+						}
+					break;
+				case 32:
+					st = I2C_WriteOneByte(_i2c, dev->addr, INTERNAL_TUNING_2, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 33;
+						}
+					break;
+				case 33:
+					st = I2C_WriteOneByte(_i2c, dev->addr, SYSRANGE_START, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 34;
+						}
+					break;
+				case 34:
+					st = I2C_WriteOneByte(_i2c, dev->addr, INTERNAL_TUNING_2, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 35;
+						}
+					break;
+				case 35:
+					st = I2C_WriteOneByte(_i2c, dev->addr, POWER_MANAGEMENT_GO1_POWER_FORCE, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 36;
+						}
+					break;//get SPAD info end
+				case 36:
+					st = I2C_ReadBytes(_i2c, dev->addr, GLOBAL_CONFIG_SPAD_ENABLES_REF_0, ( uint8_t* )&dev->ref_spad_map, 6);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 37;
+						}
+					break;
+					// -- VL53L0X_set_reference_spads() begin (assume NVM values are valid)
+				case 37:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 38;
+						}
+					break;
+				case 38:
+					st = I2C_WriteOneByte(_i2c, dev->addr, DYNAMIC_SPAD_REF_EN_START_OFFSET, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 39;
+						}
+					break;
+				case 39:
+					st = I2C_WriteOneByte(_i2c, dev->addr, DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD, 0x2C);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 40;
+						}
+					break;
+				case 40:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 41;
+						}
+					break;
+				case 41:
+					st = I2C_WriteOneByte(_i2c, dev->addr, GLOBAL_CONFIG_REF_EN_START_SELECT, 0xB4);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						uint8_t first_spad_to_enable = dev->spad_type_is_aperture ? 12 : 0;  // 12 is the first aperture spad
+						uint8_t spads_enabled = 0;
+						for (uint8_t i = 0; i < 48; i++) {
+							if (i < first_spad_to_enable || spads_enabled == dev->spad_count) {
+								// This bit is lower than the first one that should be enabled, or
+								// (reference_spad_count) bits have already been enabled, so zero this bit
+								dev->ref_spad_map[i / 8] &= ~(1 << (i % 7));
+								}
+							else if ((dev->ref_spad_map[i / 8] >> (i % 7)) & 0x1) {
+								spads_enabled++;
+								}
+							}
+						dev->stepL3 = 42;
+						}
+					break;
+				case 42:
+					st = I2C_WriteBytes(_i2c, dev->addr, GLOBAL_CONFIG_SPAD_ENABLES_REF_0, dev->ref_spad_map, 6);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 43;
+						}
+					break;
+					// -- VL53L0X_set_reference_spads() end
+
+					// -- VL53L0X_load_tuning_settings() begin
+					// DefaultTuningSettings from vl53l0x_tuning.h
+				case 43:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 44;
+						}
+					break;
+				case 44:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x00, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 45;
+						}
+					break;
+				case 45:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 46;
+						}
+					break;
+				case 46:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x09, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 47;
+						}
+					break;
+				case 47:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x10, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 48;
+						}
+					break;
+				case 48:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x11, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 49;
+						}
+					break;//+
+				case 49:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x24, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 50;
+						}
+					break;
+				case 50:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x25, 0xFF);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 51;
+						}
+					break;
+				case 51:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x75, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 52;
+						}
+					break;
+				case 52:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 53;
+						}
+					break;
+				case 53:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x4E, 0x2C);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 54;
+						}
+					break;
+				case 54:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x48, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 55;
+						}
+					break;
+				case 55:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x30, 0x20);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 56;
+						}
+					break;
+				case 56:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 57;
+						}
+					break;
+				case 57:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x30, 0x09);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 58;
+						}
+					break;
+				case 58:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x54, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 59;
+						}
+					break;
+				case 59:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x31, 0x04);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 60;
+						}
+					break;
+				case 60:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x32, 0x03);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 61;
+						}
+					break;
+				case 61:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x40, 0x83);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 62;
+						}
+					break;
+				case 62:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x46, 0x25);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 63;
+						}
+					break;
+				case 63:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x60, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 64;
+						}
+					break;
+				case 64:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x27, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 65;
+						}
+					break;
+				case 65:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x50, 0x06);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 66;
+						}
+					break;
+				case 66:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x51, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 67;
+						}
+					break;
+				case 67:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x52, 0x96);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 68;
+						}
+					break;
+				case 68:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x56, 0x08);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 69;
+						}
+					break;
+				case 69:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x57, 0x30);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 70;
+						}
+					break;
+				case 70:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x61, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 71;
+						}
+					break;
+				case 71:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x62, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 72;
+						}
+					break;
+				case 72:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x64, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 73;
+						}
+					break;
+				case 73:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x65, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 74;
+						}
+					break;
+				case 74:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x66, 0xA0);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 75;
+						}
+					break;
+				case 75:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 76;
+						}
+					break;
+				case 76:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x22, 0x32);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 77;
+						}
+					break;
+				case 77:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x47, 0x14);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 78;
+						}
+					break;
+				case 78:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x49, 0xFF);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 79;
+						}
+					break;
+				case 79:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x4A, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 80;
+						}
+					break;
+				case 80:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 81;
+						}
+					break;
+				case 81:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x7A, 0x0A);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 82;
+						}
+					break;
+				case 82:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x7B, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 83;
+						}
+					break;
+				case 83:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x78, 0x21);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 84;
+						}
+					break;
+				case 84:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 85;
+						}
+					break;
+				case 85:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x23, 0x34);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 86;
+						}
+					break;
+				case 86:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x42, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 87;
+						}
+					break;
+				case 87:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x44, 0xFF);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 88;
+						}
+					break;
+				case 88:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x45, 0x26);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 89;
+						}
+					break;
+				case 89:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x46, 0x05);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 90;
+						}
+					break;
+				case 90:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x40, 0x40);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 91;
+						}
+					break;
+				case 91:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x0E, 0x06);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 92;
+						}
+					break;
+				case 92:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x20, 0x1A);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 93;
+						}
+					break;
+				case 93:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x43, 0x40);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 94;
+						}
+					break;
+				case 94:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 95;
+						}
+					break;
+				case 95:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x34, 0x03);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 96;
+						}
+					break;
+				case 96:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x35, 0x44);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 97;
+						}
+					break;
+				case 97:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 98;
+						}
+					break;
+				case 98:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x31, 0x04);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 99;
+						}
+					break;
+				case 99:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x4B, 0x09);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 100;
+						}
+					break;
+				case 100:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x4C, 0x05);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 101;
+						}
+					break;
+				case 101:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x4D, 0x04);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 102;
+						}
+					break;
+				case 102:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 103;
+						}
+					break;
+				case 103:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x44, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 104;
+						}
+					break;
+				case 104:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x45, 0x20);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 105;
+						}
+					break;
+				case 105:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x47, 0x08);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 106;
+						}
+					break;
+				case 106:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x48, 0x28);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 107;
+						}
+					break;
+				case 107:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x67, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 108;
+						}
+					break;
+				case 108:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x70, 0x04);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 109;
+						}
+					break;
+				case 109:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x71, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 110;
+						}
+					break;
+				case 110:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x72, 0xFE);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 111;
+						}
+					break;
+				case 111:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x76, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 112;
+						}
+					break;
+				case 112:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x77, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 113;
+						}
+					break;
+				case 113:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 114;
+						}
+					break;
+				case 114:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x0D, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 115;
+						}
+					break;
+				case 115:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 116;
+						}
+					break;
+				case 116:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x80, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 117;
+						}
+					break;
+				case 117:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x01, 0xF8);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 118;
+						}
+					break;
+				case 118:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 119;
+						}
+					break;
+				case 119:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x8E, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 120;
+						}
+					break;
+				case 120:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x00, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 121;
+						}
+					break;
+				case 121:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 122;
+						}
+					break;
+				case 122:
+					st = I2C_WriteOneByte(_i2c, dev->addr, 0x80, 0x00);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 123;
+						}
+					break;
+				case 123:
+					st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 124;
+						}
+					break;
+				case 124:
+					st = I2C_ReadOneByte(_i2c, dev->addr, GPIO_HV_MUX_ACTIVE_HIGH, &dev->tmp8);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 125;
+						}
+					break;
+				case 125:
+					st = I2C_WriteOneByte(_i2c, dev->addr, GPIO_HV_MUX_ACTIVE_HIGH, dev->tmp8 & ~0x10);  // active low
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 126;
+						}
+					break;
+				case 126:
+					st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_INTERRUPT_CLEAR, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 127;
+						}
+					break;
+					// -- VL53L0X_SetGpioConfig() end
+
+				case 127:
+					if (getMeasurementTimingBudget(_i2c, dev)) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 128;
+						}
+					break;
+					// "Disable MSRC and TCC by default"
+					// MSRC = Minimum Signal Rate Check
+					// TCC = Target CentreCheck
+					// -- VL53L0X_SetSequenceStepEnable() begin
+				case 128:
+					st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_SEQUENCE_CONFIG, 0xE8);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 129;
+						}
+					break;
+					// -- VL53L0X_SetSequenceStepEnable() end
+
+				case 129:  // "Recalculate timing budget"
+					if (setMeasurementTimingBudget(_i2c, dev, dev->measurement_timing_budget_us)) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 130;
+						}
+					break;
+					// VL53L0X_StaticInit() end
+					// VL53L0X_PerformRefCalibration() begin (VL53L0X_perform_ref_calibration())
+				case 130:  // -- VL53L0X_perform_vhv_calibration() begin
+					st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_SEQUENCE_CONFIG, 0x01);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 131;
+						}
+					break;
+				case 131:  //  performSingleRefCalibration(_i2c,dev,0x40);
+					if (performSingleRefCalibration(_i2c, dev, 0x40)) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 132;
+						}
+					break;
+					// -- VL53L0X_perform_vhv_calibration() end
+				case 132:  // -- VL53L0X_perform_phase_calibration() begin
+					st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_SEQUENCE_CONFIG, 0x02);
+					if (st == PORT_DONE) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 133;
+						}
+					break;
+				case 133:  //  performSingleRefCalibration(_i2c,dev,0x00);
+					if (performSingleRefCalibration(_i2c, dev, 0x00)) {
+						_i2c->status = PORT_BUSY;
+						dev->stepL3 = 134;
+						}
+					break;
+					// -- VL53L0X_perform_phase_calibration() end
+				case 134:  // "restore the previous Sequence Config"
+					st = I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_SEQUENCE_CONFIG, 0xE8);
+					if (st == PORT_DONE) {
+						dev->status = DEVICE_DONE;
+						dev->stepL3 = 0;
+						dev->count_timeout = 0;
+						}
+					break;
+					// VL53L0X_PerformRefCalibration() end
+				default:
+					dev->stepL3 = 0;
+					break;
+				}
+
 		}
-	if (dev->status == DEVICE_DONE) {
-		_i2c->status = PORT_FREE;
-		dev->status = DEVICE_READY;
-		return 1;
-		}
-	else if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
-		dev->status = DEVICE_FAULTH;
-		_i2c->status = PORT_FREE;
-		return 1;
-		}
-	return 0;
+	break;
+		case DEVICE_DONE:
+			dev->status = DEVICE_READY;
+			_i2c->status = PORT_FREE;
+			return 1;
+		case DEVICE_ERROR:
+			if (++dev->errCount >= dev->errLimit) {
+				dev->status = DEVICE_FAULTH;
+				_i2c->status = PORT_FREE;
+				}
+			else {
+				dev->status = DEVICE_READY;
+				_i2c->status = PORT_FREE;
+				dev->stepL1 = 0;
+				dev->stepL2 = 0;
+				dev->stepL3 = 0;
+				}
+			break;
+		case DEVICE_FAULTH:
+			return 1;
+		default:
+			break;
 	}
+return 0;
+}
 
 uint16_t getSmoothRange(VL53L0x_t* dev) {
 	static_assert(VL53L0x_SHOOTH_DEEP % 2 == 0, "smooth deep most be power of 2");

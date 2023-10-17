@@ -109,7 +109,7 @@ uint8_t INA219_GetData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 			break;
 		case DEVICE_PROCESSING:
 			switch (dev->step) {
-				case 0://read  voltage
+				case 0:{//read  voltage
 					uint8_t dt[INA219_REG_LEN];
 					if (I2C_ReadBytes(_i2c, dev->addr, INA219_REG_BUSVOLTAGE, dt, INA219_REG_LEN)) {
 						if (_i2c->status == PORT_DONE) {
@@ -121,8 +121,8 @@ uint8_t INA219_GetData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 							dev->status = DEVICE_ERROR;
 							}
 						}
-					break;
-				case 1://read power
+					break;}
+				case 1:{//read power
 					uint8_t dt[INA219_REG_LEN];
 					if (I2C_ReadBytes(_i2c, dev->addr, INA219_REG_POWER, dt, INA219_REG_LEN)) {
 						if (_i2c->status == PORT_DONE) {
@@ -134,8 +134,8 @@ uint8_t INA219_GetData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 							dev->status = DEVICE_ERROR;
 							}
 						}
-					break;
-				case 2://read current
+					break;}
+				case 2:{//read current
 					uint8_t dt[INA219_REG_LEN];
 					if (I2C_ReadBytes(_i2c, dev->addr, INA219_REG_CURRENT, dt, INA219_REG_LEN)) {
 						if (_i2c->status == PORT_DONE) {
@@ -147,8 +147,8 @@ uint8_t INA219_GetData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 							dev->status = DEVICE_ERROR;
 							}
 						}
-					break;
-				case 3://read shunt  voltage
+					break;}
+				case 3:{//read shunt  voltage
 					uint8_t dt[INA219_REG_LEN];
 					if (I2C_ReadBytes(_i2c, dev->addr, INA219_REG_SHUNTVOLTAGE, dt, INA219_REG_LEN)) {
 						if (_i2c->status == PORT_DONE) {
@@ -159,7 +159,7 @@ uint8_t INA219_GetData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
 							dev->status = DEVICE_ERROR;
 							}
 						}
-					break;
+					break;}
 				default:
 					break;
 				}

@@ -20,80 +20,43 @@
 
 #include "TCA9548A.h"
 
-uint8_t TCA9548A_Init(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev) {
-	PortStatus_t st  = 0;
-	if (dev->status == DEVICE_FAULTH) {
-		return 1;
-		}
-	else if ((dev->status == DEVICE_READY) && (_i2c->status == PORT_FREE)) {
-		_i2c->status = PORT_BUSY;
-		dev->status = DEVICE_PROCESSING;
-		dev->port = 0x00;
-		}
-	if (dev->status == DEVICE_PROCESSING) {
-		st = I2C_WriteOne(_i2c, dev->addr, dev->port);
-		if (st == PORT_DONE) {
-			_i2c->status = PORT_FREE;
+uint8_t TCA9548A_SetChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t channelMask) {
+	switch (dev->status) {
+		case DEVICE_READY:
+			if (_i2c->status == PORT_FREE) {
+				_i2c->status = PORT_BUSY;
+				dev->status = DEVICE_PROCESSING;
+				}
+			break;
+		case DEVICE_PROCESSING:
+			if (I2C_WriteOne(_i2c, dev->addr, dev->port)) {
+				if (_i2c->status == PORT_DONE) {
+					dev->status = DEVICE_DONE;
+					}
+				else if (_i2c->status == PORT_ERROR) {
+					dev->status = DEVICE_ERROR;
+					}
+				}
+			break;
+		case DEVICE_DONE:
 			dev->status = DEVICE_READY;
+			_i2c->status = PORT_FREE;
 			return 1;
-			}
-		}
-	if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
-		dev->status = DEVICE_FAULTH;
-		_i2c->status = PORT_FREE;
-		return 1;
+		case DEVICE_ERROR:
+			if (++dev->errCount >= dev->errLimit) {
+				dev->status = DEVICE_FAULTH;
+				_i2c->status = PORT_FREE;
+				}
+			else {
+				dev->status = DEVICE_READY;
+				_i2c->status = PORT_FREE;
+				}
+			break;
+		case DEVICE_FAULTH:
+			return 1;
+		default:
+			break;
 		}
 	return 0;
 	}
 
-uint8_t TCA9548A_OnChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t channelMask) {
-	PortStatus_t st;
-	if (dev->status == DEVICE_FAULTH) {
-		return 1;
-		}
-	else if ((dev->status == DEVICE_READY) && (_i2c->status == PORT_FREE)) {
-		_i2c->status = PORT_BUSY;
-		dev->status = DEVICE_PROCESSING;
-		dev->port = channelMask;
-		}
-	if (dev->status == DEVICE_PROCESSING) {
-		st = I2C_WriteOne(_i2c, dev->addr, dev->port);
-		if (st == PORT_DONE) {
-			_i2c->status = PORT_FREE;
-			dev->status = DEVICE_READY;
-			return 1;
-			}
-		}
-	if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
-		dev->status = DEVICE_FAULTH;
-		_i2c->status = PORT_FREE;
-//		return 1;
-		}
-	return 0;
-	}
-
-uint8_t TCA9548A_OffChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t channelMask) {
-	PortStatus_t st;
-	if (dev->status == DEVICE_FAULTH) {
-		return 1;
-		}
-	else if ((dev->status == DEVICE_READY) && (_i2c->status == PORT_FREE)) {
-		_i2c->status = PORT_BUSY;
-		dev->status = DEVICE_PROCESSING;
-		dev->port &= ~channelMask;
-		}
-	if (dev->status == DEVICE_PROCESSING) {
-		st = I2C_WriteOne(_i2c, dev->addr, dev->port);
-		if (st == PORT_DONE) {
-			_i2c->status = PORT_FREE;
-			dev->status = DEVICE_READY;
-			return 1;
-			}
-		}
-	if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
-		dev->status = DEVICE_FAULTH;
-		_i2c->status = PORT_FREE;
-		return 1;
-		}
-	return 0;
-	}

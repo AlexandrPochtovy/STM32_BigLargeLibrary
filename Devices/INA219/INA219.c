@@ -33,122 +33,156 @@ static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 
 //Init & setup	=============================================================================================
 uint8_t INA219_Init(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
-	PortStatus_t st;
-	if (dev->status == DEVICE_FAULTH) {
-		return 1;
-		}
-	else if ((dev->status == DEVICE_READY) && (_i2c->status == PORT_FREE)) {
-		_i2c->status = PORT_BUSY;
-		dev->status = DEVICE_PROCESSING;
-		dev->step = 0;
-		}
-	switch (dev->step) {
-		case 0:
-			if (dev->status == DEVICE_PROCESSING) {
-				uint16_t cfg = INA219_CFG_MODE_SHBV_CONTINUOUS |	// shunt and bus voltage continuous	defaulth
-					INA219_CFG_SADC_12BIT_128S |	// 128 x 12-bit shunt samples averaged together
-					INA219_CFG_BADC_12BIT_128S |	// 128 x 12-bit bus samples averaged together
-					INA219_CFG_GAIN_8_320MV |	// Gain 8, 320mV Range defaulth
-					INA219_CFG_BVRANGE_16V;				// 0-16V Range
-				st = I2C_WriteBytes(_i2c, dev->addr, INA219_REG_CONFIG, (uint8_t *)&cfg, INA219_REG_LEN);
-				if (st == PORT_DONE) {
-					_i2c->status = PORT_BUSY;
-					dev->step = 1;
-					}
+	switch (dev->status) {
+		case DEVICE_READY:
+			if (_i2c->status == PORT_FREE) {
+				_i2c->status = PORT_BUSY;
+				dev->status = DEVICE_PROCESSING;
+				dev->step = 0;
 				}
 			break;
-		case 1:
-			if (dev->status == DEVICE_PROCESSING) {
-				uint16_t data = INA219_CalibrationVal;
-				st = I2C_WriteBytes(_i2c, dev->addr, INA219_REG_CALIBRATION, (uint8_t *)&data, INA219_REG_LEN);
-				if (st == PORT_DONE) {
-					dev->status = DEVICE_DONE;
-					}
+		case DEVICE_PROCESSING:
+			switch (dev->step) {
+				case 0:
+					uint16_t cfg = INA219_CFG_MODE_SHBV_CONTINUOUS |	// shunt and bus voltage continuous	defaulth
+						INA219_CFG_SADC_12BIT_128S |	// 128 x 12-bit shunt samples averaged together
+						INA219_CFG_BADC_12BIT_128S |	// 128 x 12-bit bus samples averaged together
+						INA219_CFG_GAIN_8_320MV |	// Gain 8, 320mV Range defaulth
+						INA219_CFG_BVRANGE_16V;				// 0-16V Range
+					if (I2C_WriteBytes(_i2c, dev->addr, INA219_REG_CONFIG, (uint8_t *)&cfg, INA219_REG_LEN)) {
+						if (_i2c->status == PORT_DONE) {
+							_i2c->status = PORT_BUSY;
+							dev->step = 1;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 1:
+					uint16_t data = INA219_CalibrationVal;
+					if (I2C_WriteBytes(_i2c, dev->addr, INA219_REG_CALIBRATION, (uint8_t *)&data, INA219_REG_LEN)) {
+						if (_i2c->status == PORT_DONE) {
+							_i2c->status = PORT_BUSY;
+							dev->status = DEVICE_DONE;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				default:
+					break;
 				}
 			break;
+		case DEVICE_DONE:
+			dev->status = DEVICE_READY;
+			_i2c->status = PORT_FREE;
+			return 1;
+		case DEVICE_ERROR:
+			if (++dev->errCount >= dev->errLimit) {
+				dev->status = DEVICE_FAULTH;
+				_i2c->status = PORT_FREE;
+				}
+			else {
+				dev->status = DEVICE_READY;
+				_i2c->status = PORT_FREE;
+				dev->step = 0;
+				}
+			break;
+		case DEVICE_FAULTH:
+			return 1;
 		default:
 			break;
-		}
-	if (dev->status == DEVICE_DONE) {
-		_i2c->status = PORT_FREE;
-		dev->status = DEVICE_READY;
-		return 1;
-		}
-	else if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
-		dev->status = DEVICE_FAULTH;
-		_i2c->status = PORT_FREE;
-		return 1;
 		}
 	return 0;
 	}
 
 uint8_t INA219_GetData(I2C_IRQ_Conn_t *_i2c, INA219_t *dev) {
-	PortStatus_t st;
-	if (dev->status == DEVICE_FAULTH) {
-		return 1;
-		}
-	else if ((dev->status == DEVICE_READY) && (_i2c->status == PORT_FREE)) {
-		_i2c->status = PORT_BUSY;
-		dev->status = DEVICE_PROCESSING;
-		dev->step = 0;
-		}
-	switch (dev->step) {
-		case 0://read  voltage
-			if (dev->status == DEVICE_PROCESSING) {
-				uint8_t dt[INA219_REG_LEN];
-				st = I2C_ReadBytes(_i2c, dev->addr, INA219_REG_BUSVOLTAGE, dt, INA219_REG_LEN);
-				if (st == PORT_DONE) {
-					dev->raw.voltage = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);
-					_i2c->status = PORT_BUSY;
-					dev->step = 1;
-					}
+	switch (dev->status) {
+		case DEVICE_READY:
+			if (_i2c->status == PORT_FREE) {
+				_i2c->status = PORT_BUSY;
+				dev->status = DEVICE_PROCESSING;
+				dev->step = 0;
 				}
 			break;
-		case 1://read power
-			if (dev->status == DEVICE_PROCESSING) {
-				uint8_t dt[INA219_REG_LEN];
-				st = I2C_ReadBytes(_i2c, dev->addr, INA219_REG_POWER, dt, INA219_REG_LEN);
-				if (st == PORT_DONE) {
-					dev->raw.power = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);
-					_i2c->status = PORT_BUSY;
-					dev->step = 2;
-					}
+		case DEVICE_PROCESSING:
+			switch (dev->step) {
+				case 0://read  voltage
+					uint8_t dt[INA219_REG_LEN];
+					if (I2C_ReadBytes(_i2c, dev->addr, INA219_REG_BUSVOLTAGE, dt, INA219_REG_LEN)) {
+						if (_i2c->status == PORT_DONE) {
+							dev->raw.voltage = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);
+							_i2c->status = PORT_BUSY;
+							dev->step = 1;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 1://read power
+					uint8_t dt[INA219_REG_LEN];
+					if (I2C_ReadBytes(_i2c, dev->addr, INA219_REG_POWER, dt, INA219_REG_LEN)) {
+						if (_i2c->status == PORT_DONE) {
+							dev->raw.power = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);
+							_i2c->status = PORT_BUSY;
+							dev->step = 2;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 2://read current
+					uint8_t dt[INA219_REG_LEN];
+					if (I2C_ReadBytes(_i2c, dev->addr, INA219_REG_CURRENT, dt, INA219_REG_LEN)) {
+						if (_i2c->status == PORT_DONE) {
+							dev->raw.current = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);
+							_i2c->status = PORT_BUSY;
+							dev->step = 3;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 3://read shunt  voltage
+					uint8_t dt[INA219_REG_LEN];
+					if (I2C_ReadBytes(_i2c, dev->addr, INA219_REG_SHUNTVOLTAGE, dt, INA219_REG_LEN)) {
+						if (_i2c->status == PORT_DONE) {
+							dev->raw.shuntV = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);
+							dev->status = DEVICE_DONE;
+							}
+						else if (_i2c->status == PORT_ERROR) {
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				default:
+					break;
 				}
 			break;
-		case 2://read current
-			if (dev->status == DEVICE_PROCESSING) {
-				uint8_t dt[INA219_REG_LEN];
-				st = I2C_ReadBytes(_i2c, dev->addr, INA219_REG_CURRENT, dt, INA219_REG_LEN);
-				if (st == PORT_DONE) {
-					dev->raw.current = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);
-					_i2c->status = PORT_BUSY;
-					dev->step = 3;
-					}
+		case DEVICE_DONE:
+			dev->status = DEVICE_READY;
+			_i2c->status = PORT_FREE;
+			return 1;
+		case DEVICE_ERROR:
+			if (++dev->errCount >= dev->errLimit) {
+				dev->status = DEVICE_FAULTH;
+				_i2c->status = PORT_FREE;
+				}
+			else {
+				dev->status = DEVICE_READY;
+				_i2c->status = PORT_FREE;
+				dev->step = 0;
 				}
 			break;
-		case 3://read shunt  voltage
-			if (dev->status == DEVICE_PROCESSING) {
-				uint8_t dt[INA219_REG_LEN];
-				st = I2C_ReadBytes(_i2c, dev->addr, INA219_REG_SHUNTVOLTAGE, dt, INA219_REG_LEN);
-				if (st == PORT_DONE) {
-					dev->raw.shuntV = (uint16_t)CONCAT_BYTES(dt[0], dt[1]);
-					dev->step = 0;
-					dev->status = DEVICE_DONE;
-					}
-				}
-			break;
+		case DEVICE_FAULTH:
+			return 1;
 		default:
 			break;
-		}
-	if (dev->status == DEVICE_DONE) {
-		_i2c->status = PORT_FREE;
-		dev->status = DEVICE_READY;
-		return 1;
-		}
-	else if ((st == PORT_ERROR) && (++dev->errCount >= dev->errLimit)) {
-		dev->status = DEVICE_FAULTH;
-		_i2c->status = PORT_FREE;
-		return 1;
 		}
 	return 0;
 	}

@@ -30,14 +30,14 @@ enum TCA9548A_ADDRESS {
   };
 
 enum TCA9548A_channel {
-	TCA9548A_CH0 = 0x01,
-	TCA9548A_CH1 = 0x02,
-	TCA9548A_CH2 = 0x04,
-	TCA9548A_CH3 = 0x08,
-	TCA9548A_CH4 = 0x10,
-	TCA9548A_CH5 = 0x20,
-	TCA9548A_CH6 = 0x40,
-	TCA9548A_CH7 = 0x80
+  TCA9548A_CH0 = 0x01,
+  TCA9548A_CH1 = 0x02,
+  TCA9548A_CH2 = 0x04,
+  TCA9548A_CH3 = 0x08,
+  TCA9548A_CH4 = 0x10,
+  TCA9548A_CH5 = 0x20,
+  TCA9548A_CH6 = 0x40,
+  TCA9548A_CH7 = 0x80
   };
 
 //common data struct for sensor
@@ -50,29 +50,13 @@ typedef struct TCA9548A {
   } TCA9548A_t;
 
 /*****************************************************************
-  * @brief init i2c multiplexer: clear port and off all channels
-  * @param _i2c - pointer to I2C bus connection structure
-  * @param dev - pointer to multiplexer main structure
-  * @retval 1 when end
-  */
-uint8_t TCA9548A_Init(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev);
-
-/*****************************************************************
   * @brief set i2c multiplexer's port's channels as mask
   * @param _i2c - pointer to I2C bus connection structure
   * @param dev - pointer to multiplexer main structure
   * @param channelMask - mask for enable channels
   * @retval 1 when end
   */
-uint8_t TCA9548A_OnChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t channelMask);
+uint8_t TCA9548A_SetChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t channelMask);
 
-/*****************************************************************
-  * @brief reset i2c multiplexer's port's channels as mask
-  * @param _i2c - pointer to I2C bus connection structure
-  * @param dev - pointer to multiplexer main structure
-  * @param channelMask - mask for disable channels
-  * @retval 1 when end
-  */
-uint8_t TCA9548A_OffChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t channelMask);
 
 #endif /* TCA9548A_H_ */

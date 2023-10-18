@@ -144,7 +144,7 @@ void I2C_Alt_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 			LL_I2C_GenerateStopCondition(_i2c->i2c); 		//stop before last byte read
 			FIFO_PutOne(_i2c->buffer, ((uint8_t) _i2c->i2c->DR)); 		//read last byte from data reg
 			--_i2c->len;
-			_i2c->status = PORT_COMPLITE; 		//set bus free status
+			_i2c->status = PORT_DONE; 		//set bus free status
 		}
 		else if (_i2c->len == 2) {
 			LL_I2C_AcknowledgeNextData(_i2c->i2c, LL_I2C_NACK); 		//Ack disable if only one byte read
@@ -169,7 +169,7 @@ void I2C_Alt_IRQ_CallBack(I2C_IRQ_Conn_t *_i2c) {
 			for (uint8_t i = 0;  i < 100; ++ i) {
 				__NOP();
 			}
-			_i2c->status = PORT_COMPLITE; 		//set bus free status
+			_i2c->status = PORT_DONE; 		//set bus free status
 		}
 	}
 

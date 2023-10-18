@@ -44,9 +44,8 @@ uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 				case 0:// check connection read chip's ID
 					uint8_t ID = 0;
 					if (I2C_ReadOneByte(_i2c, dev->addr, ITG3205_WHOAMI, &ID)) {
-						if (_i2c->status == PORT_DONE) {
+						if (_i2c->status == PORT_BUSY) {
 							if (((ID & 0xFE) << 1) == ITG3205_ADDR) {
-								_i2c->status = PORT_BUSY;
 								dev->step = 1;
 								}
 							else {
@@ -62,8 +61,7 @@ uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 					break;
 				case 1: {//setup clock
 					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_PWR_MGM, ITG3205_PWR_CLOCK_INTERNAL)) {
-						if (_i2c->status == PORT_DONE) {
-							_i2c->status = PORT_BUSY;
+						if (_i2c->status == PORT_BUSY) {
 							dev->step = 2;
 							}
 						else if (_i2c->status == PORT_ERROR) {
@@ -74,8 +72,7 @@ uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 					}
 				case 2:// setup samplerate
 					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_SMPLRT_DIV, 0x07)) {
-						if (_i2c->status == PORT_DONE) {
-							_i2c->status = PORT_BUSY;
+						if (_i2c->status == PORT_BUSY) {
 							dev->step = 3;
 							}
 						else if (_i2c->status == PORT_ERROR) {
@@ -85,8 +82,7 @@ uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 					break;
 				case 3: //setup low-pass filter
 					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_DLPF_FS, ITG3205_DLPF_FS_SEL | ITG3205_DLPF_CFG_5Hz)) {
-						if (_i2c->status == PORT_DONE) {
-							_i2c->status = PORT_BUSY;
+						if (_i2c->status == PORT_BUSY) {
 							dev->step = 4;
 							}
 						else if (_i2c->status == PORT_ERROR) {
@@ -96,7 +92,7 @@ uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 					break;
 				case 4: // setup interrupt
 					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_INT_CFG, 0x00)) {
-						if (_i2c->status == PORT_DONE) {
+						if (_i2c->status == PORT_BUSY) {
 							dev->status = DEVICE_DONE;
 							}
 						else if (_i2c->status == PORT_ERROR) {
@@ -143,7 +139,7 @@ uint8_t ITG3205_GetData(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 		case DEVICE_PROCESSING: {
 			uint8_t dt[ITG3205_DATA_LEN];
 			if (I2C_ReadBytes(_i2c, dev->addr, ITG3205_TEMP_OUT_H, dt, ITG3205_DATA_LEN)) {
-				if (_i2c->status == PORT_DONE) {
+				if (_i2c->status == PORT_BUSY) {
 					dev->raw.temp = (int16_t)CONCAT_BYTES(dt[0], dt[1]);
 					dev->raw.X = (int16_t)CONCAT_BYTES(dt[2], dt[3]);
 					dev->raw.Y = (int16_t)CONCAT_BYTES(dt[4], dt[5]);

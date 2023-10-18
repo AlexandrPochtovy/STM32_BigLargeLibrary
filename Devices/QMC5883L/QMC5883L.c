@@ -40,8 +40,7 @@ uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
 			switch (dev->step) {
 				case 0: //set reset period don't give a fuck recommended magic number 0x01 RTFM OMG!!!
 					if (I2C_WriteOneByte(_i2c, dev->addr, QMC5883L_REG_PERIOD, 0x01)) {
-						if (_i2c->status == PORT_DONE) {
-							_i2c->status = PORT_BUSY;
+						if (_i2c->status == PORT_BUSY) {
 							dev->step = 1;
 							}
 						else if (_i2c->status == PORT_ERROR) {
@@ -54,7 +53,7 @@ uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
 					data[0] = QMC5883L_MODE_CONTINUOUS | QMC5883L_ODR_50HZ | QMC5883L_RNG_2G | QMC5883L_SAMPLES_512;
 					data[1] = 0x00;
 					if (I2C_WriteBytes(_i2c, dev->addr, QMC5883L_REG_CFG_A, data, 2)) {
-						if (_i2c->status == PORT_DONE) {
+						if (_i2c->status == PORT_BUSY) {
 							dev->status = DEVICE_DONE;
 							}
 						else if (_i2c->status == PORT_ERROR) {
@@ -101,7 +100,7 @@ uint8_t QMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
 		case DEVICE_PROCESSING: {
 			uint8_t dt[QMC5883L_DATA_LEN];
 			if (I2C_ReadBytes(_i2c, dev->addr, QMC5883L_REG_OUT_X_L, dt, QMC5883L_DATA_LEN)) {
-				if (_i2c->status == PORT_DONE) {
+				if (_i2c->status == PORT_BUSY) {
 					dev->raw.X = (int16_t)CONCAT_BYTES(dt[1], dt[0]);
 					dev->raw.Y = (int16_t)CONCAT_BYTES(dt[3], dt[2]);
 					dev->raw.Z = (int16_t)CONCAT_BYTES(dt[5], dt[4]);

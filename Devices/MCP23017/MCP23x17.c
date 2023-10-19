@@ -46,13 +46,11 @@ uint8_t MCP23_17_Init(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev) {
 			data[11] = 0x00;  //reg 0x0B IOCONB		RW setup byte
 			data[12] = 0x00;  //reg 0x0C GPPUA		RW setup pull-up port A pins disabled for output
 			data[13] = 0x00;  //reg 0x0D GPPUB		RW setup pull-up port B pins enabled for input
-			if (I2C_WriteBytes(_i2c, dev->addr, MCP23017_IODIRA, data, MCP23017_CFG_LENGHT)) {
-				if (_i2c->status == PORT_BUSY) {
-					dev->status = DEVICE_DONE;
-					}
-				else if (_i2c->status == PORT_ERROR) {
-					dev->status = DEVICE_ERROR;
-					}
+			if (I2C_WriteBytes(_i2c, dev->addr, MCP23017_IODIRA, data, MCP23017_CFG_LENGHT) && (_i2c->status == PORT_BUSY)) {
+				dev->status = DEVICE_DONE;
+				}
+			else if (_i2c->status == PORT_ERROR) {
+				dev->status = DEVICE_ERROR;
 				}
 			break;}
 		case DEVICE_DONE:
@@ -86,13 +84,11 @@ uint8_t MCP23_17_ReadPort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uint
 				}
 			break;
 		case DEVICE_PROCESSING:
-			if (I2C_ReadOneByte(_i2c, dev->addr, port, value)) {
-				if (_i2c->status == PORT_BUSY) {
-					dev->status = DEVICE_DONE;
-					}
-				else if (_i2c->status == PORT_ERROR) {
-					dev->status = DEVICE_ERROR;
-					}
+			if (I2C_ReadOneByte(_i2c, dev->addr, port, value) && (_i2c->status == PORT_BUSY)) {
+				dev->status = DEVICE_DONE;
+				}
+			else if (_i2c->status == PORT_ERROR) {
+				dev->status = DEVICE_ERROR;
 				}
 			break;
 		case DEVICE_DONE:
@@ -126,14 +122,11 @@ uint8_t MCP23_17_WritePort(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t port, uin
 				}
 			break;
 		case DEVICE_PROCESSING:
-			if (I2C_WriteOneByte(_i2c, dev->addr, port, value)) {
-				if (_i2c->status == PORT_BUSY) {
-					dev->status = DEVICE_DONE;
-					return 1;
-					}
-				else if (_i2c->status == PORT_ERROR) {
-					dev->status = DEVICE_ERROR;
-					}
+			if (I2C_WriteOneByte(_i2c, dev->addr, port, value) && (_i2c->status == PORT_BUSY)) {
+				dev->status = DEVICE_DONE;
+				}
+			else if (_i2c->status == PORT_ERROR) {
+				dev->status = DEVICE_ERROR;
 				}
 			break;
 		case DEVICE_DONE:
@@ -167,13 +160,11 @@ uint8_t MCP23_17_ReadAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value) {
 				}
 			break;
 		case DEVICE_PROCESSING:
-			if (I2C_ReadBytes(_i2c, dev->addr, MCP23017_GPIOA, value, 2)) {
-				if (_i2c->status == PORT_BUSY) {
-					dev->status = DEVICE_DONE;
-					}
-				else if (_i2c->status == PORT_ERROR) {
-					dev->status = DEVICE_ERROR;
-					}
+			if (I2C_ReadBytes(_i2c, dev->addr, MCP23017_GPIOA, value, 2) && (_i2c->status == PORT_BUSY)) {
+				dev->status = DEVICE_DONE;
+				}
+			else if (_i2c->status == PORT_ERROR) {
+				dev->status = DEVICE_ERROR;
 				}
 			break;
 		case DEVICE_DONE:
@@ -207,14 +198,11 @@ uint8_t MCP23_17_WriteAB(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t *value) {
 				}
 			break;
 		case DEVICE_PROCESSING:
-			if (I2C_WriteBytes(_i2c, dev->addr, MCP23017_GPIOA, value, 2)) {
-				if (_i2c->status == PORT_BUSY) {
-					dev->status = DEVICE_DONE;
-					return 1;
-					}
-				else if (_i2c->status == PORT_ERROR) {
-					dev->status = DEVICE_ERROR;
-					}
+			if (I2C_WriteBytes(_i2c, dev->addr, MCP23017_GPIOA, value, 2) && (_i2c->status == PORT_BUSY)) {
+				dev->status = DEVICE_DONE;
+				}
+			else if (_i2c->status == PORT_ERROR) {
+				dev->status = DEVICE_ERROR;
 				}
 			break;
 		case DEVICE_DONE:
@@ -248,14 +236,11 @@ uint8_t MCP23_17_Check(I2C_IRQ_Conn_t *_i2c, MCP23_t *dev, uint8_t reg) {
 				}
 			break;
 		case DEVICE_PROCESSING:
-			if (I2C_WriteOne(_i2c, dev->addr, MCP23017_GPIOA)) {
-				if (_i2c->status == PORT_BUSY) {
-					dev->status = DEVICE_DONE;
-					return 1;
-					}
-				else if (_i2c->status == PORT_ERROR) {
-					dev->status = DEVICE_ERROR;
-					}
+			if (I2C_WriteOne(_i2c, dev->addr, MCP23017_GPIOA) && (_i2c->status == PORT_BUSY)) {
+				dev->status = DEVICE_DONE;
+				}
+			else if (_i2c->status == PORT_ERROR) {
+				dev->status = DEVICE_ERROR;
 				}
 			break;
 		case DEVICE_DONE:

@@ -30,13 +30,11 @@ uint8_t TCA9548A_SetChannels(I2C_IRQ_Conn_t *_i2c, TCA9548A_t *dev, uint8_t chan
 				}
 			break;
 		case DEVICE_PROCESSING:
-			if (I2C_WriteOne(_i2c, dev->addr, dev->port)) {
-				if (_i2c->status == PORT_BUSY) {
-					dev->status = DEVICE_DONE;
-					}
-				else if (_i2c->status == PORT_ERROR) {
-					dev->status = DEVICE_ERROR;
-					}
+			if (I2C_WriteOne(_i2c, dev->addr, dev->port) && (_i2c->status == PORT_BUSY)) {
+				dev->status = DEVICE_DONE;
+				}
+			else if (_i2c->status == PORT_ERROR) {
+				dev->status = DEVICE_ERROR;
 				}
 			break;
 		case DEVICE_DONE:

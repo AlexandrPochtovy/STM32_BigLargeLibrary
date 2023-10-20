@@ -1,17 +1,18 @@
 /*********************************************************************************
-   Original author: Alexandr Pochtovy<alex.mail.prime@gmail.com>
+  Original author:  Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+                    https://github.com/AlexandrPochtovy
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+      http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
  * 	ADXL345.h
  * 	Created on: 31.01.2022
@@ -21,45 +22,60 @@
 #define ADXL345_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+  {
 #endif
 
-#include "main.h"
-#include "Peripherals/I2C/MyI2C.h"
 #include "ADXL345_Register.h"
+#include "I2C_API.h"
 
-enum ADXL345_ADDRESS {
-	ADXL345_ADDR = 0xA6//Assumes ALT address pin low
-};
+  /**********************************************************************
+   *                       TYPEDEF & ENUM                                *
+   ***********************************************************************/
+  enum ADXL345_ADDRESS {
+    ADXL345_ADDR = 0xA6 // Assumes ALT address pin low
+    };
 
-const uint8_t ADXL345_DATA_LENGHT = 6;
+  typedef struct ADXL345_RAW {
+    int16_t X;
+    int16_t Y;
+    int16_t Z;
+    } ADXL345_RAW_t;
 
-typedef struct ADXL345_RAW {
-	int16_t X;
-	int16_t Y;
-	int16_t Z;
-} ADXL345_RAW_t;
+  typedef struct ADXL345_data {
+    float X;
+    float Y;
+    float Z;
+    } ADXL345_data_t;
 
-typedef struct ADXL345_data {
-	float X;
-	float Y;
-	float Z;
-} ADXL345_data_t;
+  // common data struct for sensor
+  typedef struct ADXL345 {
+    const enum ADXL345_ADDRESS addr;
+    DeviceStatus_t status;
+    const uint8_t errLimit;
+    uint8_t errCount;
+    uint8_t step;
+    ADXL345_RAW_t raw;
+    ADXL345_data_t data;
+    } ADXL345_t;
 
-//common data struct for sensor
-typedef struct ADXL345 {
-	const uint8_t addr;
-	uint8_t step;
-	DeviceStatus_t status;
-	ADXL345_RAW_t raw;
-	ADXL345_data_t data;
-} ADXL345_t;
+  /*****************************************************************
+   * @brief init accelerometer: send settings
+   * @param _i2c - pointer to I2C bus connection structure
+   * @param dev - pointer to accelerometer main structure
+   * @retval 1 when end
+   */
+  uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev);
 
-uint8_t ADXL345_Init(I2C_IRQ_Connection_t *_i2c, ADXL345_t *dev);
-uint8_t ADXL345_GetData(I2C_IRQ_Connection_t *_i2c, ADXL345_t *dev);
-float ADXL345_ConvertData (int16_t raw);
+  /*****************************************************************
+   * @brief get all axis data from accelerometer and store in main accelerometer structure in RAW format
+   * @param _i2c - pointer to I2C bus connection structure
+   * @param dev - pointer to accelerometer main structure
+   * @retval 1 when end
+   */
+  uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev);
 
 #ifdef __cplusplus
-}
+  }
 #endif
 #endif /* ADXL345_H_ */

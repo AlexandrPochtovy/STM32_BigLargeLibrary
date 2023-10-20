@@ -1,17 +1,18 @@
 /*********************************************************************************
- Original author: Alexandr Pochtovy<alex.mail.prime@gmail.com>
+	Original author:  Aliaksandr Pachtovy<alex.mail.prime@gmail.com>
+										https://github.com/AlexandrPochtovy
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
 
- http://www.apache.org/licenses/LICENSE-2.0
+			http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
 
  BME280.c
  Created on: 30.05.2021
@@ -21,13 +22,8 @@
 
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (uint16_t)(((uint16_t)msb << 8) | (uint16_t)lsb);
-}
+	}
 
-//parsing raw data	=================================================================
-/*!
- *  @brief This API is used to parse the pressure, temperature and
- *  humidity data and store it in the bme280_uncomp_data structure instance.
- */
 void bme280_parse_sensor_data(BME280_t *dev, uint8_t *data) {
 	/* Variables to store the sensor data */
 	uint32_t data_xlsb;
@@ -47,12 +43,8 @@ void bme280_parse_sensor_data(BME280_t *dev, uint8_t *data) {
 	data_msb = (uint32_t)data[6] << 8;
 	data_lsb = (uint32_t)data[7];
 	dev->uncomp_data.humidity = data_msb | data_lsb;
-}
+	}
 
-/*!
- *  @brief This internal API is used to parse the temperature and
- *  pressure calibration data and store it in device structure.
- */
 void parse_temp_press_calib_data(BME280_t *dev, uint8_t *data) {
 	dev->calib_data.dig_t1 = CONCAT_BYTES(data[1], data[0]);
 	dev->calib_data.dig_t2 = (int16_t)CONCAT_BYTES(data[3], data[2]);
@@ -67,9 +59,9 @@ void parse_temp_press_calib_data(BME280_t *dev, uint8_t *data) {
 	dev->calib_data.dig_p8 = (int16_t)CONCAT_BYTES(data[21], data[20]);
 	dev->calib_data.dig_p9 = (int16_t)CONCAT_BYTES(data[23], data[22]);
 	dev->calib_data.dig_h1 = data[25];
-}
+	}
 
-void parse_humidity_calib_data(BME280_t *dev, uint8_t *data) {  //need check
+void parse_humidity_calib_data(BME280_t *dev, uint8_t *data) {
 	int16_t dig_h4_lsb;
 	int16_t dig_h4_msb;
 	int16_t dig_h5_lsb;
@@ -83,66 +75,8 @@ void parse_humidity_calib_data(BME280_t *dev, uint8_t *data) {  //need check
 	dig_h5_lsb = (int16_t)(data[4] >> 4);
 	dev->calib_data.dig_h5 = dig_h5_msb | dig_h5_lsb;
 	dev->calib_data.dig_h6 = (int8_t)data[6];
-}
-
-//INITIALIZATION	================================================================
-/*!
- *  @brief This API is the entry point.
- *  It reads the chip-id and calibration data from the sensor.
- */
-uint8_t BME280_Init(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {
-	uint8_t data[BME280_T_P_CALIB_DATA_LEN];
-		_i2c->addr = dev->addr;
-		switch (dev->step) {
-		case 0://setup humidity
-			dev->status = DEVICE_NOT_INIT;
-			if (WriteOneRegByte(_i2c, dev->addr, BME280_REG_CTRL_HUM, BME280_HUM_OVERSAMPLING_16X)) {
-				dev->step = 1;
-			}
-			break;
-		case 1://setup mode temp pressure
-			data[0] = BME280_NORMAL_MODE | BME280_PRESS_OVERSAMPLING_16X | BME280_TEMP_OVERSAMPLING_16X;
-			data[1] = BME280_SPI_3WIRE_MODE_OFF | BME280_FILTER_COEFF_16 | BME280_STANDBY_TIME_20_MS;
-			if (WriteRegBytes(_i2c, dev->addr, BME280_REG_CTRL_MEAS_PWR, data, 2)) {
-				dev->step = 2;
-			}
-			break;
-		case 2://read calib temp data
-			if (ReadRegBytes(_i2c, dev->addr, BME280_REG_T_P_CALIB_DATA, data, BME280_T_P_CALIB_DATA_LEN)) {
-				parse_temp_press_calib_data(dev, data);
-				dev->step = 3;
-			}
-			break;
-		case 3:  //read calib pressure data
-			if (ReadRegBytes(_i2c, dev->addr, BME280_REG_HUM_CALIB_DATA, data, BME280_HUM_CALIB_DATA_LEN)) {
-				parse_humidity_calib_data(dev, data);
-				dev->status = DEVICE_INIT;
-				dev->step = 0;
-			}
-			return 1;
-		default:
-			dev->step = 0;
-			break;
-		}
-	return 0;
-}
-
-uint8_t BME280_GetData(I2C_IRQ_Connection_t *_i2c, BME280_t *dev) {
-	uint8_t data[BME280_DATA_LEN];
-	if (ReadRegBytes(_i2c, dev->addr, BME280_REG_DATA, data, BME280_DATA_LEN)) {
-		bme280_parse_sensor_data(dev, data);
-		bme280_calculate_data_int(dev);
-		bme280_calculate_data_float(dev);
-		dev->step = 0;
-		return 1;
 	}
-	return 0;
-}
 
-/*!
- * @brief This internal API is used to compensate the raw temperature data and
- * return the compensated temperature data in integer data type.
- */
 int32_t compensate_temperature_int(BME280_t *dev) {
 	int32_t var1;
 	int32_t var2;
@@ -158,12 +92,12 @@ int32_t compensate_temperature_int(BME280_t *dev) {
 	temperature = (dev->calib_data.t_fine * 5 + 128) / 256;
 	if (temperature < temperature_min) {
 		temperature = temperature_min;
-	}
+		}
 	else if (temperature > temperature_max) {
 		temperature = temperature_max;
-	}
+		}
 	return temperature;
-}
+	}
 
 float compensate_temperature_float(BME280_t *dev) {
 	float var1;
@@ -174,25 +108,20 @@ float compensate_temperature_float(BME280_t *dev) {
 
 	var1 = ((float)dev->uncomp_data.temperature) / 16384.0 - ((float)dev->calib_data.dig_t1) / 1024.0;
 	var1 = var1 * ((float)dev->calib_data.dig_t2);
-	var2 = (((float)dev->uncomp_data.temperature) / 131072.0
-	    - ((float)dev->calib_data.dig_t1) / 8192.0);
+	var2 = (((float)dev->uncomp_data.temperature) / 131072.0 - ((float)dev->calib_data.dig_t1) / 8192.0);
 	var2 = (var2 * var2) * ((double)dev->calib_data.dig_t3);
 	dev->calib_data.t_fine = (int32_t)(var1 + var2);
 	temperature = (var1 + var2) / 5120.0;
 
 	if (temperature < temperature_min) {
 		temperature = temperature_min;
-	}
+		}
 	else if (temperature > temperature_max) {
 		temperature = temperature_max;
-	}
+		}
 	return temperature;
-}
+	}
 
-/*!
- * @brief This internal API is used to compensate the raw pressure data and
- * return the compensated pressure data in integer data type.
- */
 uint32_t compensate_pressure_int(BME280_t *dev) {
 	int32_t var1;
 	int32_t var2;
@@ -217,31 +146,28 @@ uint32_t compensate_pressure_int(BME280_t *dev) {
 		pressure = ((uint32_t)(var5 - (uint32_t)(var2 / 4096))) * 3125;
 		if (pressure < 0x80000000) {
 			pressure = (pressure << 1) / ((uint32_t)var1);
-		}
+			}
 		else {
 			pressure = (pressure / (uint32_t)var1) * 2;
-		}
-		var1 = (((int32_t)dev->calib_data.dig_p9)
-		    * ((int32_t)(((pressure / 8) * (pressure / 8)) / 8192))) / 4096;
+			}
+		var1 = (((int32_t)dev->calib_data.dig_p9) * ((int32_t)(((pressure / 8) * (pressure / 8)) / 8192))) / 4096;
 		var2 = (((int32_t)(pressure / 4)) * ((int32_t)dev->calib_data.dig_p8)) / 8192;
 		pressure = (uint32_t)((int32_t)pressure + ((var1 + var2 + dev->calib_data.dig_p7) / 16));
 		if (pressure < pressure_min) {
 			pressure = pressure_min;
-		}
+			}
 		else if (pressure > pressure_max) {
 			pressure = pressure_max;
+			}
 		}
-	}
 	else {
 		pressure = pressure_min;
-	}
+		}
 	return pressure;
-}
+	}
 
 float compensate_pressure_float(BME280_t *dev) {
-	float var1;
-	float var2;
-	float var3;
+	float var1, var2, var3;
 	float pressure;
 	float pressure_min = 30000.0;
 	float pressure_max = 110000.0;
@@ -263,26 +189,19 @@ float compensate_pressure_float(BME280_t *dev) {
 		pressure = pressure + (var1 + var2 + ((float)dev->calib_data.dig_p7)) / 16.0;
 		if (pressure < pressure_min) {
 			pressure = pressure_min;
-		}
+			}
 		else if (pressure > pressure_max) {
 			pressure = pressure_max;
+			}
 		}
-	}
-	else /* Invalid case */{
+	else { /* Invalid case */
 		pressure = pressure_min;
-	}
+		}
 	return pressure;
-}
-/*!
- * @brief This internal API is used to compensate the raw humidity data and
- * return the compensated humidity data in integer data type.
- */
+	}
+
 uint32_t compensate_humidity_int(BME280_t *dev) {
-	int32_t var1;
-	int32_t var2;
-	int32_t var3;
-	int32_t var4;
-	int32_t var5;
+	int32_t var1, var2, var3, var4, var5;
 	uint32_t humidity;
 	uint32_t humidity_max = 102400;
 
@@ -303,24 +222,18 @@ uint32_t compensate_humidity_int(BME280_t *dev) {
 	humidity = (uint32_t)(var5 / 4096);
 	if (humidity > humidity_max) {
 		humidity = humidity_max;
-	}
+		}
 	return humidity;
-}
+	}
 
 float compensate_humidity_float(BME280_t *dev) {
 	float humidity;
 	float humidity_min = 0.0;
 	float humidity_max = 100.0;
-	float var1;
-	float var2;
-	float var3;
-	float var4;
-	float var5;
-	float var6;
+	float var1, var2, var3, var4, var5, var6;
 
 	var1 = ((float)dev->calib_data.t_fine) - 76800.0;
-	var2 = (((float)dev->calib_data.dig_h4) * 64.0
-	    + (((float)dev->calib_data.dig_h5) / 16384.0) * var1);
+	var2 = (((float)dev->calib_data.dig_h4) * 64.0 + (((float)dev->calib_data.dig_h5) / 16384.0) * var1);
 	var3 = dev->uncomp_data.humidity - var2;
 	var4 = ((float)dev->calib_data.dig_h2) / 65536.0;
 	var5 = (1.0 + (((float)dev->calib_data.dig_h3) / 67108864.0) * var1);
@@ -329,32 +242,138 @@ float compensate_humidity_float(BME280_t *dev) {
 	humidity = var6 * (1.0 - ((float)dev->calib_data.dig_h1) * var6 / 524288.0);
 	if (humidity > humidity_max) {
 		humidity = humidity_max;
-	}
+		}
 	else if (humidity < humidity_min) {
 		humidity = humidity_min;
-	}
+		}
 	return humidity;
-}
+	}
 
-/*!
- * @brief This API is used to compensate the pressure and/or
- * temperature and/or humidity data according to the component selected
- * by the user.
- */
-void bme280_calculate_data_int(BME280_t *dev) {
-	/* Compensate the temperature data */
-	dev->data_int.temperature = compensate_temperature_int(dev);
-	/* Compensate the pressure data */
-	dev->data_int.pressure = compensate_pressure_int(dev);
-	/* Compensate the humidity data */
-	dev->data_int.humidity = compensate_humidity_int(dev);
-}
+uint8_t BME280_Init(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
+	switch (dev->status) {
+		case DEVICE_READY:
+			if (_i2c->status == PORT_FREE) {
+				_i2c->status = PORT_BUSY;
+				dev->status = DEVICE_PROCESSING;
+				dev->step = 0;
+				}
+			break;
+		case DEVICE_PROCESSING:
+			switch (dev->step) {
+				case 0: {// check connection read chip's ID
+					uint8_t ID;
+					if (I2C_ReadOneByte(_i2c, dev->addr, BME280_REG_CHIP_ID, &ID) && (_i2c->status == PORT_BUSY)) {
+						if (ID == BME280_CHIP_ID) {
+							dev->step = 1;
+							}
+						else {
+							dev->status = DEVICE_FAULTH;
+							_i2c->status = PORT_FREE;
+							return 1;
+							}
+						}
+					break;}
+				case 1:// setup humidity
+					if (I2C_WriteOneByte(_i2c, dev->addr, BME280_REG_CTRL_HUM, BME280_HUM_OVERSAMPLING_16X) && (_i2c->status == PORT_BUSY)) {
+						dev->step = 2;
+						}
+					break;
+				case 2: {// setup mode temp pressure
+					uint8_t data[2];
+					data[0] = BME280_NORMAL_MODE | BME280_PRESS_OVERSAMPLING_16X | BME280_TEMP_OVERSAMPLING_16X;
+					data[1] = BME280_SPI_3WIRE_MODE_OFF | BME280_FILTER_COEFF_16 | BME280_STANDBY_TIME_20_MS;
+					if (I2C_WriteBytes(_i2c, dev->addr, BME280_REG_CTRL_MEAS_PWR, data, 2) && (_i2c->status == PORT_BUSY)) {
+						dev->step = 3;
+						}
+					break;}
+				case 3: {// read calib temp pressure data
+					uint8_t data[BME280_T_P_CALIB_DATA_LEN];
+					if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_T_P_CALIB_DATA, data, BME280_T_P_CALIB_DATA_LEN) && (_i2c->status == PORT_BUSY)) {
+						parse_temp_press_calib_data(dev, data);
+						dev->step = 4;
+						}
+					break;}
+				case 4: {// read calib humidity data
+					uint8_t data[BME280_HUM_CALIB_DATA_LEN];
+					if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_HUM_CALIB_DATA, data, BME280_HUM_CALIB_DATA_LEN) && (_i2c->status == PORT_BUSY)) {
+						parse_humidity_calib_data(dev, data);
+						dev->status = DEVICE_DONE;
+						}
+					break;}
+				default:
+					break;
+				}
+			if (_i2c->status == PORT_ERROR) {
+				dev->status = DEVICE_ERROR;
+				}
+			break;
+		case DEVICE_DONE:
+			dev->status = DEVICE_READY;
+			_i2c->status = PORT_FREE;
+			return 1;
+		case DEVICE_ERROR:
+			if (++dev->errCount >= dev->errLimit) {
+				dev->status = DEVICE_FAULTH;
+				_i2c->status = PORT_FREE;
+				}
+			else {
+				dev->status = DEVICE_READY;
+				_i2c->status = PORT_FREE;
+				dev->step = 0;
+				}
+			break;
+		case DEVICE_FAULTH:
+			return 1;
+		default:
+			break;
+		}
+	return 0;
+	}
 
-void bme280_calculate_data_float(BME280_t *dev) {
-	/* Compensate the temperature data */
-	dev->data_float.temperature = compensate_temperature_float(dev);
-	/* Compensate the pressure data */
-	dev->data_float.pressure = compensate_pressure_float(dev);
-	/* Compensate the humidity data */
-	dev->data_float.humidity = compensate_humidity_float(dev);
-}
+uint8_t BME280_GetData(I2C_IRQ_Conn_t *_i2c, BME280_t *dev) {
+	switch (dev->status) {
+		case DEVICE_READY:
+			if (_i2c->status == PORT_FREE) {
+				_i2c->status = PORT_BUSY;
+				dev->status = DEVICE_PROCESSING;
+				dev->step = 0;
+				}
+			break;
+		case DEVICE_PROCESSING: {
+			uint8_t data[BME280_DATA_LEN];
+			if (I2C_ReadBytes(_i2c, dev->addr, BME280_REG_DATA, data, BME280_DATA_LEN) && (_i2c->status == PORT_BUSY)) {
+				bme280_parse_sensor_data(dev, data);
+				dev->data_int.temperature = compensate_temperature_int(dev);		 /* Compensate the temperature data */
+				dev->data_int.pressure = compensate_pressure_int(dev);					 /* Compensate the pressure data */
+				dev->data_int.humidity = compensate_humidity_int(dev);					 /* Compensate the humidity data */
+				dev->data_float.temperature = compensate_temperature_float(dev); /* Compensate the temperature data */
+				dev->data_float.pressure = compensate_pressure_float(dev);			 /* Compensate the pressure data */
+				dev->data_float.humidity = compensate_humidity_float(dev);			 /* Compensate the humidity data */
+				dev->status = DEVICE_DONE;
+				}
+			else if (_i2c->status == PORT_ERROR) {
+				dev->status = DEVICE_ERROR;
+				}
+			break;}
+		case DEVICE_DONE:
+			dev->status = DEVICE_READY;
+			_i2c->status = PORT_FREE;
+			return 1;
+		case DEVICE_ERROR:
+			if (++dev->errCount >= dev->errLimit) {
+				dev->status = DEVICE_FAULTH;
+				_i2c->status = PORT_FREE;
+				}
+			else {
+				dev->status = DEVICE_READY;
+				_i2c->status = PORT_FREE;
+				dev->step = 0;
+				}
+			break;
+		case DEVICE_FAULTH:
+			return 1;
+		default:
+			break;
+		}
+	return 0;
+	}

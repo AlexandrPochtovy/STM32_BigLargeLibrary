@@ -24,17 +24,17 @@
 #define VL53L0x_SHOOTH_DEEP 8
 #endif
 
-//static_assert(VL53L0x_SHOOTH_DEEP % 2 == 0, "smooth deep most be power of 2");
+ //static_assert(VL53L0x_SHOOTH_DEEP % 2 == 0, "smooth deep most be power of 2");
 
-/**********************************************************************
- *          		STATIC INLINE FUNCTIONS                               *
- ***********************************************************************/
- /*****************************************************************
-	* @brief  Encode VCSEL pulse period register value from period in PCLKs
-	* based on VL53L0X_encode_vcsel_period()
-	* @param  uint8_t period_pclks in clks
-	* @retval uint8_t period in microsec
-	*/
+ /**********************************************************************
+	*          		STATIC INLINE FUNCTIONS                               *
+	***********************************************************************/
+	/*****************************************************************
+	 * @brief  Encode VCSEL pulse period register value from period in PCLKs
+	 * based on VL53L0X_encode_vcsel_period()
+	 * @param  uint8_t period_pclks in clks
+	 * @retval uint8_t period in microsec
+	 */
 static inline uint8_t __encodeVcselPeriod(uint8_t period_pclks) {
 	return (((period_pclks) >> 1) - 1);
 	}
@@ -46,7 +46,7 @@ static inline uint8_t __encodeVcselPeriod(uint8_t period_pclks) {
  * @retval
  */
 static inline uint8_t __decodeVcselPeriod(uint8_t reg_val) {
-	return ((( reg_val )+1) << 1);
+	return (((reg_val)+1) << 1);
 	}
 
 /*****************************************************************
@@ -57,7 +57,7 @@ static inline uint8_t __decodeVcselPeriod(uint8_t reg_val) {
  * @retval
  */
 static inline uint32_t __calcMacroPeriod(uint8_t vcsel_period_pclks) {
-	return (((( uint32_t )2304 * (vcsel_period_pclks) * 1655) + 500) / 1000);
+	return ((((uint32_t)2304 * (vcsel_period_pclks) * 1655) + 500) / 1000);
 	}
 
 /****************************************************************
@@ -86,7 +86,7 @@ uint32_t timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_pe
  * format: "(LSByte * 2^MSByte) + 1"
  */
 uint16_t decodeTimeout(uint16_t reg_val) {
-	return ( uint16_t )((reg_val & 0x00FF) << ( uint16_t )((reg_val & 0xFF00) >> 8)) + 1;
+	return (uint16_t)((reg_val & 0x00FF) << (uint16_t)((reg_val & 0xFF00) >> 8)) + 1;
 	}
 
 /* Encode sequence step timeout register value from timeout in MCLKs
@@ -111,7 +111,7 @@ uint16_t encodeTimeout(uint16_t timeout_mclks) {
 		}
 	}
 
-void setupVL53L0X(VL53L0x_t* dev, uint16_t timeout) {
+void setupVL53L0X(VL53L0x_t *dev, uint16_t timeout) {
 	dev->limit_timeout = timeout;
 	dev->count_timeout = 0;
 	dev->timeoutFlag = 0;
@@ -129,7 +129,7 @@ void setupVL53L0X(VL53L0x_t* dev, uint16_t timeout) {
 	* @param new_addr - new I2C address
 	* @retval 1 when complite
 	*/
-uint8_t setAddress(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, const uint8_t new_addr) {
+uint8_t setAddress(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, const uint8_t new_addr) {
 	PortStatus_t st;
 	if (dev->status == DEVICE_FAULTH) {
 		return 1;
@@ -159,7 +159,7 @@ uint8_t setAddress(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, const uint8_t new_addr)
  * @param dev - pointer to sensor's main structure
  * @retval actual i2c address
  */
-uint8_t getAddress(VL53L0x_t* dev) {
+uint8_t getAddress(VL53L0x_t *dev) {
 	return dev->addr;
 	}
 
@@ -170,7 +170,7 @@ uint8_t getAddress(VL53L0x_t* dev) {
  * @param dev - pointer to sensor's main structure
  * @retval 1 when complite
  */
-uint8_t VL53_getModelId(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
+uint8_t VL53_getModelId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev) {
 	PortStatus_t st;
 	if (dev->status == DEVICE_FAULTH) {
 		return 1;
@@ -203,7 +203,7 @@ uint8_t VL53_getModelId(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
  * @param dev - pointer to sensor's main structure
  * @retval 1 when complite
  */
-uint8_t getRevisionId(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
+uint8_t getRevisionId(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev) {
 	PortStatus_t st;
 	if (dev->status == DEVICE_FAULTH) {
 		return 1;
@@ -235,7 +235,7 @@ uint8_t getRevisionId(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
  * @param timeout - new timeout value
  * @retval none
  */
-void setTimeout(VL53L0x_t* dev, const uint16_t timeout) {
+void setTimeout(VL53L0x_t *dev, const uint16_t timeout) {
 	dev->limit_timeout = timeout;
 	}
 
@@ -245,7 +245,7 @@ void setTimeout(VL53L0x_t* dev, const uint16_t timeout) {
  * @param dev - pointer to sensor's main structure
  * @retval timeout value
  */
-uint16_t getTimeout(VL53L0x_t* dev) {
+uint16_t getTimeout(VL53L0x_t *dev) {
 	return dev->count_timeout;
 	}
 
@@ -254,7 +254,7 @@ uint16_t getTimeout(VL53L0x_t* dev) {
  * @param dev - pointer to sensor's main structure
  * @retval timeout value
  */
-void startTimeout(VL53L0x_t* dev) {
+void startTimeout(VL53L0x_t *dev) {
 	dev->count_timeout = 0;
 	}
 
@@ -263,7 +263,7 @@ void startTimeout(VL53L0x_t* dev) {
  * @param dev - pointer to sensor's main structure
  * @retval timeout flag
  */
-uint8_t checkTimeoutExpired(VL53L0x_t* dev)  //+
+uint8_t checkTimeoutExpired(VL53L0x_t *dev)  //+
 	{
 	dev->timeoutFlag = ++dev->count_timeout > dev->limit_timeout;
 	return dev->timeoutFlag;
@@ -272,13 +272,13 @@ uint8_t checkTimeoutExpired(VL53L0x_t* dev)  //+
 /**********************************************************************
  *                       INERNAL FUNCTION                              *
  ***********************************************************************/
-uint8_t setSignalRateLimit(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, uint32_t limit_Mcps) {
+uint8_t setSignalRateLimit(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, uint32_t limit_Mcps) {
 	uint8_t st;
-	uint16_t data = Min(Max(( uint16_t )limit_Mcps, 65535), 32);
+	uint16_t data = Min(Max((uint16_t)limit_Mcps, 65535), 32);
 	st = I2C_WriteBytes(_i2c,
 		dev->addr,
 		FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT,
-		( uint8_t* )&data,
+		(uint8_t *)&data,
 		2);
 	return st;
 	}
@@ -457,7 +457,7 @@ uint8_t setSignalRateLimit(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, uint32_t limit_
  return 0;
  }*/
 
-uint8_t getSequenceStepEnables(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
+uint8_t getSequenceStepEnables(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev) {
 	uint8_t sequence_config;
 	if (I2C_ReadOneByte(_i2c, dev->addr, SYSTEM_SEQUENCE_CONFIG, &sequence_config) && (_i2c->status == PORT_BUSY)) {
 		dev->enables.tcc = (sequence_config >> 4) & 0x1;
@@ -473,7 +473,7 @@ uint8_t getSequenceStepEnables(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	return 0;
 	}
 
-uint8_t getVcselPulsePeriod(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, vcselPeriodType type) {
+uint8_t getVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, vcselPeriodType type) {
 	uint8_t cfg = 0;
 	if (type == VcselPeriodPreRange) {
 		cfg = PRE_RANGE_CONFIG_VCSEL_PERIOD;
@@ -492,7 +492,7 @@ uint8_t getVcselPulsePeriod(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, vcselPeriodTyp
 	return 0;
 	}
 
-uint8_t getSequenceStepTimeouts(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
+uint8_t getSequenceStepTimeouts(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev) {
 	switch (dev->stepL1) {
 		case 0:
 			if (getVcselPulsePeriod(_i2c, dev, VcselPeriodPreRange)) {
@@ -509,7 +509,7 @@ uint8_t getSequenceStepTimeouts(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 				}
 			break;
 		case 2:
-			if (I2C_ReadBytes(_i2c, dev->addr, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, ( uint8_t* )&dev->tmp16, 2) && (_i2c->status == PORT_BUSY)) {
+			if (I2C_ReadBytes(_i2c, dev->addr, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&dev->tmp16, 2) && (_i2c->status == PORT_BUSY)) {
 				dev->timeouts.pre_range_mclks = decodeTimeout(dev->tmp16);
 				dev->timeouts.pre_range_us = timeoutMclksToMicroseconds(dev->timeouts.pre_range_mclks,
 					dev->timeouts.pre_range_vcsel_period_pclks);
@@ -523,7 +523,7 @@ uint8_t getSequenceStepTimeouts(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 				}
 			break;
 		case 4:
-			if (I2C_ReadBytes(_i2c, dev->addr, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, ( uint8_t* )&dev->tmp16, 2) && (_i2c->status == PORT_BUSY)) {
+			if (I2C_ReadBytes(_i2c, dev->addr, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&dev->tmp16, 2) && (_i2c->status == PORT_BUSY)) {
 				dev->timeouts.final_range_mclks = decodeTimeout(dev->tmp16);
 				if (dev->enables.pre_range) {
 					dev->timeouts.final_range_mclks -= dev->timeouts.pre_range_mclks;
@@ -540,7 +540,7 @@ uint8_t getSequenceStepTimeouts(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	return 0;
 	}
 
-uint8_t getMeasurementTimingBudget(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
+uint8_t getMeasurementTimingBudget(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev) {
 	uint16_t const StartOverhead = 1910;  // note that this is different than the value in set_
 	uint16_t const EndOverhead = 960;
 	uint16_t const MsrcOverhead = 660;
@@ -588,7 +588,7 @@ uint8_t getMeasurementTimingBudget(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	return 0;
 	}
 
-uint8_t setMeasurementTimingBudget(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, uint32_t budget_us)		//check
+uint8_t setMeasurementTimingBudget(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, uint32_t budget_us)		//check
 	{
 	uint16_t const StartOverhead = 1320;			// note that this is different than the value in get_
 	uint16_t const EndOverhead = 960;
@@ -667,7 +667,7 @@ uint8_t setMeasurementTimingBudget(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, uint32_
 				}
 			break;
 		case 5:
-			if (I2C_WriteBytes(_i2c, dev->addr, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, ( uint8_t* )&dev->tmp16, 2) && (_i2c->status == PORT_BUSY)) {
+			if (I2C_WriteBytes(_i2c, dev->addr, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, (uint8_t *)&dev->tmp16, 2) && (_i2c->status == PORT_BUSY)) {
 				// set_sequence_step_timeout() end
 				dev->measurement_timing_budget_us = budget_us;  // store for internal reuse
 				dev->stepL2 = 0;
@@ -681,7 +681,7 @@ uint8_t setMeasurementTimingBudget(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, uint32_
 	return 0;
 	}
 
-uint8_t performSingleRefCalibration(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, uint8_t vhv_init_byte) {
+uint8_t performSingleRefCalibration(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, uint8_t vhv_init_byte) {
 	switch (dev->stepL1) {
 		case 0:// VL53L0X_REG_SYSRANGE_MODE_START_STOP
 			if (I2C_WriteOneByte(_i2c, dev->addr, SYSRANGE_START, 0x01 | vhv_init_byte) && (_i2c->status == PORT_BUSY)) {
@@ -718,7 +718,7 @@ uint8_t performSingleRefCalibration(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, uint8_
 	return 0;
 	}
 
-uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, vcselPeriodType type,
+uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, vcselPeriodType type,
 	uint8_t period_pclks) {
 	uint8_t st;
 	switch (dev->stepL3) {
@@ -835,7 +835,7 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, vcselPeriodTyp
 			st = I2C_WriteBytes(_i2c,
 				dev->addr,
 				PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI,
-				( uint8_t* )&dev->tmp16,
+				(uint8_t *)&dev->tmp16,
 				2);
 			// set_sequence_step_timeout() end
 			// set_sequence_step_timeout() begin
@@ -1005,7 +1005,7 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, vcselPeriodTyp
 			st = I2C_WriteBytes(_i2c,
 				dev->addr,
 				FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI,
-				( uint8_t* )&dev->tmp16,
+				(uint8_t *)&dev->tmp16,
 				2);
 			if (st) {
 				dev->stepL3 = 102;
@@ -1052,7 +1052,7 @@ uint8_t setVcselPulsePeriod(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, vcselPeriodTyp
 	return 0;
 	}
 
-uint8_t VL53_StartContinuous(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, uint32_t period_ms) {
+uint8_t VL53_StartContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev, uint32_t period_ms) {
 	switch (dev->status) {
 		case DEVICE_READY:
 			if (_i2c->status == PORT_FREE) {
@@ -1104,7 +1104,7 @@ uint8_t VL53_StartContinuous(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, uint32_t peri
 						}
 					break;
 				case 7:			// continuous timed mode VL53L0X_SetInterMeasurementPeriodMilliSeconds() begin
-					if (I2C_ReadBytes(_i2c, dev->addr, OSC_CALIBRATE_VAL, ( uint8_t* )&dev->tmp16, 2) && (_i2c->status == PORT_BUSY)) {
+					if (I2C_ReadBytes(_i2c, dev->addr, OSC_CALIBRATE_VAL, (uint8_t *)&dev->tmp16, 2) && (_i2c->status == PORT_BUSY)) {
 						if (dev->tmp16) {
 							dev->tmp16 *= period_ms;
 							}
@@ -1112,7 +1112,7 @@ uint8_t VL53_StartContinuous(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, uint32_t peri
 						}
 					break;
 				case 8:
-					if (I2C_WriteBytes(_i2c, dev->addr, SYSTEM_INTERMEASUREMENT_PERIOD, ( uint8_t* )&dev->tmp16, 2) && (_i2c->status == PORT_BUSY)) {
+					if (I2C_WriteBytes(_i2c, dev->addr, SYSTEM_INTERMEASUREMENT_PERIOD, (uint8_t *)&dev->tmp16, 2) && (_i2c->status == PORT_BUSY)) {
 						dev->stepL1 = 10;
 						}
 					break;
@@ -1159,7 +1159,7 @@ uint8_t VL53_StartContinuous(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev, uint32_t peri
  * @param
  * @retval
  */
-uint8_t VL53_StopContinuous(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
+uint8_t VL53_StopContinuous(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev) {
 	switch (dev->status) {
 		case DEVICE_READY:
 			if (_i2c->status == PORT_FREE) {
@@ -1233,7 +1233,7 @@ uint8_t VL53_StopContinuous(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
  * @param
  * @retval
  */
-uint8_t VL53_readRangeContinuousMillimeters(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
+uint8_t VL53_readRangeContinuousMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev) {
 	switch (dev->status) {
 		case DEVICE_READY:
 			if (_i2c->status == PORT_FREE) {
@@ -1255,13 +1255,12 @@ uint8_t VL53_readRangeContinuousMillimeters(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev
 						else if (checkTimeoutExpired(dev)) {  //timeout
 							dev->timeoutFlag = 1;
 							dev->limit_timeout += 1;
-							//dev->range = 65535;
-							dev->status = DEVICE_DONE;
+							dev->status = DEVICE_ERROR;
 							}
 						}
 					break;
 				case 1:
-					if (I2C_ReadBytes(_i2c, dev->addr, RESULT_RANGE_STATUS + 10, ( uint8_t* )&dev->range, 2) && (_i2c->status == PORT_BUSY)) {
+					if (I2C_ReadBytes(_i2c, dev->addr, RESULT_RANGE_STATUS + 10, (uint8_t *)&dev->range, 2) && (_i2c->status == PORT_BUSY)) {
 						dev->smoothRange = alphabeta(dev->range, dev->smoothRange, VL53L0x_SHOOTH_DEEP);
 						dev->stepL1 = 2;
 						}
@@ -1304,7 +1303,7 @@ uint8_t VL53_readRangeContinuousMillimeters(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev
  * @param
  * @retval
  */
-uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
+uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev) {
 	switch (dev->status) {
 		case DEVICE_READY:
 			if (_i2c->status == PORT_FREE) {
@@ -1383,7 +1382,7 @@ uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 						}
 					break;
 				case 10:
-					if (I2C_ReadBytes(_i2c, dev->addr, RESULT_RANGE_STATUS + 10, ( uint8_t* )&dev->range, 2) && (_i2c->status == PORT_BUSY)) {
+					if (I2C_ReadBytes(_i2c, dev->addr, RESULT_RANGE_STATUS + 10, (uint8_t *)&dev->range, 2) && (_i2c->status == PORT_BUSY)) {
 						dev->smoothRange = alphabeta(dev->range, dev->smoothRange, VL53L0x_SHOOTH_DEEP);
 						dev->stepL1 = 11;
 						}
@@ -1422,8 +1421,83 @@ uint8_t readRangeSingleMillimeters(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	return 0;
 	}
 
+uint8_t VL53L0X_ResetDevice(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev) {
+	switch (dev->status) {
+		case DEVICE_READY:
+			if (_i2c->status == PORT_FREE) {
+				dev->timeoutFlag = 0;
+				_i2c->status = PORT_BUSY;
+				dev->status = DEVICE_PROCESSING;
+				dev->stepL1 = 0;
+				}
+			break;
+		case DEVICE_PROCESSING:
+			switch (dev->stepL1) {
+				case 0:/* Set reset bit */
+					if (I2C_WriteOneByte(_i2c, dev->addr, SOFT_RESET_GO2_SOFT_RESET_N, 0x00) && (_i2c->status == PORT_BUSY)) {
+						dev->stepL1 = 1;
+						}
+					break;
+				case 1:/* Wait for some time */
+					if (I2C_ReadOneByte(_i2c, dev->addr, IDENTIFICATION_MODEL_ID, &dev->tmp8) && (_i2c->status == PORT_BUSY)) {
+						if ((dev->tmp8 == 0x00)) {//reset done
+							dev->stepL1 = 2;
+							}
+						else if (checkTimeoutExpired(dev)) {  //timeout
+							dev->timeoutFlag = 1;
+							dev->limit_timeout += 1;
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				case 2:/* Release reset */
+					if (I2C_WriteOneByte(_i2c, dev->addr, SOFT_RESET_GO2_SOFT_RESET_N, 0x01) && (_i2c->status == PORT_BUSY)) {
+						dev->stepL1 = 3;
+						}
+					break;
+				case 3:
+					if (I2C_ReadOneByte(_i2c, dev->addr, IDENTIFICATION_MODEL_ID, &dev->tmp8) && (_i2c->status == PORT_BUSY)) {
+						if ((dev->tmp8 != 0x00)) {//boot done
+							dev->status = DEVICE_DONE;
+							}
+						else if (checkTimeoutExpired(dev)) {  //timeout
+							dev->timeoutFlag = 1;
+							dev->limit_timeout += 1;
+							dev->status = DEVICE_ERROR;
+							}
+						}
+					break;
+				default:
+					break;
+				}
+			if (_i2c->status == PORT_ERROR) {
+				dev->status = DEVICE_ERROR;
+				}
+			break;
+		case DEVICE_DONE:
+			dev->status = DEVICE_READY;
+			_i2c->status = PORT_FREE;
+			return 1;
+		case DEVICE_ERROR:
+			if (++dev->errCount >= dev->errLimit) {
+				dev->status = DEVICE_FAULTH;
+				_i2c->status = PORT_FREE;
+				}
+			else {
+				dev->status = DEVICE_READY;
+				_i2c->status = PORT_FREE;
+				}
+			break;
+		case DEVICE_FAULTH:
+			return 1;
+		default:
+			break;
+		}
+	return 0;
+	}
+
 //--------------------------------------------------------------
-uint8_t VL53L0x_Init(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
+uint8_t VL53L0x_Init(I2C_IRQ_Conn_t *_i2c, VL53L0x_t *dev) {
 	switch (dev->status) {
 		case DEVICE_READY:
 			if (_i2c->status == PORT_FREE) {
@@ -1436,104 +1510,76 @@ uint8_t VL53L0x_Init(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 			break;
 		case DEVICE_PROCESSING:
 			switch (dev->stepL3) {
-				case 0:  // VL53L0X_DataInit() begin
-					if (I2C_ReadOneByte(_i2c, dev->addr, VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, &dev->tmp8)) {
-						if (_i2c->status == PORT_BUSY) {
-							dev->stepL3 = 1;
+				case 200:
+					LL_GPIO_ResetOutputPin(dev->XShut_Port, dev->XShut_Pin);
+					//read pin data
+					dev->stepL3 = 201;
+					break;
+				case 201:
+					LL_GPIO_SetOutputPin(dev->XShut_Port, dev->XShut_Pin);
+					//read pin data
+					dev->stepL3 = 202;
+					break;
+				case 202:// check connection
+					if (I2C_ReadOneByte(_i2c, dev->addr, IDENTIFICATION_MODEL_ID, &dev->modelID) && (_i2c->status == PORT_BUSY)) {
+						if (dev->modelID == VL53L0x_EXPECTED_DEVICE_ID) {
+							dev->stepL3 = 0;
 							}
-						else if (_i2c->status == PORT_ERROR) {
+						else if (checkTimeoutExpired(dev)) {  //timeout
+							dev->timeoutFlag = 1;
+							dev->limit_timeout += 1;
 							dev->status = DEVICE_ERROR;
 							}
+						}
+					break;
+				case 0:  // VL53L0X_DataInit() begin
+					if (I2C_ReadOneByte(_i2c, dev->addr, VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, &dev->tmp8) && (_i2c->status == PORT_BUSY)) {
+						dev->stepL3 = 1;
 						}
 					break;
 				case 1:  // always 2.8v enable
-					if (I2C_WriteOneByte(_i2c, dev->addr, VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, dev->tmp8 | 0x01)) { // set bit 0
-						if (_i2c->status == PORT_BUSY) {
-							dev->stepL3 = 2;
-							}
-						else if (_i2c->status == PORT_ERROR) {
-							dev->status = DEVICE_ERROR;
-							}
+					if (I2C_WriteOneByte(_i2c, dev->addr, VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, dev->tmp8 | 0x01) && (_i2c->status == PORT_BUSY)) { // set bit 0
+						dev->stepL3 = 2;
 						}
 					break;
 				case 2:  //Set I2C standard mode
-					if (I2C_WriteOneByte(_i2c, dev->addr, 0x88, 0x00)) {
-						if (_i2c->status == PORT_BUSY) {
-							dev->stepL3 = 3;
-							}
-						else if (_i2c->status == PORT_ERROR) {
-							dev->status = DEVICE_ERROR;
-							}
+					if (I2C_WriteOneByte(_i2c, dev->addr, I2C_MODE, 0x00) && (_i2c->status == PORT_BUSY)) {
+						dev->stepL3 = 3;
 						}
 					break;
 				case 3:
-					if (I2C_WriteOneByte(_i2c, dev->addr, 0x80, 0x01)) {
-						if (_i2c->status == PORT_BUSY) {
-							dev->stepL3 = 4;
-							}
-						else if (_i2c->status == PORT_ERROR) {
-							dev->status = DEVICE_ERROR;
-							}
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0x80, 0x01) && (_i2c->status == PORT_BUSY)) {
+						dev->stepL3 = 4;
 						}
 					break;
 				case 4:
-					if (I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01)) {
-						if (_i2c->status == PORT_BUSY) {
-							dev->stepL3 = 5;
-							}
-						else if (_i2c->status == PORT_ERROR) {
-							dev->status = DEVICE_ERROR;
-							}
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x01) && (_i2c->status == PORT_BUSY)) {
+						dev->stepL3 = 5;
 						}
 					break;
 				case 5:
-					if (I2C_WriteOneByte(_i2c, dev->addr, 0x00, 0x00)) {
-						if (_i2c->status == PORT_BUSY) {
-							dev->stepL3 = 6;
-							}
-						else if (_i2c->status == PORT_ERROR) {
-							dev->status = DEVICE_ERROR;
-							}
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0x00, 0x00) && (_i2c->status == PORT_BUSY)) {
+						dev->stepL3 = 6;
 						}
 					break;
 				case 6:  //stop variable 0x11
-					if (I2C_ReadOneByte(_i2c, dev->addr, 0x91, &dev->stop_variable)) {
-						if (_i2c->status == PORT_BUSY) {
-							dev->stepL3 = 7;
-							}
-						else if (_i2c->status == PORT_ERROR) {
-							dev->status = DEVICE_ERROR;
-							}
+					if (I2C_ReadOneByte(_i2c, dev->addr, 0x91, &dev->stop_variable) && (_i2c->status == PORT_BUSY)) {
+						dev->stepL3 = 7;
 						}
 					break;
 				case 7:
-					if (I2C_WriteOneByte(_i2c, dev->addr, 0x00, 0x01)) {
-						if (_i2c->status == PORT_BUSY) {
-							dev->stepL3 = 8;
-							}
-						else if (_i2c->status == PORT_ERROR) {
-							dev->status = DEVICE_ERROR;
-							}
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0x00, 0x01) && (_i2c->status == PORT_BUSY)) {
+						dev->stepL3 = 8;
 						}
 					break;
 				case 8:
-					if (I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00)) {
-						if (_i2c->status == PORT_BUSY) {
-							dev->stepL3 = 9;
-							}
-						else if (_i2c->status == PORT_ERROR) {
-							dev->status = DEVICE_ERROR;
-							}
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0xFF, 0x00) && (_i2c->status == PORT_BUSY)) {
+						dev->stepL3 = 9;
 						}
 					break;
 				case 9:
-					if (I2C_WriteOneByte(_i2c, dev->addr, 0x80, 0x00)) {
-						if (_i2c->status == PORT_BUSY) {
-							dev->stepL3 = 10;
-							}
-						else if (_i2c->status == PORT_ERROR) {
-							dev->status = DEVICE_ERROR;
-							}
+					if (I2C_WriteOneByte(_i2c, dev->addr, 0x80, 0x00) && (_i2c->status == PORT_BUSY)) {
+						dev->stepL3 = 10;
 						}
 					break;
 				case 10:  // disable SIGNAL_RATE_MSRC (bit 1) and SIGNAL_RATE_PRE_RANGE (bit 4) limit checks//+
@@ -1561,7 +1607,7 @@ uint8_t VL53L0x_Init(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 					if (I2C_WriteBytes(_i2c,
 						dev->addr,
 						FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT,
-						( uint8_t* )&dev->tmp16,
+						(uint8_t *)&dev->tmp16,
 						2)) {
 						if (_i2c->status == PORT_BUSY) {
 							dev->stepL3 = 13;
@@ -1816,7 +1862,7 @@ uint8_t VL53L0x_Init(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 					if (I2C_ReadBytes(_i2c,
 						dev->addr,
 						GLOBAL_CONFIG_SPAD_ENABLES_REF_0,
-						( uint8_t* )&dev->ref_spad_map,
+						(uint8_t *)&dev->ref_spad_map,
 						6)) {
 						if (_i2c->status == PORT_BUSY) {
 							dev->stepL3 = 37;
@@ -2834,6 +2880,9 @@ uint8_t VL53L0x_Init(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 					dev->stepL3 = 0;
 					break;
 				}
+			if (_i2c->status == PORT_ERROR) {
+				dev->status = DEVICE_ERROR;
+				}
 			break;
 		case DEVICE_DONE:
 			dev->status = DEVICE_READY;
@@ -2860,7 +2909,7 @@ uint8_t VL53L0x_Init(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 	return 0;
 	}
 
-uint16_t getSmoothRange(VL53L0x_t* dev) {
+uint16_t getSmoothRange(VL53L0x_t *dev) {
 	static_assert(VL53L0x_SHOOTH_DEEP % 2 == 0, "smooth deep most be power of 2");
 	dev->smoothRange = alphabeta(dev->range, dev->smoothRange, VL53L0x_SHOOTH_DEEP);
 	return dev->smoothRange;

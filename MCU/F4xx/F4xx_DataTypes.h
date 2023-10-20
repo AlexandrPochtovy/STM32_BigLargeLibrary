@@ -33,7 +33,6 @@ typedef enum PortStatus
   PORT_FREE,        // port free, ready for connect
   PORT_BUSY,        // port busy, data exchange is being prepared
   PORT_IN_PROGRESS, // data exchange is being processing
-  PORT_COMPLITE,    // data exchange is being complite
   PORT_DONE,        // data exchange complite without error
   PORT_ERROR        // data exchange complite without error
 } PortStatus_t;

@@ -65,9 +65,9 @@ typedef struct Drive {
 	moveMode_t mode;	//main move mode
 	uint8_t step;			//machine-state's step for processing move mode
 	point_t position;	//actual coordinates of robot
-	Wheel_t left;			//left wheel actual data
-	Wheel_t right;		//right wheel actual data
-	float speedRobot;	//main speed
+	Wheel_t WL;				//left wheel actual data
+	Wheel_t WR;				//right wheel actual data
+	float speed;	//main speed
 	float distance;		//distance to target
 	float fullPath;		//full patch, integral
 	float intLength;	//integral length for move to target
@@ -83,5 +83,5 @@ typedef struct Drive {
 //TODO продумать корректную систему проверки перехода через 0 и максимум энкодера при смене направления вращения колеса
 float WheelSpeedMeasure(uint32_t deltaPulse, uint32_t deltaTime);
 //TODO продумать гистерезис чтобы не было колебаний скорости в граничных точках
-int32_t WheelSpeedZeroLimiter(int32_t sp, int32_t low, int32_t hi);
+int32_t WheelSpeedZeroLimiter(int32_t act, int32_t sp, int32_t low, int32_t hi);
 

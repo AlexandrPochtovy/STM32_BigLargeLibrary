@@ -31,44 +31,48 @@ extern "C" {
 #include <math.h>
 #include "Function/Function.h"
 
-/**********************************************************************
-*                       TYPEDEF's PID                                 * 
-***********************************************************************/
-/*****************************************************************
-  * @brief structure for simple PID controller:
-  * @param Kp - the proportional tuning constant, multiplied with SCALING_FACTOR
-    @param Ki - the Integral tuning constant, multiplied with SCALING_FACTOR
-    @param Kd - the Derivative tuning constant, multiplied with SCALING_FACTOR
-    @param a[3] - coefficients for calculate pid
-    @param e[3] - the data storage error values for calculating
-  * @retval out - output value  
-  */
-typedef struct pidSimple {
+  /**********************************************************************
+  *                       TYPEDEF's PID                                 *
+  ***********************************************************************/
+  /*****************************************************************
+    * @brief structure for simple PID controller:
+    * @param Kp - the proportional tuning constant, multiplied with SCALING_FACTOR
+      @param Ki - the Integral tuning constant, multiplied with SCALING_FACTOR
+      @param Kd - the Derivative tuning constant, multiplied with SCALING_FACTOR
+      @param a[3] - coefficients for calculate pid
+      @param e[3] - the data storage error values for calculating
+    * @retval out - output value
+    */
+  typedef struct pidSimple {
     float Kp;
     float Ki;
     float Kd;
     float a[3];
     float e[3];
     float out;
-} pidS_t;
+    } pidS_t;
 
-/*****************************************************************
-  * @brief structure for simple PID controller:
-  * @param Kp - the proportional tuning constant, multiplied with SCALING_FACTOR
-    @param Ki - the Integral tuning constant, multiplied with SCALING_FACTOR
-    @param Kd - the Derivative tuning constant, multiplied with SCALING_FACTOR
-    @param a - coefficients for calculate pid
-    @param ad[2] - derivative calculation coefficient
-    @param alpha - IIR filter coefficient
-    @param e[3] - the data storage error values for calculating
-    @param d[2] - derivative value act & prev
-    @param fd[2] - filtered derivative act & prev
-  * @retval out - output value  
-  */
-typedef struct pidFiltered {
+  /*****************************************************************
+    * @brief structure for simple PID controller:
+    * @param Kp - the proportional tuning constant, multiplied with SCALING_FACTOR
+      @param Ki - the Integral tuning constant, multiplied with SCALING_FACTOR
+      @param Kd - the Derivative tuning constant, multiplied with SCALING_FACTOR
+      @param a - coefficients for calculate pid
+      @param ad[2] - derivative calculation coefficient
+      @param alpha - IIR filter coefficient
+      @param e[3] - the data storage error values for calculating
+      @param d[2] - derivative value act & prev
+      @param fd[2] - filtered derivative act & prev
+    * @retval out - output value
+    */
+  typedef struct pidFiltered {
     float kp;
     float ki;
     float kd;
+    uint8_t N;
+    float kp_mem;
+    float ki_mem;
+    float kd_mem;
     float a;
     float ad[2];
     float alpha;
@@ -76,52 +80,52 @@ typedef struct pidFiltered {
     float d[2];
     float fd[2];
     float out;
-} pidF_t;
+    } pidF_t;
 
-/*****************************************************************
-  * @brief init the PID controller: calculate coefficients and constants
-  * @param Kp - the proportional tuning constant
-    @param Ki - the Integral tuning constant
-    @param Kd - the Derivative tuning constant
-    @param dT - time between PID calcilation in msec
-    @param *pid - pointer for pidS_t pid structure
-  * @retval none
-  */
-void PidSimple_Init(float kp, float ki, float kd, int32_t dT, pidS_t *pid);
+  /*****************************************************************
+    * @brief init the PID controller: calculate coefficients and constants
+    * @param Kp - the proportional tuning constant
+      @param Ki - the Integral tuning constant
+      @param Kd - the Derivative tuning constant
+      @param dT - time between PID calcilation in msec
+      @param *pid - pointer for pidS_t pid structure
+    * @retval none
+    */
+  void PidSimple_Init(float kp, float ki, float kd, size_t dT, pidS_t* pid);
 
-/*****************************************************************
-  * @brief calculate the PID controller
-  * @param sp - set-point value
-    @param act - actual value, i.e. feedback
-    @param min - minimum output value
-    @param max - maximum output value
-    @param *pid - pointer for pidS_t pid structure
-  * @retval control value from pid
-  */
-int32_t PidSimple_Processing(float sp, float act, int32_t min, int32_t max, pidS_t *pid);
+  /*****************************************************************
+    * @brief calculate the PID controller
+    * @param sp - set-point value
+      @param act - actual value, i.e. feedback
+      @param min - minimum output value
+      @param max - maximum output value
+      @param *pid - pointer for pidS_t pid structure
+    * @retval control value from pid
+    */
+  size_t PidSimple_Processing(float sp, float act, size_t min, size_t max, pidS_t* pid);
 
-/*****************************************************************
-  * @brief init the PID controller: calculate coefficients and constants
-  * @param Kp - the proportional tuning constant
-    @param Ki - the Integral tuning constant
-    @param Kd - the Derivative tuning constant
-    @param N - number of samples for IIR filter
-    @param dT - time between PID calcilation in msec
-    @param *pid - pointer for pidS_t pid structure
-  * @retval none
-  */
-void PidFiltered_Init(float kp, float ki, float kd, uint8_t N, int32_t dT, pidF_t *pid);
+  /*****************************************************************
+    * @brief init the PID controller: calculate coefficients and constants
+    * @param Kp - the proportional tuning constant
+      @param Ki - the Integral tuning constant
+      @param Kd - the Derivative tuning constant
+      @param N - number of samples for IIR filter
+      @param dT - time between PID calcilation in msec
+      @param *pid - pointer for pidS_t pid structure
+    * @retval none
+    */
+  void PidFiltered_Init(float kp, float ki, float kd, uint8_t N, size_t dT, pidF_t* pid);
 
-/*****************************************************************
-  * @brief calculate the PID controller
-  * @param sp - set-point value
-    @param act - actual value, i.e. feedback
-    @param min - minimum output value
-    @param max - maximum output value
-    @param *pid - pointer for pidS_t pid structure
-  * @retval control value from pid
-  */
-int32_t PidFiltered_Processing(float sp, float act, int32_t min, int32_t max, pidF_t *pid);
+  /*****************************************************************
+    * @brief calculate the PID controller
+    * @param sp - set-point value
+      @param act - actual value, i.e. feedback
+      @param min - minimum output value
+      @param max - maximum output value
+      @param *pid - pointer for pidS_t pid structure
+    * @retval control value from pid
+    */
+  size_t PidFiltered_Processing(float sp, float act, size_t dT, size_t min, size_t max, pidF_t* pid);
 
 
 #ifdef __cplusplus

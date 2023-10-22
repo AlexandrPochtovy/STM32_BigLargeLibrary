@@ -24,8 +24,8 @@
 #include "Function/Function.h"
 #include "PID/PID_Wiki/PID_Moto.h"
 
-#define WHEEL_RAD_mm	    	21u						// wheel radius in mm
-#define WHEEL_PULSE_COUNT   900u					// number of encoder pulses per wheel revolution
+#define WHEEL_RAD_mm	    	24u						// wheel radius in mm
+#define WHEEL_PULSE_COUNT   1800u					// number of encoder pulses per wheel revolution
 #define BASE_mm 		        122u					// distance between wheels of one axle in mm
 #define WALL_LIMIT_mm	      300u					// permissible distance to object in mm
 #define K_I				          10u						// integral coefficient
@@ -39,7 +39,8 @@ typedef enum direction {
 
 typedef struct Wheel {
 	direction_t direction;
-	float speed;
+	float speedSP;
+	float speedAct;
 	} Wheel_t;
 
 typedef enum moveMode {
@@ -83,5 +84,5 @@ typedef struct Drive {
 //TODO продумать корректную систему проверки перехода через 0 и максимум энкодера при смене направления вращения колеса
 float WheelSpeedMeasure(uint32_t deltaPulse, uint32_t deltaTime);
 //TODO продумать гистерезис чтобы не было колебаний скорости в граничных точках
-int32_t WheelSpeedZeroLimiter(int32_t act, int32_t sp, int32_t low, int32_t hi);
+size_t WheelSpeedZeroLimiter(size_t act, size_t sp, size_t low, size_t hi);
 

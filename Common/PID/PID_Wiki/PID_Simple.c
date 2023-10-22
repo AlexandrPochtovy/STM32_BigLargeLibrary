@@ -22,7 +22,7 @@
 
 #include "PID_Simple.h"
 
-void PidSimple_Init(float kp, float ki, float kd, int32_t dT, pidS_t *pid) {
+void PidSimple_Init(float kp, float ki, float kd, size_t dT, pidS_t* pid) {
     pid->Kp = kp;
     pid->Ki = ki;
     pid->Kd = kd;
@@ -33,9 +33,9 @@ void PidSimple_Init(float kp, float ki, float kd, int32_t dT, pidS_t *pid) {
     pid->e[1] = 0.0;
     pid->e[0] = 0.0;
     pid->out = 0.0;
-}
+    }
 
-int32_t PidSimple_Processing(float sp, float actual, int32_t min, int32_t max, pidS_t *pid) {
+size_t PidSimple_Processing(float sp, float actual, size_t min, size_t max, pidS_t* pid) {
     pid->e[2] = pid->e[1];
     pid->e[1] = pid->e[0];
     pid->e[0] = sp - actual;
@@ -43,10 +43,10 @@ int32_t PidSimple_Processing(float sp, float actual, int32_t min, int32_t max, p
     //out limit
     if (pid->out < min) { pid->out = min; }
     else if (pid->out > max) { pid->out = max; }
-    return (int32_t)pid->out;
-}
+    return ( size_t )pid->out;
+    }
 
-void PidFiltered_Init(float kp, float ki, float kd, uint8_t N, int32_t dT, pidF_t *pid) {
+void PidFiltered_Init(float kp, float ki, float kd, uint8_t N, size_t dT, pidF_t* pid) {
     pid->kp = kp;
     pid->ki = ki;
     pid->kd = kd;
@@ -55,7 +55,7 @@ void PidFiltered_Init(float kp, float ki, float kd, uint8_t N, int32_t dT, pidF_
     pid->e[1] = 0;
     pid->e[0] = 0;
     pid->out = 0;  //the current value of the actuator
-    pid->ad[0] = kd *1000 / dT;
+    pid->ad[0] = kd * 1000 / dT;
     pid->ad[1] = -2.0 * pid->ad[0];
     float tau = kd / (kp * N); // IIR filter time constant
     pid->alpha = dT / (2 * 1000 * tau);
@@ -64,9 +64,27 @@ void PidFiltered_Init(float kp, float ki, float kd, uint8_t N, int32_t dT, pidF_
     pid->fd[0] = 0;
     pid->fd[1] = 0;
     pid->out = 0;
-}
+    pid->kp_mem = pid->kp;
+    pid->ki_mem = pid->ki;
+    pid->kd_mem = pid->kd;
+    pid->N = N;
+    }
 
-int32_t PidFiltered_Processing(float sp, float act, int32_t min, int32_t max, pidF_t *pid) {
+size_t PidFiltered_Processing(float sp, float act, size_t dT, size_t min, size_t max, pidF_t* pid) {
+    if ((pid->kp != pid->kp_mem) || (pid->ki != pid->ki_mem) || (pid->kd != pid->kd_mem)) {
+        pid->a = pid->kp + pid->ki * dT / 1000;
+        pid->ad[0] = pid->kd * 1000 / dT;
+        pid->ad[1] = -2.0 * pid->ad[0];
+        float tau = pid->kd / (pid->kp * pid->N); // IIR filter time constant
+        pid->alpha = dT / (2 * 1000 * tau);
+        //pid->d[0] = 0;
+        //pid->d[1] = 0;
+        //pid->fd[0] = 0;
+        //pid->fd[1] = 0;
+        pid->kp_mem = pid->kp;
+        pid->ki_mem = pid->ki;
+        pid->kd_mem = pid->kd;
+        }
     pid->e[2] = pid->e[1];
     pid->e[1] = pid->e[0];
     pid->e[0] = sp - act;
@@ -77,10 +95,10 @@ int32_t PidFiltered_Processing(float sp, float act, int32_t min, int32_t max, pi
     pid->fd[0] = ((pid->alpha) / (pid->alpha + 1)) * (pid->d[0] + pid->d[1]) - ((pid->alpha - 1) / (pid->alpha + 1)) * pid->fd[1];
     pid->out = pid->out + pid->fd[0];
     if (pid->out < min) {
-    	pid->out = min;
-    }
+        pid->out = min;
+        }
     else if (pid->out > max) {
-    	pid->out = max;
+        pid->out = max;
+        }
+    return ( size_t )pid->out;
     }
-    return (int32_t)pid->out;
-}

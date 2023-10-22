@@ -6,7 +6,7 @@ float WheelSpeedMeasure(uint32_t deltaPulse, uint32_t deltaTime) {
     }
 
 /* output value need use as act value for correct hyst processing*/
-int32_t WheelSpeedZeroLimiter(int32_t act, int32_t sp, int32_t low, int32_t hi) {
+size_t WheelSpeedZeroLimiter(size_t act, size_t sp, size_t low, size_t hi) {
     if (sp > 0) {
         if (sp < low) {
             return 0;

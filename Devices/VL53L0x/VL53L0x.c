@@ -1391,12 +1391,14 @@ uint8_t VL53_ReadRangeSingle(I2C_IRQ_Conn_t* _i2c, VL53L0x_t* dev) {
 							}
 						}
 					break;
-				case 10:
-					if (I2C_ReadBytes(_i2c, dev->addr, RESULT_RANGE_STATUS + 10, ( uint8_t* )&dev->range, 2) && (_i2c->status == PORT_BUSY)) {
+				case 10:{
+					uint8_t dt[2];
+					if (I2C_ReadBytes(_i2c, dev->addr, RESULT_RANGE_STATUS + 10, dt, 2) && (_i2c->status == PORT_BUSY)) {
+						dev->range = CONCAT_TWO_BYTES(dt[0], dt[1]);
 						dev->smoothRange = alphabeta(dev->range, dev->smoothRange, VL53L0x_SHOOTH_DEEP);
 						dev->stepL1 = 11;
 						}
-					break;
+					break;}
 				case 11:
 					if (I2C_WriteOneByte(_i2c, dev->addr, SYSTEM_INTERRUPT_CLEAR, 0x01) && (_i2c->status == PORT_BUSY)) {
 						dev->status = DEVICE_DONE;

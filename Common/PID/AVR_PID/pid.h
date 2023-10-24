@@ -20,7 +20,8 @@
 #ifndef PID_H
 #define PID_H
 
-#include "stdint.h"
+#include <stdint.h>
+#include <stddef.h>
 
 #define SCALING_FACTOR  128
 
@@ -30,12 +31,12 @@
  */
 typedef struct PID_DATA{
   int16_t lastProcessValue;//! Last process value, used to find derivative of process value.
-  int32_t sumError; //! Summation of errors, used for integrate calculations
+  size_t sumError; //! Summation of errors, used for integrate calculations
   int16_t P_Factor;//! The Proportional tuning constant, multiplied with SCALING_FACTOR
   int16_t I_Factor;//! The Integral tuning constant, multiplied with SCALING_FACTOR
   int16_t D_Factor;//! The Derivative tuning constant, multiplied with SCALING_FACTOR
   int16_t maxError;//! Maximum allowed error, avoid overflow
-  int32_t maxSumError;//! Maximum allowed sumerror, avoid overflow
+  size_t maxSumError;//! Maximum allowed sumerror, avoid overflow
 } pidData_t;
 
 /*! \brief Maximum values

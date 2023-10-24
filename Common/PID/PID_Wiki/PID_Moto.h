@@ -44,11 +44,15 @@ typedef struct PID_MF {
 	float kp;
 	float ki;	
 	float kd;
+  uint8_t N;
 	float a[2];
 	float ku[2];
 	float ke[3];
 	float e[3];
 	float u[3];
+	float kp_mem;
+	float ki_mem;
+	float kd_mem;
     } PID_MF_t;
 
 /*****************************************************************
@@ -73,7 +77,7 @@ void PID_MotoInit(float kp, float ki, float kd, float fc, uint32_t dT, PID_M_t *
     @param *pid - pointer for pidS_t pid structure
   * @retval control value from pid
   */
-int32_t PID_MotoCalc(float sp, float act, int32_t min, int32_t max, uint32_t dT, PID_M_t *pid);
+size_t PID_MotoCalc(float sp, float act, size_t min, size_t max, uint32_t dT, PID_M_t *pid);
 
 /*****************************************************************
   * @brief init the PID controller: calculate coefficients and constants
@@ -96,6 +100,6 @@ void PID_MotoFilteredInit(float kp, float ki, float kd, uint8_t N, uint32_t dT, 
     @param *pid - pointer for pidS_t pid structure
   * @retval control value from pid
   */
-int32_t PID_MotoFilteredCalc(float sp, float act, int32_t min, int32_t max, PID_MF_t *pid);
+size_t PID_MotoFilteredCalc(float sp, float act, uint32_t dT, size_t min, size_t max, PID_MF_t *pid);
 
 #endif

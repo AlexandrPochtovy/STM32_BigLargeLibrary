@@ -52,7 +52,13 @@ size_t Max(size_t val, size_t max);
   * 				lsb - low byte
   * @retval uint16_t or int16_t value
   */
-size_t CONCAT_TWO_BYTES(uint8_t msb, uint8_t lsb);
+static inline uint16_t CONCAT_TWO_BYTES(uint8_t msb, uint8_t lsb) {
+	return (((uint16_t)msb << 8) | (uint16_t)lsb);
+}
+
+static inline int16_t ConvertTwoCompl(uint16_t val) {
+	return 0x8000 & val ? (~(0x7FFF & val) + 1) : val;
+}
 
 /*****************************************************************
   * @brief  concat four bytes into 32bits value

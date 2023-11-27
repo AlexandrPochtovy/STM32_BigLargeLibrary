@@ -13,15 +13,17 @@
 #ifndef MadgwickAHRS_h
 #define MadgwickAHRS_h
 
-#include <math.h>
-#include "QuaternionUDT.h"
-#include "Function/Function.h"
+//----------------------------------------------------------------------------------------------------
+// Variable declaration
+
+extern volatile float beta;				// algorithm gain
+extern volatile float q0, q1, q2, q3;	// quaternion of sensor frame relative to auxiliary frame
 
 //---------------------------------------------------------------------------------------------------
 // Function declarations
 
-Quaternion_t MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
-Quaternion_t MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az);
+void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
+void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az);
 
 #endif
 //=====================================================================================================

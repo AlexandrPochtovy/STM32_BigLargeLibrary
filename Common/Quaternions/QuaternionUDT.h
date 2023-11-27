@@ -23,10 +23,15 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <math.h>
 
  /**********************************************************************
  *                       TYPEDEF's                                     *
  ***********************************************************************/
+#ifndef M_PI
+#define M_PI 3.14159265358979323846f
+#endif
+
 typedef struct vector {
 	float x;// X- axis measurements
 	float y;// Y- axis measurements
@@ -46,5 +51,23 @@ typedef struct EulerAngles {
 	float pitch;
 	float yaw;
 	} EulerAngles_t;
+
+/**
+ * @brief Converts degrees to radians.
+ * @param degrees Degrees.
+ * @return Radians.
+ */
+static inline float DegreesToRadians(const float degrees) {
+    return degrees * ((float) M_PI / 180.0f);
+}
+
+/**
+ * @brief Converts radians to degrees.
+ * @param radians Radians.
+ * @return Degrees.
+ */
+static inline float RadiansToDegrees(const float radians) {
+    return radians * (180.0f / (float) M_PI);
+}
 
 #endif

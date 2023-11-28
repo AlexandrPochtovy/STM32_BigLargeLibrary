@@ -23,9 +23,15 @@
 
 #define QMC5883L_DATA_LEN 6
 
+#ifndef _FUNCTION_H_
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (((uint16_t)msb << 8) | (uint16_t)lsb);
 	}
+
+static inline int16_t Convert(uint16_t val) {
+	return 0x8000 & val ? (~(0x7FFF & val) + 1) : val;
+}
+#endif
 
 uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
 	switch (dev->status) {
@@ -94,9 +100,9 @@ uint8_t QMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
 		case DEVICE_PROCESSING: {
 			uint8_t dt[QMC5883L_DATA_LEN];
 			if (I2C_ReadBytes(_i2c, dev->addr, QMC5883L_REG_OUT_X_L, dt, QMC5883L_DATA_LEN) && (_i2c->status == PORT_BUSY)) {
-				dev->raw.X = (int16_t)CONCAT_BYTES(dt[1], dt[0]);
-				dev->raw.Y = (int16_t)CONCAT_BYTES(dt[3], dt[2]);
-				dev->raw.Z = (int16_t)CONCAT_BYTES(dt[5], dt[4]);
+				dev->raw.X = (int16_t)(CONCAT_TWO_BYTES(dt[1], dt[0]));
+				dev->raw.Y = (int16_t)(CONCAT_TWO_BYTES(dt[3], dt[2]));
+				dev->raw.Z = (int16_t)(CONCAT_TWO_BYTES(dt[5], dt[4]));
 				dev->data.X = (float)dev->raw.X * QMC5883L_LSB_2G / 32768;
 				dev->data.Y = (float)dev->raw.Y * QMC5883L_LSB_2G / 32768;
 				dev->data.Z = (float)dev->raw.Z * QMC5883L_LSB_2G / 32768;

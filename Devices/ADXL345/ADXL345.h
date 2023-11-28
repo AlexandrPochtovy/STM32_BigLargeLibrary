@@ -26,6 +26,7 @@ extern "C"
   {
 #endif
 
+#include "Function/Function.h"
 #include "ADXL345_Register.h"
 #include "I2C_API.h"
 

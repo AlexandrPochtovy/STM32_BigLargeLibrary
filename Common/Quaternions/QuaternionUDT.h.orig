@@ -52,6 +52,8 @@ typedef struct EulerAngles {
 	float yaw;
 	} EulerAngles_t;
 
+<<<<<<< HEAD
+=======
 /**
  * @brief Converts degrees to radians.
  * @param degrees Degrees.
@@ -69,5 +71,6 @@ static inline float DegreesToRadians(const float degrees) {
 static inline float RadiansToDegrees(const float radians) {
     return radians * (180.0f / (float) M_PI);
 }
+>>>>>>> 9465a66967a51e864c3e4b31564731377690b77d
 
 #endif

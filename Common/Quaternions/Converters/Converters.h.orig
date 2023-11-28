@@ -10,7 +10,10 @@
 
 #include "Quaternions/QuaternionUDT.h"
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 9465a66967a51e864c3e4b31564731377690b77d
 Quaternion_t ToQuaternion(double yaw, double pitch, double roll);
 EulerAngles_t ToEulerAngles(Quaternion_t q, uint8_t deg);
 

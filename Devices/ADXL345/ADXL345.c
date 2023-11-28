@@ -28,7 +28,13 @@
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
 	return (((uint16_t)msb << 8) | (uint16_t)lsb);
 	}
+
+static inline int16_t ConvertTwoCompl(uint16_t val) {
+	return 0x8000 & val ? (~(0x7FFF & val) + 1) : val;
+}
 #endif
+
+
 /* TODO
  add calibration when init
  */
@@ -156,11 +162,11 @@ uint8_t ADXL345_GetData(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 			{
 			uint8_t val[ADXL345_DATA_LENGHT] = { 0 };
 			if (I2C_ReadBytes(_i2c, dev->addr, ADXL345_DATAX0_REG, val, ADXL345_DATA_LENGHT) && (_i2c->status == PORT_BUSY)) {
-				dev->raw.X = (int16_t)CONCAT_BYTES(val[1], val[0]);
+				dev->raw.X = (int16_t)(CONCAT_TWO_BYTES(val[1], val[0]));
 				dev->data.X = ADXL345_ConvertData(dev->raw.X, RATIO_2G);
-				dev->raw.Y = (int16_t)CONCAT_BYTES(val[3], val[2]);
+				dev->raw.Y =  (int16_t)(CONCAT_TWO_BYTES(val[3], val[2]));
 				dev->data.Y = ADXL345_ConvertData(dev->raw.Y, RATIO_2G);
-				dev->raw.Z = (int16_t)CONCAT_BYTES(val[5], val[4]);
+				dev->raw.Z =  (int16_t)(CONCAT_TWO_BYTES(val[5], val[4]));
 				dev->data.Z = ADXL345_ConvertData(dev->raw.Z, RATIO_2G);
 				dev->status = DEVICE_DONE;
 				}

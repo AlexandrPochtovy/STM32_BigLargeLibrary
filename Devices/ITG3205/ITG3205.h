@@ -26,6 +26,7 @@ extern "C" {
 
 #include "stdint.h"
 #include "math.h"
+#include "Function/Function.h"
 #include "ITG3205_Register.h"
 #include "I2C_API.h"
   //TODO DEVICE DO NOt ANSHWER IF RECONFIG OR RECONNECT

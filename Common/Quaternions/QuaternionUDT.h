@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <math.h>
 
  /**********************************************************************
  *                       TYPEDEF's                                     *
@@ -46,5 +47,6 @@ typedef struct EulerAngles {
 	float pitch;
 	float yaw;
 	} EulerAngles_t;
+
 
 #endif

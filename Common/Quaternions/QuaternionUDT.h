@@ -58,8 +58,8 @@ typedef struct EulerAngles {
  * @return Radians.
  */
 static inline float DegreesToRadians(const float degrees) {
-    return degrees * ((float) M_PI / 180.0f);
-}
+	return degrees * (float)M_PI / 180.0f;
+	}
 
 /**
  * @brief Converts radians to degrees.
@@ -67,7 +67,7 @@ static inline float DegreesToRadians(const float degrees) {
  * @return Degrees.
  */
 static inline float RadiansToDegrees(const float radians) {
-    return radians * (180.0f / (float) M_PI);
-}
+	return radians * 180.0f / (float)M_PI;
+	}
 
 #endif

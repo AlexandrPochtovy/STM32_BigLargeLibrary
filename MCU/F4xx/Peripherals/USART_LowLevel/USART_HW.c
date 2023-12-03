@@ -28,10 +28,10 @@ void USART_ProcessingEnable(USART_FullDuplex_t *usart) {
 	usart->transmitStatus = PORT_FREE;
 	usart->receiveStatus = PORT_FREE;
 	FIFO_Init(usart->transmitData);
-	FIFO_INIT(usart->receiveData);
+	FIFO_Init(usart->receiveData);
 	usart->transmitLen = 0;
-	usart->receviceLen = 0;
-	usart->USART->CR1 |= USART_CR1_TE | // Transmitter Enable
+	usart->receiveLen = 0;
+	usart->port->CR1 |= USART_CR1_TE | // Transmitter Enable
 		USART_CR1_IDLEIE |								// IDLE interrupt enable
 		USART_CR1_RXNEIE |  							// RXNE interrupt enable
 		USART_CR1_TCIE |									// Transmission complete interrupt enable
@@ -44,16 +44,16 @@ uint8_t USART_Transmit(USART_FullDuplex_t *usart, uint8_t *data, uint8_t len) {
 	usart->transmitStatus = PORT_IN_PROGRESS;
 	FIFO_PutMulti(usart->transmitData, data, len);
 	usart->transmitLen = len;
-	usart->USART->CR1 |= USART_CR1_TE;	// Transmitter Enable
+	usart->port->CR1 |= USART_CR1_TE;	// Transmitter Enable
 	return 1;
 	}
 
 uint8_t USART_Receive(USART_FullDuplex_t *usart, uint8_t *data) {  //читает из порта пока не будет тишина
 	if (usart->receiveStatus == PORT_DONE) {
-		uint8_t lenTmp = usart->receviceLen;
-		usart->receviceLen = 0;
+		uint8_t lenTmp = usart->receiveLen;
+		usart->receiveLen = 0;
 		FIFO_GetMulti(usart->receiveData, data, lenTmp);
-		usart->USART->CR1 |= USART_CR1_RE;  // Receiver Enable
+		usart->port->CR1 |= USART_CR1_RE;  // Receiver Enable
 		usart->receiveStatus = PORT_FREE;
 		return lenTmp;
 		}
@@ -64,44 +64,44 @@ void USART_Start_DMA(USART_FullDuplex_t *usart) {  //запускает обме
 	}
 
 void USART_EV_IRQ_CallBack(USART_FullDuplex_t *usart) {
-	volatile uint16_t SR = usart->USART->SR;  //read status register
+	volatile uint16_t SR = usart->port->SR;  //read status register
 	if (SR
 		& (USART_SR_RXNE | USART_SR_PE | USART_SR_IDLE | USART_SR_ORE | USART_SR_FE | USART_SR_NE)) {
 		//OverRun Error Noise Error   Framing Error
 		if (SR & (USART_SR_ORE | USART_SR_NE | USART_SR_FE)) {
-			(void)usart->USART->DR;
+			(void)usart->port->DR;
 			return;
 			}
 		}
 
 	if (SR & USART_SR_PE) {  //Parity Error
 		__NOP();
-		(void)usart->USART->DR;
+		(void)usart->port->DR;
 		return;
 		}
 	//-----------------------		Receive		---------------------------------
 	if (SR & USART_SR_IDLE) {  // IDLE line detected
 		__NOP();
-		(void)usart->USART->DR;
+		(void)usart->port->DR;
 		usart->receiveStatus = PORT_FREE;
 		return;
 		}
 	if (SR & USART_SR_RXNE) {  //Read Data Register Not Empty
 		__NOP();
-		FIFO_PutOne(usart->receiveData, usart->USART->DR);
-		++usart->receviceLen;
+		FIFO_PutOne(usart->receiveData, usart->port->DR);
+		++usart->receiveLen;
 		}
 	//-----------------------		Transmission		---------------------------------
 	if ((SR & USART_SR_TC) && (usart->transmitLen == 0)) {  // Transmission Complete, clear - write 0 to USART_SR_TC
-		usart->USART->SR = SR & (~USART_SR_TC);  //clear TC flag
-		usart->USART->CR1 &= ~(USART_CR1_TE | USART_CR1_TCIE);  //disable transmission and TC interrupt
+		usart->port->SR = SR & (~USART_SR_TC);  //clear TC flag
+		usart->port->CR1 &= ~(USART_CR1_TE | USART_CR1_TCIE);  //disable transmission and TC interrupt
 		usart->transmitStatus = PORT_FREE;
 		}
 	else if (SR & USART_SR_TXE) {  // Transmit Data Register Empty, clear - write DR
-		FIFO_GetOne(usart->transmitData, ((uint8_t *)&usart->USART->DR));
+		FIFO_GetOne(usart->transmitData, ((uint8_t *)&usart->port->DR));
 		--usart->transmitLen;
 		if (usart->transmitLen == 0) {  //send all byte
-			usart->USART->CR1 &= ~USART_CR1_TXEIE;  //disable TXE interrupt, goto TC flag
+			usart->port->CR1 &= ~USART_CR1_TXEIE;  //disable TXE interrupt, goto TC flag
 			}
 		}
 	}

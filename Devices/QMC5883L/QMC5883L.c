@@ -51,7 +51,7 @@ uint8_t QMC5883L_Init(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
 					break;
 				case 1: { //setup sensor gain and sample rate interrupt
 					uint8_t data[2];
-					data[0] = QMC5883L_MODE_CONTINUOUS | QMC5883L_ODR_50HZ | QMC5883L_RNG_2G | QMC5883L_SAMPLES_512;
+					data[0] = QMC5883L_MODE_CONTINUOUS | QMC5883L_ODR_50HZ | QMC5883L_RNG_8G | QMC5883L_SAMPLES_512;
 					data[1] = 0x00;
 					if (I2C_WriteBytes(_i2c, dev->addr, QMC5883L_REG_CFG_A, data, 2) && (_i2c->status == PORT_BUSY)) {
 						dev->status = DEVICE_DONE;

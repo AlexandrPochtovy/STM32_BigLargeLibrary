@@ -9,10 +9,11 @@
 
 //------------------------------------------------------------------------------
 // Includes
-
-#include <math.h> // M_PI, sqrtf, atan2f, asinf
-#include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
+#include <float.h> // FLT_MAX
+#include <math.h> // M_PI, sqrtf, atan2f, asinf, fabs
 
 //------------------------------------------------------------------------------
 // Definitions

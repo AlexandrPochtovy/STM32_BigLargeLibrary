@@ -66,17 +66,17 @@ uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 					break;
 					}
 				case 2:// setup samplerate
-					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_SMPLRT_DIV, 0x07) && (_i2c->status == PORT_BUSY)) {
+					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_SMPLRT_DIV, 0xFF) && (_i2c->status == PORT_BUSY)) {
 						dev->step = 3;
 						}
 					break;
 				case 3: //setup low-pass filter
-					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_DLPF_FS, ITG3205_DLPF_FS_SEL | ITG3205_DLPF_CFG_5Hz) && (_i2c->status == PORT_BUSY)) {
+					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_DLPF_FS, ITG3205_DLPF_FS_SEL | ITG3205_DLPF_CFG_256Hz) && (_i2c->status == PORT_BUSY)) {
 						dev->step = 4;
 						}
 					break;
 				case 4: // setup interrupt
-					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_INT_CFG, 0x00) && (_i2c->status == PORT_BUSY)) {
+					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_INT_CFG, ITG3205_INT_CFG_INT_ANYRD_2CLEAR) && (_i2c->status == PORT_BUSY)) {
 						dev->status = DEVICE_DONE;
 						}
 					break;

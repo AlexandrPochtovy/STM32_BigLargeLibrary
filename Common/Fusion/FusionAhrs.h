@@ -13,7 +13,7 @@
 
 #include "FusionConvention.h"
 #include "FusionMath.h"
-#include <stdbool.h>
+
 
 //------------------------------------------------------------------------------
 // Definitions

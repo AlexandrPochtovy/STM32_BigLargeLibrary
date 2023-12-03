@@ -76,10 +76,10 @@ uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 					data[6] = 0x00;	 // 0x23  window double-tap value 1.25 ms/bit
 					data[7] = 0xFF;	 // 0x24  threshold act value 62.5mg/bit = 16g
 					data[8] = 0x0F;	 // 0x25  threshold inact value 62.5mg/bit = 16g
-					data[9] = 0xFF;	 // 0x26  time inact value 1sec/bit = 15sec
+					data[9] = 0x0F;	 // 0x26  time inact value 1sec/bit = 15sec
 					data[10] = 0x00; // 0x27 axis act|inact control enable
 					data[11] = 0x07; // 0x28 free fall value detect 62.5mg/bit
-					data[12] = 0x20; // 0x29 free fall time 5 msec/bit = 200msec
+					data[12] = 0x28; // 0x29 free fall time 5 msec/bit = 200msec
 					data[13] = 0x00; // 0x2A disable TAP detection
 					if (I2C_WriteBytes(_i2c, dev->addr, ADXL345_THRESH_TAP_REG, data, 14) && (_i2c->status == PORT_BUSY)) {
 						dev->step = 2;
@@ -89,7 +89,7 @@ uint8_t ADXL345_Init(I2C_IRQ_Conn_t *_i2c, ADXL345_t *dev) {
 				case 2:
 					{ // setup power samplerate interrupt etc
 					uint8_t data[4] = { 0 };
-					data[0] = ADXL345_BW_25;																						// 0x2C
+					data[0] = ADXL345_BW_100;																						// 0x2C
 					data[1] = ADXL345_POWER_CTL_MEASURE | ADXL345_POWER_CTL_WAKEUP_8Hz; // 0x2D
 					data[2] = ADXL345_INT_ENABLE_DATA_READY;														// 0x2E
 					data[3] = (uint8_t)~ADXL345_INT_MAP_DATA_READY;											// 0x2F

@@ -32,17 +32,17 @@ extern "C" {
 #endif
 
   typedef struct USART_FullDuplex {
-    USART_TypeDef *USART;         //pointer to HW USART port
+    USART_TypeDef *port;         //pointer to HW USART port
     PortStatus_t transmitStatus;  //status USART port
     fifo_t *transmitData;         //pointer circular buffer
     uint8_t transmitLen;          //length data
     PortStatus_t receiveStatus;   //status USART port
     fifo_t *receiveData;          //pointer circular buffer
-    uint8_t receviceLen;          //length data
+    uint8_t receiveLen;          //length data
     } USART_FullDuplex_t;
 
   typedef struct USART_HalfDuplex {
-    USART_TypeDef *USART;         //pointer to HW USART port
+    USART_TypeDef *port;         //pointer to HW USART port
     PortStatus_t status;          //status USART port
     fifo_t *data;                 //pointer circular buffer
     uint8_t lenght;               //length data

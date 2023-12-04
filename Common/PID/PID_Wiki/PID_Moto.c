@@ -15,14 +15,20 @@ void PID_MotoInit(float kp, float ki, float kd, float fc, uint32_t dT, PID_M_t* 
 		float c = cosf(2 * M_PI * fn);
 		pid->alpha = c - 1 + sqrt(c * c - 4 * c + 3);
 		}
-	pid->intgErr = 0;
-	pid->oldErrFilter = 0;
+	pid->intgErr = 0.0f;
+	pid->oldErrFilter = 0.0f;
 	}
 
-size_t PID_MotoCalc(float sp, float act, size_t min, size_t max, uint32_t dT, PID_M_t* pid) {
+size_t PID_MotoProcessing(float sp, float act, size_t min, size_t max, uint32_t dT, PID_M_t* pid) {
 	float error = sp - act;// e[k] = r[k] - y[k], error between setpoint and true position
 	float errFilter = pid->alpha * error + (1 - pid->alpha) * pid->oldErrFilter;// e_f[k] = α e[k] + (1-α) e_f[k-1], filtered error
-	float derivative = (errFilter - pid->oldErrFilter) * 1000.0f / dT;// e_d[k] = (e_f[k] - e_f[k-1]) / Tₛ, filtered derivative
+	float derivative;
+	if (dT) {
+		derivative = (errFilter - pid->oldErrFilter) * 1000.0f / dT;// e_d[k] = (e_f[k] - e_f[k-1]) / Tₛ, filtered derivative
+		}
+	else {
+		derivative = 0.0f;
+		}
 	float actInt = pid->intgErr + error * dT / 1000.0f;// e_i[k+1] = e_i[k] + Tₛ e[k], integral
 	pid->out = pid->kp * error + pid->ki * pid->intgErr + pid->kd * derivative;// PID formula: u[k] = Kp e[k] + Ki e_i[k] + Kd e_d[k], control signal
 	if (pid->out <= min) {
@@ -59,7 +65,7 @@ void PID_MotoFilteredInit(float kp, float ki, float kd, uint8_t N, uint32_t dT, 
 	pid->kd_mem = pid->kd;
 	}
 
-size_t PID_MotoFilteredCalc(float sp, float act,  uint32_t dT, size_t min, size_t max, PID_MF_t* pid) {
+size_t PID_MotoFilteredProcessing(float sp, float act, uint32_t dT, size_t min, size_t max, PID_MF_t* pid) {
 	if ((pid->kp != pid->kp_mem) || (pid->ki != pid->ki_mem) || (pid->kd != pid->kd_mem)) {
 		float tmp = ( float )(pid->N * dT) / 1000.0f;
 		float b0 = pid->kp * pid->a[0] + pid->ki * dT * pid->a[0] / 1000.0f + pid->kd * pid->N;

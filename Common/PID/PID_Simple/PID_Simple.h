@@ -47,9 +47,13 @@ extern "C" {
     float Kp;
     float Ki;
     float Kd;
+    size_t dT;
     float a[3];
     float e[3];
     float out;
+    float Kp_mem;
+    float Ki_mem;
+    float Kd_mem;
     } pidS_t;
 
   /*****************************************************************
@@ -69,6 +73,7 @@ extern "C" {
     float kp;
     float ki;
     float kd;
+    size_t dT;
     uint8_t N;
     float kp_mem;
     float ki_mem;
@@ -91,7 +96,7 @@ extern "C" {
       @param *pid - pointer for pidS_t pid structure
     * @retval none
     */
-  void PidSimple_Init(float kp, float ki, float kd, size_t dT, pidS_t* pid);
+  void PidSimpleInit(float kp, float ki, float kd, size_t dT, pidS_t* pid);
 
   /*****************************************************************
     * @brief calculate the PID controller
@@ -102,7 +107,7 @@ extern "C" {
       @param *pid - pointer for pidS_t pid structure
     * @retval control value from pid
     */
-  size_t PidSimple_Processing(float sp, float act, size_t min, size_t max, pidS_t* pid);
+  size_t PidSimpleProcessing(float sp, float act, size_t min, size_t max, pidS_t* pid);
 
   /*****************************************************************
     * @brief init the PID controller: calculate coefficients and constants
@@ -114,7 +119,7 @@ extern "C" {
       @param *pid - pointer for pidS_t pid structure
     * @retval none
     */
-  void PidFiltered_Init(float kp, float ki, float kd, uint8_t N, size_t dT, pidF_t* pid);
+  void PidFilteredInit(float kp, float ki, float kd, uint8_t N, size_t dT, pidF_t* pid);
 
   /*****************************************************************
     * @brief calculate the PID controller
@@ -125,7 +130,7 @@ extern "C" {
       @param *pid - pointer for pidS_t pid structure
     * @retval control value from pid
     */
-  size_t PidFiltered_Processing(float sp, float act, size_t dT, size_t min, size_t max, pidF_t* pid);
+  size_t PidFilteredProcessing(float sp, float act, size_t dT, size_t min, size_t max, pidF_t* pid);
 
 
 #ifdef __cplusplus

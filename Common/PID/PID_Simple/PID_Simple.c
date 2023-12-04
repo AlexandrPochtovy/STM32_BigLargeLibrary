@@ -22,20 +22,39 @@
 
 #include "PID_Simple.h"
 
-void PidSimple_Init(float kp, float ki, float kd, size_t dT, pidS_t* pid) {
-    pid->Kp = kp;
-    pid->Ki = ki;
-    pid->Kd = kd;
-    pid->a[2] = pid->Kd * 1000 / dT;
+void PidSimpleInit(float kp, float ki, float kd, size_t dT, pidS_t* pid) {
+    pid->Kp_mem = pid->Kp = kp;
+    pid->Ki_mem = pid->Ki = ki;
+    pid->Kd_mem = pid->Kd = kd;
+    pid->dT = dT;
+    if (pid->dT) {
+        pid->a[2] = pid->Kd * 1000 / pid->dT;
+        }
+    else {
+        pid->a[2] = 0;
+        }
     pid->a[1] = -pid->Kp - 2 * pid->a[2];
-    pid->a[0] = pid->Kp + pid->Ki * dT + pid->a[2];
+    pid->a[0] = pid->Kp + pid->Ki * pid->dT + pid->a[2];
     pid->e[2] = 0.0;
     pid->e[1] = 0.0;
     pid->e[0] = 0.0;
     pid->out = 0.0;
     }
 
-size_t PidSimple_Processing(float sp, float actual, size_t min, size_t max, pidS_t* pid) {
+size_t PidSimpleProcessing(float sp, float actual, size_t min, size_t max, pidS_t* pid) {
+    if ((pid->Kp != pid->Kp_mem) || (pid->Ki != pid->Ki_mem) || (pid->Kd != pid->Kd_mem)) {
+        if (pid->dT) {
+            pid->a[2] = pid->Kd * 1000 / pid->dT;
+            }
+        else {
+            pid->a[2] = 0;
+            }
+        pid->a[1] = -pid->Kp - 2 * pid->a[2];
+        pid->a[0] = pid->Kp + pid->Ki * pid->dT + pid->a[2];
+        pid->Kp_mem = pid->Kp;
+        pid->Ki_mem = pid->Ki;
+        pid->Kd_mem = pid->Kd;
+        }
     pid->e[2] = pid->e[1];
     pid->e[1] = pid->e[0];
     pid->e[0] = sp - actual;
@@ -46,44 +65,65 @@ size_t PidSimple_Processing(float sp, float actual, size_t min, size_t max, pidS
     return ( size_t )pid->out;
     }
 
-void PidFiltered_Init(float kp, float ki, float kd, uint8_t N, size_t dT, pidF_t* pid) {
-    pid->kp = kp;
-    pid->ki = ki;
-    pid->kd = kd;
+void PidFilteredInit(float kp, float ki, float kd, uint8_t N, size_t dT, pidF_t* pid) {
+    pid->kp_mem = pid->kp = kp;
+    pid->ki_mem = pid->ki = ki;
+    pid->kd_mem = pid->kd = kd;
+    pid->dT = dT;
+    pid->N = N;
     pid->a = kp + ki * dT / 1000;
     pid->e[2] = 0;
     pid->e[1] = 0;
     pid->e[0] = 0;
-    pid->out = 0;  //the current value of the actuator
-    pid->ad[0] = kd * 1000 / dT;
-    pid->ad[1] = -2.0 * pid->ad[0];
-    float tau = kd / (kp * N); // IIR filter time constant
-    pid->alpha = dT / (2 * 1000 * tau);
+    if (dT) {
+        pid->ad[0] = kd * 1000 / dT;
+        pid->ad[1] = -2.0 * pid->ad[0];
+        }
+    else {
+        pid->ad[0] = 0.0f;
+        pid->ad[1] = 0.0f;
+        }
+    if (N) {
+        float tau = kd / (kp * N); // IIR filter time constant
+        pid->alpha = dT / (2 * 1000 * tau);
+        }
+    else {
+        pid->alpha = 0.0f;
+        }
     pid->d[0] = 0;
     pid->d[1] = 0;
     pid->fd[0] = 0;
     pid->fd[1] = 0;
-    pid->out = 0;
-    pid->kp_mem = pid->kp;
-    pid->ki_mem = pid->ki;
-    pid->kd_mem = pid->kd;
-    pid->N = N;
+    pid->out = 0;//the current value of the actuator
     }
 
-size_t PidFiltered_Processing(float sp, float act, size_t dT, size_t min, size_t max, pidF_t* pid) {
-    if ((pid->kp != pid->kp_mem) || (pid->ki != pid->ki_mem) || (pid->kd != pid->kd_mem)) {
-        pid->a = pid->kp + pid->ki * dT / 1000;
-        pid->ad[0] = pid->kd * 1000 / dT;
-        pid->ad[1] = -2.0 * pid->ad[0];
-        float tau = pid->kd / (pid->kp * pid->N); // IIR filter time constant
-        pid->alpha = dT / (2 * 1000 * tau);
-        //pid->d[0] = 0;
-        //pid->d[1] = 0;
-        //pid->fd[0] = 0;
-        //pid->fd[1] = 0;
+size_t PidFilteredProcessing(float sp, float act, size_t dT, size_t min, size_t max, pidF_t* pid) {
+    if ((pid->kp != pid->kp_mem) || (pid->ki != pid->ki_mem) || (pid->kd != pid->kd_mem) || (pid->dT != dT)) {
+        pid->dT = dT;
         pid->kp_mem = pid->kp;
         pid->ki_mem = pid->ki;
         pid->kd_mem = pid->kd;
+        pid->dT = dT;
+        pid->a = pid->kp + pid->ki * pid->dT / 1000;
+        if (pid->dT) {
+            pid->ad[0] = pid->kd * 1000 / pid->dT;
+            pid->ad[1] = -2.0 * pid->ad[0];
+            }
+        else {
+            pid->ad[0] = 0.0f;
+            pid->ad[1] = 0.0f;
+            }
+        if (pid->N) {
+            float tau = pid->kd / (pid->kp * pid->N); // IIR filter time constant
+            pid->alpha = pid->dT / (2 * 1000 * tau);
+            }
+        else {
+            pid->alpha = 0.0f;
+            }
+        pid->d[0] = 0.0f;
+        pid->d[1] = 0.0f;
+        pid->fd[0] = 0.0f;
+        pid->fd[1] = 0.0f;
         }
     pid->e[2] = pid->e[1];
     pid->e[1] = pid->e[0];

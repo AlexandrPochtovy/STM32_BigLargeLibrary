@@ -103,9 +103,9 @@ uint8_t QMC5883L_GetData(I2C_IRQ_Conn_t *_i2c, QMC5883L_t *dev) {
 				dev->raw.X = (int16_t)(CONCAT_TWO_BYTES(dt[1], dt[0]));
 				dev->raw.Y = (int16_t)(CONCAT_TWO_BYTES(dt[3], dt[2]));
 				dev->raw.Z = (int16_t)(CONCAT_TWO_BYTES(dt[5], dt[4]));
-				dev->data.X = (float)dev->raw.X * QMC5883L_LSB_2G / 32768;
-				dev->data.Y = (float)dev->raw.Y * QMC5883L_LSB_2G / 32768;
-				dev->data.Z = (float)dev->raw.Z * QMC5883L_LSB_2G / 32768;
+				dev->data.X = (float)dev->raw.X * QMC5883L_LSB_8G / 32768;
+				dev->data.Y = (float)dev->raw.Y * QMC5883L_LSB_8G / 32768;
+				dev->data.Z = (float)dev->raw.Z * QMC5883L_LSB_8G / 32768;
 				dev->status = DEVICE_DONE;
 				}
 			else if (_i2c->status == PORT_ERROR) {

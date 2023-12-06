@@ -39,6 +39,7 @@ typedef enum direction {
 
 typedef struct Wheel {
 	direction_t direction;
+	uint32_t pulses;
 	float speedSP;
 	float speedAct;
 	} Wheel_t;

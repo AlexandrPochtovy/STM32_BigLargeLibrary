@@ -47,6 +47,13 @@ size_t Min(size_t val, size_t min);
 size_t Max(size_t val, size_t max);
 
 /*****************************************************************
+  * @brief limit value between min and max
+  * @param value, max
+  * @retval max
+  */
+size_t LimitValue(size_t val, size_t min, size_t max);
+
+/*****************************************************************
   * @brief  concat two bytes into 16bits value
   * @param  msb - hi byte
   * 				lsb - low byte
@@ -124,6 +131,8 @@ float sigmoida_zero(float x, float a);
 uint16_t alphabeta(uint16_t act, uint16_t last, uint8_t deep);
 
 size_t SimpleRamp_IT(size_t actual, size_t SP, size_t min, size_t max, size_t step);
+
+size_t CurveRamp_IT(size_t actual, size_t SP, size_t min, size_t max);
 
 #ifdef __cplusplus
 }

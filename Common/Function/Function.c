@@ -27,7 +27,9 @@ size_t Max(size_t val, size_t max) {
 	return (val < max ? val : max);
 	}
 
-
+size_t LimitValue(size_t val, size_t min, size_t max) {
+	return (val > min ? (val < max ? val : max) : min);
+}
 
 size_t CONCAT_FOUR_BYTES(uint8_t msbh, uint8_t msb, uint8_t lsbh, uint8_t lsb) {
 	return ((size_t)msbh << 24) | ((size_t)msb << 16) | ((size_t)lsbh << 8) | (size_t)lsb;
@@ -90,6 +92,30 @@ size_t SimpleRamp_IT(size_t actual, size_t SP, size_t min, size_t max, size_t st
 			}
 		}
 	else if (SP < actual) {
+		if (actual >= (min + step)) {
+			return actual - step;
+			}
+		else {
+			return min;
+			}
+		}
+	else {
+		return actual;
+		}
+	}
+
+size_t CurveRamp_IT(size_t actual, size_t SP, size_t min, size_t max) {
+	if (SP > actual) {
+		size_t step = (SP - actual) / 64 + 1;
+		if (actual <= (max - step)) {
+			return actual + step;
+			}
+		else {
+			return max;
+			}
+		}
+	else if (SP < actual) {
+		size_t step = (actual - SP) / 64 + 1;
 		if (actual >= (min + step)) {
 			return actual - step;
 			}

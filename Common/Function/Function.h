@@ -134,6 +134,8 @@ size_t SimpleRamp_IT(size_t actual, size_t SP, size_t min, size_t max, size_t st
 
 size_t CurveRamp_IT(size_t actual, size_t SP, size_t min, size_t max);
 
+float MovingAverageFilter(float act, float last, float k);
+
 #ifdef __cplusplus
 }
 #endif

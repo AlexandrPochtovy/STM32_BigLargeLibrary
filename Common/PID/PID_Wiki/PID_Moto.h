@@ -65,7 +65,7 @@ typedef struct PID_MF {
   @param *pid - pointer for pidS_t pid structure
   @retval none
   */
-void PID_MotoInit(float kp, float ki, float kd, float fc, uint32_t dT, PID_M_t* pid);
+void PID_MotoInit(float kp, float ki, float kd, uint32_t dT, PID_M_t* pid);
 
 /*****************************************************************
   @brief calculate the PID controller

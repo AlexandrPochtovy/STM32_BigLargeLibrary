@@ -98,12 +98,13 @@ void PidFilteredInit(float kp, float ki, float kd, uint8_t N, size_t dT, pidF_t*
     }
 
 size_t PidFilteredProcessing(float sp, float act, size_t dT, size_t min, size_t max, pidF_t* pid) {
-    if ((pid->kp != pid->kp_mem) || (pid->ki != pid->ki_mem) || (pid->kd != pid->kd_mem) || (pid->dT != dT)) {
+    if ((pid->kp != pid->kp_mem) || (pid->ki != pid->ki_mem) ||
+    		(pid->kd != pid->kd_mem) || (pid->dT != dT) || (pid->N != pid->N_mem)) {
         pid->dT = dT;
         pid->kp_mem = pid->kp;
         pid->ki_mem = pid->ki;
         pid->kd_mem = pid->kd;
-        pid->dT = dT;
+        pid->N_mem = pid->N;
         pid->a = pid->kp + pid->ki * pid->dT / 1000;
         if (pid->dT) {
             pid->ad[0] = pid->kd * 1000 / pid->dT;
@@ -133,6 +134,9 @@ size_t PidFilteredProcessing(float sp, float act, size_t dT, size_t min, size_t 
     pid->d[0] = pid->ad[0] * pid->e[0] + pid->ad[1] * pid->e[1] + pid->ad[0] * pid->e[2];
     pid->fd[1] = pid->fd[0];
     pid->fd[0] = ((pid->alpha) / (pid->alpha + 1)) * (pid->d[0] + pid->d[1]) - ((pid->alpha - 1) / (pid->alpha + 1)) * pid->fd[1];
+    if (pid->fd[0] < 0.0001f) {
+    	pid->fd[0] = 0.0f;
+    }
     pid->out = pid->out + pid->fd[0];
     if (pid->out < min) {
         pid->out = min;

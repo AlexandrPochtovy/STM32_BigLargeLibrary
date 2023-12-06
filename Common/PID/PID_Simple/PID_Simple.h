@@ -78,6 +78,7 @@ extern "C" {
     float kp_mem;
     float ki_mem;
     float kd_mem;
+    uint8_t N_mem;
     float a;
     float ad[2];
     float alpha;

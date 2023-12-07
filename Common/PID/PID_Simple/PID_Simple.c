@@ -34,7 +34,7 @@ void PidSimpleInit(float kp, float ki, float kd, size_t dT, pidS_t* pid) {
         pid->a[2] = 0;
         }
     pid->a[1] = -pid->Kp - 2 * pid->a[2];
-    pid->a[0] = pid->Kp + pid->Ki * pid->dT + pid->a[2];
+    pid->a[0] = kp + ki * dT + pid->a[2];
     pid->e[2] = 0.0;
     pid->e[1] = 0.0;
     pid->e[0] = 0.0;
@@ -60,7 +60,7 @@ size_t PidSimpleProcessing(float sp, float actual, size_t min, size_t max, pidS_
     pid->e[0] = sp - actual;
     pid->out = pid->out + pid->a[0] * pid->e[0] + pid->a[1] * pid->e[1] + pid->a[2] * pid->e[2];
     //out limit
-    if (pid->out < min) { pid->out = min; }
+    if ((pid->out < min) || (sp <= 0.001f)) { pid->out = min; }
     else if (pid->out > max) { pid->out = max; }
     return ( size_t )pid->out;
     }
@@ -99,7 +99,7 @@ void PidFilteredInit(float kp, float ki, float kd, uint8_t N, size_t dT, pidF_t*
 
 size_t PidFilteredProcessing(float sp, float act, size_t dT, size_t min, size_t max, pidF_t* pid) {
     if ((pid->kp != pid->kp_mem) || (pid->ki != pid->ki_mem) ||
-    		(pid->kd != pid->kd_mem) || (pid->dT != dT) || (pid->N != pid->N_mem)) {
+            (pid->kd != pid->kd_mem) || (pid->dT != dT) || (pid->N != pid->N_mem)) {
         pid->dT = dT;
         pid->kp_mem = pid->kp;
         pid->ki_mem = pid->ki;
@@ -134,9 +134,9 @@ size_t PidFilteredProcessing(float sp, float act, size_t dT, size_t min, size_t 
     pid->d[0] = pid->ad[0] * pid->e[0] + pid->ad[1] * pid->e[1] + pid->ad[0] * pid->e[2];
     pid->fd[1] = pid->fd[0];
     pid->fd[0] = ((pid->alpha) / (pid->alpha + 1)) * (pid->d[0] + pid->d[1]) - ((pid->alpha - 1) / (pid->alpha + 1)) * pid->fd[1];
-    if (pid->fd[0] < 0.0001f) {
-    	pid->fd[0] = 0.0f;
-    }
+    if (pid->fd[0] < 0.001f) {
+        pid->fd[0] = 0.0f;
+        }
     pid->out = pid->out + pid->fd[0];
     if (pid->out < min) {
         pid->out = min;

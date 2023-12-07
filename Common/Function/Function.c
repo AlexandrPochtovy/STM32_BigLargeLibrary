@@ -128,6 +128,3 @@ size_t CurveRamp_IT(size_t actual, size_t SP, size_t min, size_t max) {
 		}
 	}
 
-float MovingAverageFilter(float act, float last, float k) {
-	return last + (act - last) * k;
-	}

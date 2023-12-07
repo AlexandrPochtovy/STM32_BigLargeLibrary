@@ -18,17 +18,34 @@
  * Created on: Nov 30, 2023
  ********************************************************************************/
 
+ /*packet data format:
+ byte[0]     synchro-byte
+ byte[1]     command
+ byte[2]     packet number
+ byte[3]     packet length
+ byte[4..n]  valid data, no bytes if HELLO command use
+ byte[n-4]   CRC32
+ */
+
 #include "CommandProcessing.h"
 
 static ConnectionMode_t step = BEGIN;
 static uint8_t buffer[255];
 
-void RequestProcessing(USART_FullDuplex_t *usart) {
+uint8_t CheckCRC32(uint8_t* data, uint8_t len) {
+	uint32_t crc32Calc = F4xx_HW_CRC32(CRC1, ( uint32_t* )&data, len - 4);
+	uint32_t crcShift = ( uint32_t* )&buffer[len - 4];
+	return crc32Calc == crcShift;
+	}
+
+uint8_t AddCRC32(uint8_t* data, uint8_t len) {//TODO check pointers!
+	uint32_t crc32Calc = F4xx_HW_CRC32(CRC1, ( uint32_t* )&data, len - 4);
+	data[len - 4] = crc32Calc;
+	return 1;
+	}
+
+void RequestProcessing(USART_FullDuplex_t* usart) {
 	uint8_t len;
-	union crc32check {
-		uint32_t crc32;
-		uint8_t value[4];
-		} crcData;
 	if (step == BEGIN) { //start communications
 		USART_ProcessingEnable(usart);
 		step = LISTENING;
@@ -40,31 +57,42 @@ void RequestProcessing(USART_FullDuplex_t *usart) {
 			}
 		}
 	if (step == REQUEST_PROCESSING) {
-		if (buffer[0] == COMMAND_START_BYTE) {
-			crcData.crc32 = F4xx_HW_CRC32(CRC1, (uint32_t *)&buffer, len - 4);
-			uint32_t crc = (uint32_t *)&buffer[len - 4];
-			if (crc == crcData.crc32) {//crc valid
-				buffer[0] = COMMAND_ACCEPT_BYTE;
-				buffer[2] += 1;
-				switch (buffer[1]) {
-					case /* constant-expression */:
-						/* code */
-						break;
+		if ((buffer[0] == COMMAND_START_BYTE) && (CheckCRC32(&buffer, len))) {
+			switch (buffer[1]) {
+				case COMMAND_HELLO:
+					;
+					break;
+				case COMMAND_READ_SENSOR:
+					;
+					break;
+				case READ_DRIVE_DATA:
 
-					default:
-						break;
-					}
-				}
-			else {//TODO add send "crc invalid"
-				step = LISTENING;
+					break;
+				case READ_OTHER_DATA:
+
+					break;
+				case READ_SETTINGS:
+
+					break;
+				case WRITE_SETTINGS:
+
+					break;
+				case COMMAND_NOOP:
+
+					break;
+				default:
+					break;
 				}
 			}
-		else {//TODO add send "wrong start byte"
-			step = LISTENING;
+		else {//send NOOP if wrong start byte or bad crc32
+			buffer[1] = COMMAND_NOOP;
+			len = 4;
 			}
-		}
-	if (step == PACKET_CREATE) {
-
+		buffer[0] = COMMAND_ACCEPT_BYTE;
+		buffer[2] += 1;
+		buffer[3] = len;
+		AddCRC32(&buffer, len);
+		step = SENDING;
 		}
 	if (step == SENDING) {
 		if (USART_Transmit(usart, &buffer, len)) {

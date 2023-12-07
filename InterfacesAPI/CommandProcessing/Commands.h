@@ -19,15 +19,6 @@
  ********************************************************************************/
 #include <stdint.h>
 
- /*packet data format:
- byte[0]     synchro-byte
- byte[1]     command
- byte[2]     packet number
- byte[3]     packet length
- byte[4..n]  valid data, no bytes if HELLO command use
- byte[n-4]   CRC32
- */
-
  /*	Commands
 		HELLO((byte) 0x00),
 		READ_SENSOR((byte) 0x01),
@@ -41,10 +32,11 @@
 #define COMMAND_ACCEPT_BYTE (uint8_t)0x55
 
 typedef enum Commands {
-	HELLO = (uint8_t)0x00,
-	READ_SENSOR = (uint8_t)0x01,
+	COMMAND_HELLO = (uint8_t)0x00,
+	COMMAND_READ_SENSOR = (uint8_t)0x01,
 	READ_DRIVE_DATA = (uint8_t)0x02,
 	READ_OTHER_DATA = (uint8_t)0x03,
 	READ_SETTINGS = (uint8_t)0x04,
-	WRITE_SETTINGS = (uint8_t)0x05
+	WRITE_SETTINGS = (uint8_t)0x05,
+	COMMAND_NOOP = (uint8_t)0xFF
 	} Commands_t;

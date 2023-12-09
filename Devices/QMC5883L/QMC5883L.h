@@ -24,6 +24,7 @@
 extern "C" {
 #endif
 
+#include "Function/Function.h"
 #include "QMC5883L_Register.h"
 #include "I2C_API.h"
 

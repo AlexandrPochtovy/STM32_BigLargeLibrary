@@ -26,9 +26,14 @@
 
 #ifndef _FUNCTION_H_
 static inline uint16_t CONCAT_BYTES(uint8_t msb, uint8_t lsb) {
-	return (uint16_t)(((uint16_t)msb << 8) | (uint16_t)lsb);
+	return (((uint16_t)msb << 8) | (uint16_t)lsb);
 	}
+
+static inline int16_t Convert(uint16_t val) {
+	return 0x8000 & val ? (~(0x7FFF & val) + 1) : val;
+}
 #endif
+
 
 uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 	switch (dev->status) {
@@ -61,17 +66,17 @@ uint8_t ITG3205_Init(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 					break;
 					}
 				case 2:// setup samplerate
-					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_SMPLRT_DIV, 0x07) && (_i2c->status == PORT_BUSY)) {
+					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_SMPLRT_DIV, 0xFF) && (_i2c->status == PORT_BUSY)) {
 						dev->step = 3;
 						}
 					break;
 				case 3: //setup low-pass filter
-					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_DLPF_FS, ITG3205_DLPF_FS_SEL | ITG3205_DLPF_CFG_5Hz) && (_i2c->status == PORT_BUSY)) {
+					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_DLPF_FS, ITG3205_DLPF_FS_SEL | ITG3205_DLPF_CFG_256Hz) && (_i2c->status == PORT_BUSY)) {
 						dev->step = 4;
 						}
 					break;
 				case 4: // setup interrupt
-					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_INT_CFG, 0x00) && (_i2c->status == PORT_BUSY)) {
+					if (I2C_WriteOneByte(_i2c, dev->addr, ITG3205_INT_CFG, ITG3205_INT_CFG_INT_ANYRD_2CLEAR) && (_i2c->status == PORT_BUSY)) {
 						dev->status = DEVICE_DONE;
 						}
 					break;
@@ -117,10 +122,14 @@ uint8_t ITG3205_GetData(I2C_IRQ_Conn_t *_i2c, ITG3205_t *dev) {
 		case DEVICE_PROCESSING: {
 			uint8_t dt[ITG3205_DATA_LEN];
 			if (I2C_ReadBytes(_i2c, dev->addr, ITG3205_TEMP_OUT_H, dt, ITG3205_DATA_LEN) && (_i2c->status == PORT_BUSY)) {
-				dev->raw.temp = (int16_t)CONCAT_BYTES(dt[0], dt[1]);
-				dev->raw.X = (int16_t)CONCAT_BYTES(dt[2], dt[3]);
-				dev->raw.Y = (int16_t)CONCAT_BYTES(dt[4], dt[5]);
-				dev->raw.Z = (int16_t)CONCAT_BYTES(dt[6], dt[7]);
+				uint16_t tmp = CONCAT_TWO_BYTES(dt[0], dt[1]);
+				dev->raw.temp = (int16_t)(tmp);
+				tmp = CONCAT_TWO_BYTES(dt[2], dt[3]);
+				dev->raw.X = (int16_t)(tmp);
+				tmp = CONCAT_TWO_BYTES(dt[4], dt[5]);
+				dev->raw.Y = (int16_t)(tmp);
+				tmp = CONCAT_TWO_BYTES(dt[6], dt[7]);
+				dev->raw.Z = (int16_t)(tmp);
 				dev->data.temp = 35 + ((float)(dev->raw.temp + 13200)) / Chip_TEMP_LSB;
 				dev->data.X = (float)dev->raw.X / Chip_GYRO_LSB * M_PI / 180;
 				dev->data.Y = (float)dev->raw.Y / Chip_GYRO_LSB * M_PI / 180;

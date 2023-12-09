@@ -18,10 +18,11 @@
  * Created on: Sep 16, 2023
 *********************************************************************************/
 
-#include "stdint.h"
-#include "stddef.h"
-#include "math.h"
+#include <stdint.h>
+#include <stddef.h>
+#include <math.h>
 #include "Function/Function.h"
+#include "Buffers/FILObuffer/FILObuffer.h"
 #include "PID/PID_Wiki/PID_Moto.h"
 
 #define WHEEL_RAD_mm	    	24u						// wheel radius in mm
@@ -30,6 +31,7 @@
 #define WALL_LIMIT_mm	      300u					// permissible distance to object in mm
 #define K_I				          10u						// integral coefficient
 #define ERROR_mm 		        (BASE_mm / 2)	// position error in mm
+#define kDI_step						0.1f
 
 typedef enum direction {
 	STOP,
@@ -80,9 +82,8 @@ typedef struct Drive {
 	setPoint_t SP;		//заданнные значения для движения
 	} Drive_t;
 
-
 //TODO продумать корректную систему проверки перехода через 0 и максимум энкодера при смене направления вращения колеса
 float WheelSpeedMeasure(uint32_t deltaPulse, uint32_t deltaTime);
-//TODO продумать гистерезис чтобы не было колебаний скорости в граничных точках
+
 size_t WheelSpeedZeroLimiter(size_t act, size_t sp, size_t low, size_t hi);
 
